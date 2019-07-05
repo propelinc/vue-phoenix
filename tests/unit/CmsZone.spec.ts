@@ -2,8 +2,8 @@ import { shallowMount, mount, createLocalVue } from '@vue/test-utils';
 import { compileToFunctions } from 'vue-template-compiler';
 import Vue from 'vue';
 
-import cmsClient, { Content } from '@/cmsHttp';
-import CmsPlugin from '@/index';
+import cmsClient from '@/cmsHttp';
+import CmsPlugin, { Content } from '@/main';
 import CmsZone from '@/components/CmsZone.vue';
 
 Vue.compile = compileToFunctions;

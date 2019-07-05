@@ -63,8 +63,8 @@
 import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
 
 import { isEqual } from 'lodash';
-import cmsClient, { Content } from '../cmsHttp';
-import CmsPlugin from '../index';
+import cmsClient from '../cmsHttp';
+import CmsPlugin, { Content } from '../main';
 import CmsContent from './CmsContent';
 
 const durationVisibleToBeTrackedMs = 1000;
