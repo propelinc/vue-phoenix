@@ -7,10 +7,6 @@ const localVue = createLocalVue();
 
 describe('CmsZone.vue', (): void => {
 
-  beforeEach((): void => {
-    // bus.setRoot(new Vue());
-  });
-
   it('content-for specifies yield-to', async (): Promise<void> => {
     const component = Vue.extend({
       components: { ContentFor, YieldTo },

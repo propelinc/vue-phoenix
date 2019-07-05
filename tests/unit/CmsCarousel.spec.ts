@@ -4,10 +4,6 @@ import CmsCarousel from '@/components/CmsCarousel.vue';
 const localVue = createLocalVue();
 
 describe('CmsCarousel.vue', (): void => {
-  beforeEach((): void => {
-    // bus.setRoot(new Vue());
-  });
-
   it('uses the default slot to make a slick carousel', async (): Promise<void> => {
     const wrapper = mount(CmsCarousel, {
       localVue,
