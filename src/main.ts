@@ -59,12 +59,11 @@ export interface CmsOptions {
   checkConnection?: (() => boolean);
 }
 
-export interface CmsPlugin extends CmsOptions {
-  install: (Vue: typeof _Vue, options?: CmsOptions) => void;
-  checkConnection: () => boolean;
+export interface PluginOptions extends CmsOptions {
+  checkConnection: (() => boolean);
 }
 
-export default {
+export const pluginOptions: PluginOptions = {
   baseUrl: '.',
   checkConnection() {
     return navigator.onLine;
@@ -79,40 +78,43 @@ export default {
   getSiteVars(): object {
     return {};
   },
-  install(Vue: typeof _Vue, options?: CmsOptions): void {
-    Object.assign(this, options);
-    Vue.component('yield-to', YieldTo);
-    Vue.component('content-for', ContentFor);
-    Vue.component('cms-content', CmsContent);
-    Vue.component('cms-carousel', CmsCarousel);
-    Vue.component('cms-zone', CmsZone);
+};
 
-    /**
-     * Directive used to track impressions on a zone.
-     *
-     * Example usage:
-     * <div v-cms-track-zone="5">Click me</div>
-     */
-    Vue.directive('cms-track-zone', {
-      bind (el: DestroyHTMLElement, binding: DirectiveBinding, vnode: VNode) {
-        const handler = () => {
-          if (vnode.context && vnode.context.$root) {
-            vnode.context.$root.$emit(`cms.track.${binding.value}`);
-          }
-        };
-        el.addEventListener('click', handler);
-        el.$destroy = () => el.removeEventListener('click', handler);
-      },
-      unbind(el: DestroyHTMLElement) {
-        el.$destroy();
-      },
+const plugin = function install(Vue: typeof _Vue, options?: CmsOptions) {
+  Object.assign(pluginOptions, options);
+  Vue.component('yield-to', YieldTo);
+  Vue.component('content-for', ContentFor);
+  Vue.component('cms-content', CmsContent);
+  Vue.component('cms-carousel', CmsCarousel);
+  Vue.component('cms-zone', CmsZone);
+
+  /**
+   * Directive used to track impressions on a zone.
+   *
+   * Example usage:
+   * <div v-cms-track-zone="5">Click me</div>
+   */
+  Vue.directive('cms-track-zone', {
+    bind (el: DestroyHTMLElement, binding: DirectiveBinding, vnode: VNode) {
+      const handler = () => {
+        if (vnode.context && vnode.context.$root) {
+          vnode.context.$root.$emit(`cms.track.${binding.value}`);
+        }
+      };
+      el.addEventListener('click', handler);
+      el.$destroy = () => el.removeEventListener('click', handler);
+    },
+    unbind(el: DestroyHTMLElement) {
+      el.$destroy();
+    },
+  });
+
+  if (options && options.router) {
+    const router = options.router;
+    router.afterEach(() => {
+      router.app.$emit('router.change', window.location.hash);
     });
+  }
+};
 
-    if (options && options.router) {
-      const router = options.router;
-      router.afterEach(() => {
-        router.app.$emit('router.change', window.location.hash);
-      });
-    }
-  },
-} as CmsPlugin;
+export default { install: plugin };

@@ -1,26 +1,34 @@
-import Axios from 'axios';
-import CmsPlugin, { Content } from './main';
-
-const axios = Axios.create({
-  baseURL: CmsPlugin.baseUrl,
-  timeout: 30 * 1000, // Timeout
-});
+import Axios, { AxiosInstance } from 'axios';
+import { pluginOptions, Content } from './main';
 
 class CmsClient {
+
+  private _axios: null | AxiosInstance = null;
+
+  get axios(): AxiosInstance {
+    if (!this._axios) {
+      this._axios = Axios.create({
+        baseURL: pluginOptions.baseUrl,
+        timeout: 30 * 1000, // Timeout
+      });
+    }
+    return this._axios;
+  }
+
   async http({ zoneId, url, params }: { zoneId: string, url: string, params?: object }) {
-    const captable = CmsPlugin.getCaptable();
+    const captable = pluginOptions.getCaptable();
     const zoneCaptable = captable[zoneId];
     const headers = zoneCaptable ? { Captable: zoneCaptable } : {};
-    const response = await axios.get(url, { params, headers });
+    const response = await this.axios.get(url, { params, headers });
     if (response.data && response.data.captable) {
-      CmsPlugin.setCaptable({ zoneId, captable: response.data.captable });
+      pluginOptions.setCaptable({ zoneId, captable: response.data.captable });
     }
     return response;
   }
 
   async fetchZone({ zoneId, extra }: { zoneId: string, extra: object }) {
-    if (CmsPlugin.beforeFetchZone) {
-      await CmsPlugin.beforeFetchZone();
+    if (pluginOptions.beforeFetchZone) {
+      await pluginOptions.beforeFetchZone();
     }
 
     return this.http({
@@ -28,7 +36,7 @@ class CmsClient {
       url: `/cms/zone/${zoneId}`,
       params: {
         cb: Math.floor(Math.random() * 999999999),
-        ...CmsPlugin.getSiteVars(),
+        ...pluginOptions.getSiteVars(),
         ...extra,
       },
     });

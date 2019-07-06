@@ -64,8 +64,9 @@ import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
 
 import { isEqual } from 'lodash';
 import cmsClient from '../cmsHttp';
-import CmsPlugin, { Content } from '../main';
+import { pluginOptions, Content } from '../main';
 import CmsContent from './CmsContent';
+import CmsCarousel from './CmsCarousel.vue';
 
 const durationVisibleToBeTrackedMs = 1000;
 const percentVisible = 50;
@@ -80,7 +81,10 @@ export function getClosest(elm: Element, selector: string): HTMLElement | null {
   return null;
 }
 
-@Component({ components: { CmsContent } })
+@Component({
+  name: 'cms-zone',
+  components: { CmsCarousel, CmsContent },
+})
 export default class CmsZone extends Vue {
   @Prop(String) public zoneId!: string;
   @Prop(Object) public extra!: {};
@@ -133,7 +137,7 @@ export default class CmsZone extends Vue {
   }
 
   private async refresh(): Promise<void> {
-    if (!CmsPlugin.checkConnection()) {
+    if (!pluginOptions.checkConnection()) {
       this.$el.classList.add('cms-zone-offline');
       this.$el.classList.remove('cms-zone-error');
       this.$el.classList.remove('cms-zone-loading');
