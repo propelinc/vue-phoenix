@@ -1,4 +1,4 @@
-import Vue, { PluginFunction } from 'vue';
+import Vue from 'vue';
 
 import CmsPlugin, { CmsOptions } from './main';
 
