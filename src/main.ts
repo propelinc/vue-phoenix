@@ -57,6 +57,7 @@ export interface CmsOptions {
   /* eslint-disable-next-line @propelinc/no-explicit-any */
   beforeFetchZone?: null | (() => Promise<any>);
   checkConnection?: (() => boolean);
+  onCarouselSwipe?: ((zoneId: string, index: number) => void);
 }
 
 export interface PluginOptions extends CmsOptions {
@@ -69,11 +70,14 @@ export const pluginOptions: PluginOptions = {
     return navigator.onLine;
   },
   setCaptable(captable: Captable) {
-    console.info('Did not set captable', captable);
-    throw new Error('Not implemented');
+    localStorage.setItem('captable', JSON.stringify(captable));
   },
   getCaptable(): Captable {
-    throw new Error('Not implemented');
+    try {
+      return JSON.parse(localStorage.getItem('captable'));
+    } catch(e) {
+      return {};
+    }
   },
   getSiteVars(): object {
     return {};
