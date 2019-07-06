@@ -1,11 +1,9 @@
-import Vue, { PluginFunction } from 'vue'
-import Router from 'vue-router';
+import Vue, { PluginFunction } from 'vue';
 
-import CmsPlugin, { CmsOptions as _CmsOptions } from './main';
-export { Content, HTMLContent, Captable, ZoneCaptable, CmsOptions } from './main';
+import CmsPlugin, { CmsOptions } from './main';
+
+declare module 'vue/types/options' {
+  interface ComponentOptions<V extends Vue> extends CmsOptions {}
+}
 
 export default CmsPlugin;
-
-// declare module 'vue/types/options' {
-//   interface ComponentOptions<V extends Vue> extends _CmsOptions {}
-// }
