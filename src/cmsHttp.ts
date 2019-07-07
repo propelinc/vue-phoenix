@@ -1,9 +1,21 @@
 import Axios, { AxiosInstance } from 'axios';
 import { pluginOptions, Content } from './main';
 
+interface CmsStyleSheet {
+  url: string;
+  css_hash: string;
+  sheet?: HTMLLinkElement;
+}
+
 class CmsClient {
 
   private _axios: null | AxiosInstance = null;
+
+  private cssUpdatedAt = 0;
+
+  private stylesheets: { [key: string]: CmsStyleSheet } = {};
+
+  private globalCssPromise: Promise<void> | null = null;
 
   get axios(): AxiosInstance {
     if (!this._axios) {
@@ -26,10 +38,64 @@ class CmsClient {
     return response;
   }
 
+  async fetchGlobalStyles() {
+    const now = new Date().getTime();
+    if (this.cssUpdatedAt && this.cssUpdatedAt + pluginOptions.globalCssCacheMs > now) {
+      return;
+    }
+
+    if (!this.globalCssPromise) {
+      console.info('Fetching global CMS styles');
+      this.globalCssPromise = this.axios.get('/cms/styles')
+        // eslint-disable-next-line @propelinc/no-explicit-any
+        .then((response: any): void => {
+          response.data.styles.forEach((stylesheet: CmsStyleSheet) => {
+            this.updateStyleSheet(stylesheet);
+          });
+          this.cssUpdatedAt = now;
+        })
+        .finally((): void => {
+          this.globalCssPromise = null;
+        });
+    }
+
+    return this.globalCssPromise;
+  }
+
+  updateStyleSheet(stylesheet: CmsStyleSheet) {
+    const currSheet = this.stylesheets[stylesheet.url];
+    if (!currSheet || currSheet.css_hash !== stylesheet.css_hash) {
+      this.removeStyleSheet(currSheet);
+      this.stylesheets[stylesheet.url] = stylesheet;
+      this.addStyleSheet(stylesheet);
+    }
+  }
+
+  addStyleSheet(stylesheet: CmsStyleSheet) {
+    var linkElement = document.createElement('link');
+    linkElement.setAttribute('rel', 'stylesheet');
+    linkElement.setAttribute('type', 'text/css');
+    linkElement.setAttribute('href', stylesheet.url);
+    var head = document.getElementsByTagName('head')[0];
+    head.appendChild(linkElement);
+  }
+
+  removeStyleSheet(stylesheet: CmsStyleSheet) {
+    if (stylesheet && stylesheet.sheet) {
+      stylesheet.sheet.disabled = true;
+      if (stylesheet.sheet.parentNode) {
+        stylesheet.sheet.parentNode.removeChild(stylesheet.sheet);
+        delete stylesheet.sheet;
+      }
+    }
+  }
+
   async fetchZone({ zoneId, extra }: { zoneId: string, extra: object }) {
     if (pluginOptions.beforeFetchZone) {
       await pluginOptions.beforeFetchZone();
     }
+
+    await this.fetchGlobalStyles();
 
     return this.http({
       zoneId,

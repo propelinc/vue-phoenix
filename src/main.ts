@@ -48,6 +48,7 @@ interface DestroyHTMLElement extends HTMLElement {
 
 export interface CmsOptions {
   baseUrl: string;
+  globalCssCacheMs?: number;
   router?: Router;
 
   setCaptable: ((captable: Captable) => void);
@@ -61,11 +62,13 @@ export interface CmsOptions {
 }
 
 export interface PluginOptions extends CmsOptions {
+  globalCssCacheMs: number;
   checkConnection: (() => boolean);
 }
 
 export const pluginOptions: PluginOptions = {
   baseUrl: '.',
+  globalCssCacheMs: 2 * 60 * 1000,
   checkConnection() {
     return navigator.onLine;
   },
@@ -74,7 +77,8 @@ export const pluginOptions: PluginOptions = {
   },
   getCaptable(): Captable {
     try {
-      return JSON.parse(localStorage.getItem('captable'));
+      const captableStr = localStorage.getItem('captable');
+      return JSON.parse(captableStr || '');
     } catch(e) {
       return {};
     }
