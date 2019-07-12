@@ -47,13 +47,13 @@ interface DestroyHTMLElement extends HTMLElement {
 }
 
 export interface CmsOptions {
-  baseUrl: string;
+  baseUrl?: string;
   globalCssCacheMs?: number;
   router?: Router;
 
-  setCaptable: ((captable: Captable) => void);
-  getCaptable: (() => Captable);
-  getSiteVars: (() => object);
+  setCaptable?: ((captable: Captable) => void);
+  getCaptable?: (() => Captable);
+  getSiteVars?: (() => object);
 
   /* eslint-disable-next-line @propelinc/no-explicit-any */
   beforeFetchZone?: null | (() => Promise<any>);
@@ -62,6 +62,10 @@ export interface CmsOptions {
 }
 
 export interface PluginOptions extends CmsOptions {
+  baseUrl: string;
+  setCaptable: ((captable: Captable) => void);
+  getCaptable: (() => Captable);
+  getSiteVars: (() => object);
   globalCssCacheMs: number;
   checkConnection: (() => boolean);
 }
