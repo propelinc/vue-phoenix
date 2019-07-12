@@ -1,4 +1,4 @@
-# vue-phoenix [![Build Status](https://api.travis-ci.org/propelinc/vue-phoenix.png?branch=master)](https://travis-ci.org/propelinc/vue-phoenix) [![MIT](https://img.shields.io/badge/License-MIT%20License-blue.svg)](https://raw.githubusercontent.com/propelinc/vue-phoenix/master/LICENSE)
+# vue-phoenix [![Build Status](https://travis-ci.org/propelinc/vue-phoenix.svg?branch=master)](https://travis-ci.org/propelinc/vue-phoenix) [![MIT](https://img.shields.io/badge/License-MIT%20License-blue.svg)](https://raw.githubusercontent.com/propelinc/vue-phoenix/master/LICENSE)
 
 Client integration for the phoenix CMS server for Vue.js apps.
 
