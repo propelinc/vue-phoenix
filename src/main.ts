@@ -6,6 +6,7 @@ import { ContentFor, YieldTo } from './components/capture';
 import CmsContent from './components/CmsContent';
 import CmsCarousel from './components/CmsCarousel.vue';
 import CmsZone from './components/CmsZone.vue';
+import { addDirectives, TrackClickDataAttributes, trackClickHandlerFunction } from './directives';
 
 export interface Captable {
 }
@@ -59,18 +60,21 @@ export interface CmsOptions {
   beforeFetchZone?: null | (() => Promise<any>);
   checkConnection?: (() => boolean);
   onCarouselSwipe?: ((zoneId: string, index: number) => void);
+
+  trackClickHandler?: trackClickHandlerFunction;
 }
 
 export interface PluginOptions extends CmsOptions {
   baseUrl: string;
-  setCaptable: ((captable: Captable) => void);
+  checkConnection: (() => boolean);
   getCaptable: (() => Captable);
   getSiteVars: (() => object);
   globalCssCacheMs: number;
-  checkConnection: (() => boolean);
+  setCaptable: ((captable: Captable) => void);
+  trackClickHandler: trackClickHandlerFunction;
 }
 
-export const pluginOptions: PluginOptions = {
+export const defaultOptions: PluginOptions = {
   baseUrl: '.',
   globalCssCacheMs: 2 * 60 * 1000,
   checkConnection() {
@@ -90,10 +94,17 @@ export const pluginOptions: PluginOptions = {
   getSiteVars(): object {
     return {};
   },
+  trackClickHandler(attrs: TrackClickDataAttributes): void {
+    if (!attrs["event-name"]) {
+      throw new Error('v-track-click: "event-name" attribute is required.');
+    }
+    console.log(`Click was tracked on ${attrs["event-name"]} with properties ${attrs["event-props"]}`)
+  }
 };
 
 const plugin = function install(Vue: typeof _Vue, options?: CmsOptions) {
-  Object.assign(pluginOptions, options);
+  // I think the order might be wrong here
+  Object.assign(defaultOptions, options);
   Vue.component('yield-to', YieldTo);
   Vue.component('content-for', ContentFor);
   Vue.component('cms-content', CmsContent);
@@ -120,6 +131,8 @@ const plugin = function install(Vue: typeof _Vue, options?: CmsOptions) {
       el.$destroy();
     },
   });
+
+  addDirectives(Vue, defaultOptions.trackClickHandler);
 
   if (options && options.router) {
     const router = options.router;
