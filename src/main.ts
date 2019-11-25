@@ -9,6 +9,7 @@ import CmsZone from './components/CmsZone.vue';
 import { addDirectives, TrackClickDataAttributes, trackClickHandlerFunction } from './directives';
 
 export { getClosest } from './utils';
+export { TrackClickDataAttributes } from './directives';
 
 export interface Captable {
 }
