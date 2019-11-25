@@ -102,7 +102,7 @@ class TrackClick implements TrackClickDirectiveOptions {
     this.handler = handlerFunction;
   }
 
-  bind(el: DestroyHTMLElement, binding: DirectiveBinding, vnode: VNode): void {
+  bind = (el: DestroyHTMLElement, binding: DirectiveBinding, vnode: VNode): void => {
     const attrs = vnode.data && vnode.data.attrs ? vnode.data.attrs: {};
 
     const _this = this;
