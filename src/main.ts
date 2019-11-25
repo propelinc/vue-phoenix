@@ -8,6 +8,8 @@ import CmsCarousel from './components/CmsCarousel.vue';
 import CmsZone from './components/CmsZone.vue';
 import { addDirectives, TrackClickDataAttributes, trackClickHandlerFunction } from './directives';
 
+export { getClosest } from './utils';
+
 export interface Captable {
 }
 
@@ -100,10 +102,10 @@ export const defaultOptions: PluginOptions = {
     }
   },
 };
+export var finalPluginOptions: PluginOptions;
 
 const plugin = function install(Vue: typeof _Vue, options?: CmsOptions) {
-  // I think the order might be wrong here
-  Object.assign(defaultOptions, options);
+  finalPluginOptions = Object.assign({}, defaultOptions, options);
   Vue.component('yield-to', YieldTo);
   Vue.component('content-for', ContentFor);
   Vue.component('cms-content', CmsContent);
