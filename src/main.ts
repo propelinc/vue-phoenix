@@ -76,7 +76,7 @@ export interface PluginOptions extends CmsOptions {
   trackClickHandler: trackClickHandlerFunction;
 }
 
-export const defaultOptions: PluginOptions = {
+export const pluginOptions: PluginOptions = {
   baseUrl: '.',
   globalCssCacheMs: 2 * 60 * 1000,
   checkConnection() {
@@ -105,7 +105,7 @@ export const defaultOptions: PluginOptions = {
 export var finalPluginOptions: PluginOptions;
 
 const plugin = function install(Vue: typeof _Vue, options?: CmsOptions) {
-  finalPluginOptions = Object.assign({}, defaultOptions, options);
+  Object.assign(pluginOptions, options);
   Vue.component('yield-to', YieldTo);
   Vue.component('content-for', ContentFor);
   Vue.component('cms-content', CmsContent);
@@ -133,7 +133,7 @@ const plugin = function install(Vue: typeof _Vue, options?: CmsOptions) {
     },
   });
 
-  addDirectives(Vue, defaultOptions.trackClickHandler);
+  addDirectives(Vue, pluginOptions.trackClickHandler);
 
   if (options && options.router) {
     const router = options.router;

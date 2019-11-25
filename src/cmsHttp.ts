@@ -1,5 +1,5 @@
 import Axios, { AxiosInstance } from 'axios';
-import { finalPluginOptions, Content } from './main';
+import { pluginOptions, Content } from './main';
 
 interface CmsStyleSheet {
   url: string;
@@ -20,7 +20,7 @@ class CmsClient {
   get axios(): AxiosInstance {
     if (!this._axios) {
       this._axios = Axios.create({
-        baseURL: finalPluginOptions.baseUrl,
+        baseURL: pluginOptions.baseUrl,
         timeout: 30 * 1000, // Timeout
       });
     }
@@ -28,19 +28,19 @@ class CmsClient {
   }
 
   async http({ zoneId, url, params }: { zoneId: string, url: string, params?: object }) {
-    const captable = finalPluginOptions.getCaptable();
+    const captable = pluginOptions.getCaptable();
     const zoneCaptable = captable[zoneId];
     const headers = zoneCaptable ? { Captable: zoneCaptable } : {};
     const response = await this.axios.get(url, { params, headers });
     if (response.data && response.data.captable) {
-      finalPluginOptions.setCaptable({ zoneId, captable: response.data.captable });
+      pluginOptions.setCaptable({ zoneId, captable: response.data.captable });
     }
     return response;
   }
 
   async fetchGlobalStyles() {
     const now = new Date().getTime();
-    if (this.cssUpdatedAt && this.cssUpdatedAt + finalPluginOptions.globalCssCacheMs > now) {
+    if (this.cssUpdatedAt && this.cssUpdatedAt + pluginOptions.globalCssCacheMs > now) {
       return;
     }
 
@@ -91,8 +91,8 @@ class CmsClient {
   }
 
   async fetchZone({ zoneId, extra }: { zoneId: string, extra: object }) {
-    if (finalPluginOptions.beforeFetchZone) {
-      await finalPluginOptions.beforeFetchZone();
+    if (pluginOptions.beforeFetchZone) {
+      await pluginOptions.beforeFetchZone();
     }
 
     await this.fetchGlobalStyles();
@@ -102,7 +102,7 @@ class CmsClient {
       url: `/cms/zone/${zoneId}`,
       params: {
         cb: Math.floor(Math.random() * 999999999),
-        ...finalPluginOptions.getSiteVars(),
+        ...pluginOptions.getSiteVars(),
         ...extra,
       },
     });

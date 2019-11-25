@@ -7,7 +7,7 @@
 <script lang="ts">
 import { Vue, Component, Prop } from 'vue-property-decorator';
 import Slick from 'vue-slick';
-import { finalPluginOptions } from '../main';
+import { pluginOptions } from '../main';
 
 type Slick = typeof Slick;
 
@@ -43,8 +43,8 @@ export default class CmsCarousel extends Vue {
     if (currentSlide !== this.index) {
       this.$emit('change', currentSlide);
       this.index = currentSlide;
-      if (finalPluginOptions.onCarouselSwipe) {
-        finalPluginOptions.onCarouselSwipe(this.zoneId, this.index);
+      if (pluginOptions.onCarouselSwipe) {
+        pluginOptions.onCarouselSwipe(this.zoneId, this.index);
       }
     }
   }
