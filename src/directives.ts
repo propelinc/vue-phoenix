@@ -1,4 +1,4 @@
-import Vue, { VNode } from 'vue';
+import { VNode, VueConstructor } from 'vue';
 import { DirectiveBinding, DirectiveOptions } from 'vue/types/options';
 
 import { getClosest } from './utils';
@@ -79,8 +79,8 @@ const scrollOnFocus: DirectiveOptions = {
 };
 
 export interface TrackClickDataAttributes {
-  'event-name': string;
-  'event-props': {[key: string]: any}, // eslint-disable-line @propelinc/no-explicit-any
+  'event-name'?: string;
+  'event-props'?: {[key: string]: any}, // eslint-disable-line @propelinc/no-explicit-any
 }
 
 export type trackClickHandlerFunction = (dataAttributes: TrackClickDataAttributes) => void;
@@ -99,16 +99,16 @@ const trackClick: TrackClickDirectiveOptions = {
   handler() {
     return;
   },
-  // bind(el: DestroyHTMLElement, binding: DirectiveBinding, vnode: VNode): void {
-  //   const attrs = vnode.data && vnode.data.attrs ? vnode.data.attrs : {};
+  bind(el: DestroyHTMLElement, binding: DirectiveBinding, vnode: VNode): void {
+    const attrs = vnode.data && vnode.data.attrs ? vnode.data.attrs: {};
 
-  //   const _this = this;
-  //   function wrappedHandler(): void {
-  //     _this.handler(attrs);
-  //   }
-  //   el.addEventListener('click', wrappedHandler);
-  //   el.$destroy = (): void => el.removeEventListener('click', wrappedHandler);
-  // },
+    const _this = this;
+    function wrappedHandler(): void {
+      _this.handler(attrs);
+    }
+    el.addEventListener('click', wrappedHandler);
+    el.$destroy = (): void => el.removeEventListener('click', wrappedHandler);
+  },
   unbind: (el: DestroyHTMLElement): void => {
     // unbind is subject to a very specific race condition:
     //
@@ -127,7 +127,7 @@ const trackClick: TrackClickDirectiveOptions = {
   },
 };
 
-export function addDirectives(Vue: Vue, trackClickHandler: trackClickHandlerFunction): void {
+export function addDirectives(Vue: VueConstructor, trackClickHandler: trackClickHandlerFunction): void {
   Vue.directive('infinite-scroll', infiniteScroll);
   Vue.directive('scroll-on-focus', scrollOnFocus);
 

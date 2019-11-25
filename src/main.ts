@@ -95,11 +95,10 @@ export const defaultOptions: PluginOptions = {
     return {};
   },
   trackClickHandler(attrs: TrackClickDataAttributes): void {
-    if (!attrs["event-name"]) {
+    if (!attrs['event-name']) {
       throw new Error('v-track-click: "event-name" attribute is required.');
     }
-    console.log(`Click was tracked on ${attrs["event-name"]} with properties ${attrs["event-props"]}`)
-  }
+  },
 };
 
 const plugin = function install(Vue: typeof _Vue, options?: CmsOptions) {
