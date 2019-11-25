@@ -95,10 +95,13 @@ interface TrackClickDirectiveOptions extends DirectiveOptions {
  * Example usage:
  * <div v-track-click event-name="foo" :event-props="{ bar: 'tzar' }">Click me</div>
  */
-const trackClick: TrackClickDirectiveOptions = {
-  handler() {
-    return;
-  },
+class TrackClick implements TrackClickDirectiveOptions {
+  handler: trackClickHandlerFunction;
+
+  constructor(handlerFunction: trackClickHandlerFunction) {
+    this.handler = handlerFunction;
+  }
+
   bind(el: DestroyHTMLElement, binding: DirectiveBinding, vnode: VNode): void {
     const attrs = vnode.data && vnode.data.attrs ? vnode.data.attrs: {};
 
@@ -108,8 +111,9 @@ const trackClick: TrackClickDirectiveOptions = {
     }
     el.addEventListener('click', wrappedHandler);
     el.$destroy = (): void => el.removeEventListener('click', wrappedHandler);
-  },
-  unbind: (el: DestroyHTMLElement): void => {
+  }
+
+  unbind(el: DestroyHTMLElement): void {
     // unbind is subject to a very specific race condition:
     //
     // If you set up both a v-track-click directive and an @click handler you can run into some issues
@@ -124,13 +128,11 @@ const trackClick: TrackClickDirectiveOptions = {
     setTimeout((): void => {
       el.$destroy();
     }, 0);
-  },
-};
+  }
+}
 
 export function addDirectives(Vue: VueConstructor, trackClickHandler: trackClickHandlerFunction): void {
   Vue.directive('infinite-scroll', infiniteScroll);
   Vue.directive('scroll-on-focus', scrollOnFocus);
-
-  trackClick.handler = trackClickHandler;
-  Vue.directive('track-click', trackClick);
+  Vue.directive('track-click', new TrackClick(trackClickHandler));
 }
