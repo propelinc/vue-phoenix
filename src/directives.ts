@@ -2,8 +2,9 @@ import { VNode, VueConstructor } from 'vue';
 import { DirectiveBinding, DirectiveOptions } from 'vue/types/options';
 
 import { getClosest } from './utils';
-import { PluginOptions } from './main';
+import { pluginOptions } from './main';
 
+export type trackClickHandlerFunction = (eventName: string | undefined, eventProps: {[key: string]: any}) => void; // eslint-disable-line @propelinc/no-explicit-any
 
 interface DestroyHTMLElement extends HTMLElement {
     $destroy: () => void;
@@ -79,8 +80,6 @@ const scrollOnFocus: DirectiveOptions = {
   },
 };
 
-export type trackClickHandlerFunction = (eventName: string | undefined, eventProps: {[key: string]: any}) => void; // eslint-disable-line @propelinc/no-explicit-any
-var trackClickHandler: trackClickHandlerFunction;
 /**
  * Track an event to amplitude on click.
  *
@@ -91,9 +90,9 @@ const trackClick: DirectiveOptions =  {
   bind(el: DestroyHTMLElement, binding: DirectiveBinding, vnode: VNode): void {
     const attrs = vnode.data && vnode.data.attrs ? vnode.data.attrs: {};
 
-    function wrappedHandler(): void {
-      trackClickHandler(attrs['event-name'], attrs['event-props'] || {} );
-    }
+    const wrappedHandler = (): void => {
+      pluginOptions.trackClickHandler(attrs['event-name'], attrs['event-props'] || {} );
+    };
     el.addEventListener('click', wrappedHandler);
     el.$destroy = (): void => el.removeEventListener('click', wrappedHandler);
   },
@@ -115,10 +114,8 @@ const trackClick: DirectiveOptions =  {
   },
 };
 
-export function addDirectives(Vue: VueConstructor, pluginOptions: PluginOptions): void {
+export function addDirectives(Vue: VueConstructor): void {
   Vue.directive('infinite-scroll', infiniteScroll);
   Vue.directive('scroll-on-focus', scrollOnFocus);
-
-  trackClickHandler = pluginOptions.trackClickHandler;
   Vue.directive('track-click', trackClick);
 }
