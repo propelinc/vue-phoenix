@@ -80,35 +80,23 @@ const scrollOnFocus: DirectiveOptions = {
 };
 
 export type trackClickHandlerFunction = (eventName: string | undefined, eventProps: {[key: string]: any}) => void; // eslint-disable-line @propelinc/no-explicit-any
-
-interface TrackClickDirectiveOptions extends DirectiveOptions {
-  handler: trackClickHandlerFunction;
-}
-
+var trackClickHandler: trackClickHandlerFunction;
 /**
  * Track an event to amplitude on click.
  *
  * Example usage:
  * <div v-track-click event-name="foo" :event-props="{ bar: 'tzar' }">Click me</div>
  */
-class TrackClick implements TrackClickDirectiveOptions {
-  handler: trackClickHandlerFunction;
-
-  constructor(handlerFunction: trackClickHandlerFunction) {
-    this.handler = handlerFunction;
-  }
-
-  bind = (el: DestroyHTMLElement, binding: DirectiveBinding, vnode: VNode): void => {
+const trackClick: DirectiveOptions =  {
+  bind(el: DestroyHTMLElement, binding: DirectiveBinding, vnode: VNode): void {
     const attrs = vnode.data && vnode.data.attrs ? vnode.data.attrs: {};
 
-    const _this = this;
     function wrappedHandler(): void {
-      _this.handler(attrs['event-name'], attrs['event-props'] || {} );
+      trackClickHandler(attrs['event-name'], attrs['event-props'] || {} );
     }
     el.addEventListener('click', wrappedHandler);
     el.$destroy = (): void => el.removeEventListener('click', wrappedHandler);
-  }
-
+  },
   unbind(el: DestroyHTMLElement): void {
     // unbind is subject to a very specific race condition:
     //
@@ -124,11 +112,13 @@ class TrackClick implements TrackClickDirectiveOptions {
     setTimeout((): void => {
       el.$destroy();
     }, 0);
-  }
-}
+  },
+};
 
 export function addDirectives(Vue: VueConstructor, pluginOptions: PluginOptions): void {
   Vue.directive('infinite-scroll', infiniteScroll);
   Vue.directive('scroll-on-focus', scrollOnFocus);
-  Vue.directive('track-click', new TrackClick(pluginOptions.trackClickHandler));
+
+  trackClickHandler = pluginOptions.trackClickHandler;
+  Vue.directive('track-click', trackClick);
 }
