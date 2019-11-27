@@ -2,7 +2,6 @@ import CmsPlugin, { Content, HTMLContent } from './src/main';
 
 
 export { getClosest } from './src/utils';
-export { TrackClickDataAttributes } from './src/directives';
 
 export type CmsContent = Content;
 export type CmsHtmlContent = HTMLContent;
