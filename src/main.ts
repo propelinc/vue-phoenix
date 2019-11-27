@@ -6,7 +6,7 @@ import { ContentFor, YieldTo } from './components/capture';
 import CmsContent from './components/CmsContent';
 import CmsCarousel from './components/CmsCarousel.vue';
 import CmsZone from './components/CmsZone.vue';
-import { addDirectives, trackClickHandlerFunction } from './directives';
+import { addDirectives } from './directives';
 
 export interface Captable {
 }
@@ -61,7 +61,7 @@ export interface CmsOptions {
   checkConnection?: (() => boolean);
   onCarouselSwipe?: ((zoneId: string, index: number) => void);
 
-  trackClickHandler?: trackClickHandlerFunction;
+  trackClickHandler?: (eventName: string | undefined, eventProps: {[key: string]: any}) => void; // eslint-disable-line @propelinc/no-explicit-any
 }
 
 export interface PluginOptions extends CmsOptions {
@@ -71,7 +71,7 @@ export interface PluginOptions extends CmsOptions {
   getSiteVars: (() => object);
   globalCssCacheMs: number;
   setCaptable: ((captable: Captable) => void);
-  trackClickHandler: trackClickHandlerFunction;
+  trackClickHandler: (eventName: string | undefined, eventProps: {[key: string]: any}) => void; // eslint-disable-line @propelinc/no-explicit-any
 }
 
 export const pluginOptions: PluginOptions = {
@@ -131,7 +131,7 @@ const plugin = function install(Vue: typeof _Vue, options?: CmsOptions) {
     },
   });
 
-  addDirectives(Vue, pluginOptions);
+  addDirectives(Vue);
 
   if (options && options.router) {
     const router = options.router;

@@ -4,8 +4,6 @@ import { DirectiveBinding, DirectiveOptions } from 'vue/types/options';
 import { getClosest } from './utils';
 import { pluginOptions } from './main';
 
-export type trackClickHandlerFunction = (eventName: string | undefined, eventProps: {[key: string]: any}) => void; // eslint-disable-line @propelinc/no-explicit-any
-
 interface DestroyHTMLElement extends HTMLElement {
     $destroy: () => void;
 }
