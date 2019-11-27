@@ -2,6 +2,7 @@ import { VNode, VueConstructor } from 'vue';
 import { DirectiveBinding, DirectiveOptions } from 'vue/types/options';
 
 import { getClosest } from './utils';
+import { PluginOptions } from './main';
 
 
 interface DestroyHTMLElement extends HTMLElement {
@@ -78,12 +79,7 @@ const scrollOnFocus: DirectiveOptions = {
   },
 };
 
-export interface TrackClickDataAttributes {
-  'event-name'?: string;
-  'event-props'?: {[key: string]: any}, // eslint-disable-line @propelinc/no-explicit-any
-}
-
-export type trackClickHandlerFunction = (dataAttributes: TrackClickDataAttributes) => void;
+export type trackClickHandlerFunction = (eventName: string | undefined, eventProps: {[key: string]: any}) => void; // eslint-disable-line @propelinc/no-explicit-any
 
 interface TrackClickDirectiveOptions extends DirectiveOptions {
   handler: trackClickHandlerFunction;
@@ -107,7 +103,7 @@ class TrackClick implements TrackClickDirectiveOptions {
 
     const _this = this;
     function wrappedHandler(): void {
-      _this.handler(attrs);
+      _this.handler(attrs['event-name'], attrs['event-props'] || {} );
     }
     el.addEventListener('click', wrappedHandler);
     el.$destroy = (): void => el.removeEventListener('click', wrappedHandler);
@@ -131,8 +127,8 @@ class TrackClick implements TrackClickDirectiveOptions {
   }
 }
 
-export function addDirectives(Vue: VueConstructor, trackClickHandler: trackClickHandlerFunction): void {
+export function addDirectives(Vue: VueConstructor, pluginOptions: PluginOptions): void {
   Vue.directive('infinite-scroll', infiniteScroll);
   Vue.directive('scroll-on-focus', scrollOnFocus);
-  Vue.directive('track-click', new TrackClick(trackClickHandler));
+  Vue.directive('track-click', new TrackClick(pluginOptions.trackClickHandler));
 }

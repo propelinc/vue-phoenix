@@ -94,8 +94,8 @@ export const pluginOptions: PluginOptions = {
   getSiteVars(): object {
     return {};
   },
-  trackClickHandler(attrs: TrackClickDataAttributes): void {
-    if (!attrs['event-name']) {
+  trackClickHandler(eventName: string | undefined): void {
+    if (!eventName) {
       throw new Error('v-track-click: "event-name" attribute is required.');
     }
   },
@@ -131,7 +131,7 @@ const plugin = function install(Vue: typeof _Vue, options?: CmsOptions) {
     },
   });
 
-  addDirectives(Vue, pluginOptions.trackClickHandler);
+  addDirectives(Vue, pluginOptions);
 
   if (options && options.router) {
     const router = options.router;
