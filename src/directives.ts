@@ -1,3 +1,4 @@
+
 import { VNode, VueConstructor } from 'vue';
 import { DirectiveBinding, DirectiveOptions } from 'vue/types/options';
 
@@ -89,6 +90,9 @@ const trackClick: DirectiveOptions =  {
     const attrs = vnode.data && vnode.data.attrs ? vnode.data.attrs: {};
 
     const wrappedHandler = (): void => {
+      if (!attrs['event-name']) {
+        throw new Error('v-track-click: "event-name" attribute is required.');
+      }
       pluginOptions.trackClickHandler(attrs['event-name'], attrs['event-props'] || {} );
     };
     el.addEventListener('click', wrappedHandler);

@@ -61,7 +61,7 @@ export interface CmsOptions {
   checkConnection?: (() => boolean);
   onCarouselSwipe?: ((zoneId: string, index: number) => void);
 
-  trackClickHandler?: (eventName: string | undefined, eventProps: {[key: string]: any}) => void; // eslint-disable-line @propelinc/no-explicit-any
+  trackClickHandler?: (eventName: string, eventProps: {[key: string]: any}) => void; // eslint-disable-line @propelinc/no-explicit-any
 }
 
 export interface PluginOptions extends CmsOptions {
@@ -71,7 +71,7 @@ export interface PluginOptions extends CmsOptions {
   getSiteVars: (() => object);
   globalCssCacheMs: number;
   setCaptable: ((captable: Captable) => void);
-  trackClickHandler: (eventName: string | undefined, eventProps: {[key: string]: any}) => void; // eslint-disable-line @propelinc/no-explicit-any
+  trackClickHandler: (eventName: string, eventProps: {[key: string]: any}) => void; // eslint-disable-line @propelinc/no-explicit-any
 }
 
 export const pluginOptions: PluginOptions = {
@@ -94,10 +94,8 @@ export const pluginOptions: PluginOptions = {
   getSiteVars(): object {
     return {};
   },
-  trackClickHandler(eventName: string | undefined): void {
-    if (!eventName) {
-      throw new Error('v-track-click: "event-name" attribute is required.');
-    }
+  trackClickHandler(_: string): void {
+    return;
   },
 };
 export var finalPluginOptions: PluginOptions;
