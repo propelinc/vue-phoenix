@@ -1,4 +1,3 @@
-
 import { VNode, VueConstructor } from 'vue';
 import { DirectiveBinding, DirectiveOptions } from 'vue/types/options';
 
