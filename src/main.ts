@@ -6,6 +6,7 @@ import { ContentFor, YieldTo } from './components/capture';
 import CmsContent from './components/CmsContent';
 import CmsCarousel from './components/CmsCarousel.vue';
 import CmsZone from './components/CmsZone.vue';
+import { addDirectives } from './directives';
 
 export interface Captable {
 }
@@ -59,15 +60,18 @@ export interface CmsOptions {
   beforeFetchZone?: null | (() => Promise<any>);
   checkConnection?: (() => boolean);
   onCarouselSwipe?: ((zoneId: string, index: number) => void);
+
+  trackClickHandler?: (eventName: string | undefined, eventProps: {[key: string]: any}) => void; // eslint-disable-line @propelinc/no-explicit-any
 }
 
 export interface PluginOptions extends CmsOptions {
   baseUrl: string;
-  setCaptable: ((captable: Captable) => void);
+  checkConnection: (() => boolean);
   getCaptable: (() => Captable);
   getSiteVars: (() => object);
   globalCssCacheMs: number;
-  checkConnection: (() => boolean);
+  setCaptable: ((captable: Captable) => void);
+  trackClickHandler: (eventName: string | undefined, eventProps: {[key: string]: any}) => void; // eslint-disable-line @propelinc/no-explicit-any
 }
 
 export const pluginOptions: PluginOptions = {
@@ -90,7 +94,13 @@ export const pluginOptions: PluginOptions = {
   getSiteVars(): object {
     return {};
   },
+  trackClickHandler(eventName: string | undefined): void {
+    if (!eventName) {
+      throw new Error('v-track-click: "event-name" attribute is required.');
+    }
+  },
 };
+export var finalPluginOptions: PluginOptions;
 
 const plugin = function install(Vue: typeof _Vue, options?: CmsOptions) {
   Object.assign(pluginOptions, options);
@@ -120,6 +130,8 @@ const plugin = function install(Vue: typeof _Vue, options?: CmsOptions) {
       el.$destroy();
     },
   });
+
+  addDirectives(Vue);
 
   if (options && options.router) {
     const router = options.router;
