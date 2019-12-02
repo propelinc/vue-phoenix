@@ -94,7 +94,7 @@ export const pluginOptions: PluginOptions = {
   getSiteVars(): object {
     return {};
   },
-  trackClickHandler(_: string): void {
+  trackClickHandler(): void {
     return;
   },
 };
