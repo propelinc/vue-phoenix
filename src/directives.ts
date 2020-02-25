@@ -78,6 +78,10 @@ const scrollOnFocus: DirectiveOptions = {
   },
 };
 
+interface DestroyHTMLElementWithAttrs extends DestroyHTMLElement {
+  attrs?: object;
+}
+
 /**
  * Track an event to amplitude on click.
  *
@@ -85,30 +89,29 @@ const scrollOnFocus: DirectiveOptions = {
  * <div v-track-click event-name="foo" :event-props="{ bar: 'tzar' }">Click me</div>
  */
 const trackClick: DirectiveOptions =  {
-  bind(el: DestroyHTMLElement, binding: DirectiveBinding, vnode: VNode): void {
-    const attrs = vnode.data && vnode.data.attrs ? vnode.data.attrs: {};
-
+  bind(el: DestroyHTMLElementWithAttrs, binding: DirectiveBinding, vnode: VNode): void {
+    el.attrs = vnode.data && vnode.data.attrs ? vnode.data.attrs: {};
     const wrappedHandler = (): void => {
-      if (!attrs['event-name']) {
+      if (!el.attrs || !el.attrs['event-name']) {
         throw new Error('v-track-click: "event-name" attribute is required.');
       }
-      pluginOptions.trackClickHandler(attrs['event-name'], attrs['event-props'] || {} );
+      pluginOptions.trackClickHandler(el.attrs['event-name'], el.attrs['event-props'] || {});
     };
     el.addEventListener('click', wrappedHandler);
     el.$destroy = (): void => el.removeEventListener('click', wrappedHandler);
   },
-  unbind(el: DestroyHTMLElement): void {
-    // unbind is subject to a very specific race condition:
+  update(el: DestroyHTMLElementWithAttrs, binding: DirectiveBinding, vnode: VNode): void {
+    el.attrs = vnode.data && vnode.data.attrs ? vnode.data.attrs: {};
+  },
+  unbind(el: DestroyHTMLElementWithAttrs): void {
+    // When using both a v-track-click directive and an @click handler you can run into a race condition.
+    // The @click handler fires first. If that @click handler leads to the DOM element being removed from the DOM,
+    // the unbind call will run before the track-click handler is run. This leads to the click handler
+    // being removed before it can fire.
     //
-    // If you set up both a v-track-click directive and an @click handler you can run into some issues
-    // The @click handler seems to get registered and to fire first.
-    // If that @click handler moves you away from the current page immediately, the unbind call will run
-    // before the click handler function setup on bind.
-    // This will lead to the click handler being removed and the handler not being run
-    //
-    // To fix that issue, we are using a setTimeout of 0. This yeilds the javascript event loop during the
-    // navigation away from the elements page. This allows the other click handlers to run before the
-    // event listeners are removed
+    // To fix that issue, we are using a setTimeout of 0. This allows the click handler to execute
+    // before it is removed.
+    delete el.attrs;
     setTimeout((): void => {
       el.$destroy();
     }, 0);
