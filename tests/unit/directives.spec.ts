@@ -14,29 +14,39 @@ describe('v-track-click directives', (): void => {
     pluginOptions.trackClickHandler = jest.fn();
   });
 
-  const specs = [{
-    template: `<div v-track-click event-name="kamehameha" :event-props="{ foo: 'bar' }"></div>`,
-    eventName: 'kamehameha',
-    eventProps: { foo: 'bar' },
-  }, {
-    template: `<div v-track-click></div>`,
-  }];
+  it('does not track an event on click', (): void => {
+    const component = Vue.extend({ template: '<div v-track-click></div>' });
+    const wrapper = shallowMount(component, { localVue });
+    expect(pluginOptions.trackClickHandler).not.toHaveBeenCalled();
 
-  specs.forEach((testCase, i): void => {
-    it(`tracks an event on click: ${i}`, (): void => {
-      const component = Vue.extend({ template: testCase.template });
-      const wrapper = shallowMount(component, { localVue });
-      expect(pluginOptions.trackClickHandler).not.toHaveBeenCalled();
+    console.error = jest.fn();
+    wrapper.find('div').trigger('click');
 
-      console.error = jest.fn();
-      wrapper.find('div').trigger('click');
+    expect(window.onerror).toHaveBeenCalled();
+    expect(pluginOptions.trackClickHandler).not.toHaveBeenCalled();
+  });
 
-      if (testCase.eventName) {
-        expect(pluginOptions.trackClickHandler).toHaveBeenCalledWith(testCase.eventName, testCase.eventProps);
-      } else {
-        expect(window.onerror).toHaveBeenCalled();
-        expect(pluginOptions.trackClickHandler).not.toHaveBeenCalled();
-      }
+  it('tracks an event on click', async (): Promise<void> => {
+    const testCase = {
+      template: `<div v-track-click event-name="kamehameha" :event-props="eventProps"></div>`,
+      eventName: 'kamehameha',
+      eventProps: { foo: 'bar' },
+    };
+
+    const component = Vue.extend({
+      template: testCase.template,
+      data: () => ({ eventProps: testCase.eventProps }),
     });
+    const wrapper = shallowMount(component, { localVue });
+    expect(pluginOptions.trackClickHandler).not.toHaveBeenCalled();
+
+    console.error = jest.fn();
+    wrapper.find('div').trigger('click');
+
+    expect(pluginOptions.trackClickHandler).toHaveBeenCalledWith(testCase.eventName, testCase.eventProps);
+    testCase.eventProps.foo = 'car';
+    await Vue.nextTick();
+
+    expect(pluginOptions.trackClickHandler).toHaveBeenCalledWith(testCase.eventName, testCase.eventProps);
   });
 });
