@@ -78,24 +78,31 @@ const scrollOnFocus: DirectiveOptions = {
   },
 };
 
+interface TrackClickDirectiveOptions extends DirectiveOptions {
+  attrs?: object;
+}
+
+
 /**
  * Track an event to amplitude on click.
  *
  * Example usage:
  * <div v-track-click event-name="foo" :event-props="{ bar: 'tzar' }">Click me</div>
  */
-const trackClick: DirectiveOptions =  {
+const trackClick: TrackClickDirectiveOptions =  {
   bind(el: DestroyHTMLElement, binding: DirectiveBinding, vnode: VNode): void {
-    const attrs = vnode.data && vnode.data.attrs ? vnode.data.attrs: {};
-
+    this.attrs = vnode.data && vnode.data.attrs ? vnode.data.attrs: {};
     const wrappedHandler = (): void => {
-      if (!attrs['event-name']) {
+      if (!this.attrs || !this.attrs['event-name']) {
         throw new Error('v-track-click: "event-name" attribute is required.');
       }
-      pluginOptions.trackClickHandler(attrs['event-name'], attrs['event-props'] || {} );
+      pluginOptions.trackClickHandler(this.attrs['event-name'], this.attrs['event-props'] || {});
     };
     el.addEventListener('click', wrappedHandler);
     el.$destroy = (): void => el.removeEventListener('click', wrappedHandler);
+  },
+  update(el: DestroyHTMLElement, binding: DirectiveBinding, vnode: VNode): void {
+    this.attrs = vnode.data && vnode.data.attrs ? vnode.data.attrs: {};
   },
   unbind(el: DestroyHTMLElement): void {
     // unbind is subject to a very specific race condition:
@@ -109,6 +116,7 @@ const trackClick: DirectiveOptions =  {
     // To fix that issue, we are using a setTimeout of 0. This yeilds the javascript event loop during the
     // navigation away from the elements page. This allows the other click handlers to run before the
     // event listeners are removed
+    delete this.attrs;
     setTimeout((): void => {
       el.$destroy();
     }, 0);
