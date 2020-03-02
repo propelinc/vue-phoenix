@@ -98,20 +98,21 @@ const trackClick: DirectiveOptions =  {
       pluginOptions.trackClickHandler(el.attrs['event-name'], el.attrs['event-props'] || {});
     };
     el.addEventListener('click', wrappedHandler);
-    el.$destroy = (): void => el.removeEventListener('click', wrappedHandler);
+    el.$destroy = (): void => {
+      el.removeEventListener('click', wrappedHandler);
+      delete el.attrs;
+    }
   },
   update(el: DestroyHTMLElementWithAttrs, binding: DirectiveBinding, vnode: VNode): void {
     el.attrs = vnode.data && vnode.data.attrs ? vnode.data.attrs: {};
   },
   unbind(el: DestroyHTMLElementWithAttrs): void {
-    // When using both a v-track-click directive and an @click handler you can run into a race condition.
-    // The @click handler fires first. If that @click handler leads to the DOM element being removed from the DOM,
-    // the unbind call will run before the track-click handler is run. This leads to the click handler
+    // A race condition occurs when using both a v-track-click directive and an @click handler.
+    // If the @click handler removes the element from the DOM, the directive unbind
+    // runs before the track-click handler can run. This leads to the v-track-click handler
     // being removed before it can fire.
-    //
-    // To fix that issue, we are using a setTimeout of 0. This allows the click handler to execute
-    // before it is removed.
-    delete el.attrs;
+
+    // The setTimeout allows the click handler to execute before it is removed.
     setTimeout((): void => {
       el.$destroy();
     }, 0);

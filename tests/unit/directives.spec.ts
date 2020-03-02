@@ -43,10 +43,31 @@ describe('v-track-click directives', (): void => {
     console.error = jest.fn();
     wrapper.find('div').trigger('click');
 
-    expect(pluginOptions.trackClickHandler).toHaveBeenCalledWith(testCase.eventName, testCase.eventProps);
+    expect(pluginOptions.trackClickHandler).toHaveBeenCalledWith(testCase.eventName, { foo: 'bar' });
     testCase.eventProps.foo = 'car';
     await Vue.nextTick();
 
-    expect(pluginOptions.trackClickHandler).toHaveBeenCalledWith(testCase.eventName, testCase.eventProps);
+    expect(pluginOptions.trackClickHandler).toHaveBeenCalledWith(testCase.eventName, { foo: 'car' });
+  });
+
+  it('tracks an event on click even if element is removed from the DOM', async (): Promise<void> => {
+    const testCase = {
+      template: `<div v-if="eventProps.foo == 'bar'" v-track-click @click="eventProps.foo = 'car'" event-name="kamehameha" :event-props="eventProps"></div>`,
+      eventName: 'kamehameha',
+      eventProps: { foo: 'bar' },
+    };
+
+    const component = Vue.extend({
+      template: testCase.template,
+      data: () => ({ eventProps: testCase.eventProps }),
+    });
+    const wrapper = shallowMount(component, { localVue });
+    expect(pluginOptions.trackClickHandler).not.toHaveBeenCalled();
+
+    console.error = jest.fn();
+    wrapper.find('div').trigger('click');
+
+    await Vue.nextTick();
+    expect(pluginOptions.trackClickHandler).toHaveBeenCalledWith(testCase.eventName, { foo: 'car' });
   });
 });
