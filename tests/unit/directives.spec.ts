@@ -50,7 +50,7 @@ describe('v-track-click directives', (): void => {
     expect(pluginOptions.trackClickHandler).toHaveBeenCalledWith(testCase.eventName, { foo: 'car' });
   });
 
-  it('tracks an event on click', async (): Promise<void> => {
+  it('tracks an event on click even if element is removed from the DOM', async (): Promise<void> => {
     const testCase = {
       template: `<div v-if="eventProps.foo == 'bar'" v-track-click @click="eventProps.foo = 'car'" event-name="kamehameha" :event-props="eventProps"></div>`,
       eventName: 'kamehameha',
