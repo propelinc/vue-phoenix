@@ -123,6 +123,9 @@ class CmsClient {
     await this.http({ zoneId, url: content.tracker });
   }
 
+  setBaseUrl(url: string) {
+    this.axios.defaults.baseURL = url;
+  }
 }
 
 export default new CmsClient();

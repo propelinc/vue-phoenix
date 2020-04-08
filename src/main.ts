@@ -7,6 +7,7 @@ import CmsContent from './components/CmsContent';
 import CmsCarousel from './components/CmsCarousel.vue';
 import CmsZone from './components/CmsZone.vue';
 import { addDirectives } from './directives';
+import cmsClient from './cmsHttp';
 
 export interface Captable {
 }
@@ -99,6 +100,11 @@ export const pluginOptions: PluginOptions = {
   },
 };
 export var finalPluginOptions: PluginOptions;
+
+export function setBaseUrl(url: string) {
+  pluginOptions.baseUrl = url;
+  cmsClient.setBaseUrl(url);
+}
 
 const plugin = function install(Vue: typeof _Vue, options?: CmsOptions) {
   Object.assign(pluginOptions, options);
