@@ -10,10 +10,8 @@ export default class CmsContent extends Vue {
   @Prop(String) public zoneId!: string;
   @Prop({ default: '' }) public tag!: string;
 
-  public _context: object = this.context;
-
-  private created(): void {
-    this._context = {
+  private get _context() {
+    return {
       ...this.context,
       ...this.extra,
     };
