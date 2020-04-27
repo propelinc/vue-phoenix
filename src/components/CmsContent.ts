@@ -6,13 +6,15 @@ import { Vue, Component, Prop } from 'vue-property-decorator';
 export default class CmsContent extends Vue {
   @Prop(String) public html!: string;
   @Prop(Object) public extra!: {};
+  @Prop(Object) public context!: {};
   @Prop(String) public zoneId!: string;
   @Prop({ default: '' }) public tag!: string;
 
-  public context: object = {};
+  public _context: object = this.context;
 
   private created(): void {
-    this.context = {
+    this._context = {
+      ...this.context,
       ...this.extra,
     };
   }
@@ -37,7 +39,7 @@ export default class CmsContent extends Vue {
     };
 
     return h(dynamic, {
-      props: { context: this.context, zoneId: this.zoneId },
+      props: { context: this._context, zoneId: this.zoneId },
     });
   }
 

@@ -16,7 +16,7 @@ describe('CmsZone.vue', (): void => {
   let resolvePromise: any; // eslint-disable-line @propelinc/no-explicit-any
   let rejectPromise: any; // eslint-disable-line @propelinc/no-explicit-any
 
-  function makeResponse(zoneType: string, content: Content[]): any { // eslint-disable-line @propelinc/no-explicit-any
+  function makeResponse(zoneType: string, content: Content[]) {
     return {
       status: 200,
       data: {
@@ -36,12 +36,12 @@ describe('CmsZone.vue', (): void => {
       rejectPromise = reject;
     });
 
-    Element.prototype.getBoundingClientRect = jest.fn((): DOMRect | ClientRect => {
-      return { width: 120, height: 120, top: 0, left: 0, bottom: 0, right: 0 };
+    Element.prototype.getBoundingClientRect = jest.fn((): DOMRect => {
+      return { width: 120, height: 120, top: 0, left: 0, bottom: 0, right: 0 } as DOMRect;
     });
 
     cmsClient.trackZone = jest.fn();
-    cmsClient.fetchZone = jest.fn().mockImplementation((options: any): any => { // eslint-disable-line @propelinc/no-explicit-any
+    cmsClient.fetchZone = jest.fn().mockImplementation((options: any) => {
       requestOptions = options;
       return response;
     });
@@ -196,7 +196,7 @@ describe('CmsZone.vue isContentVisible tests:', (): void => {
 
   function getElementWithRect(height: number, top: number, bottom: number): Element {
     const element = document.createElement('div');
-    (element as any).getBoundingClientRect = (): any => ({ height, top, bottom });// eslint-disable-line @propelinc/no-explicit-any
+    (element as any).getBoundingClientRect = () => ({ height, top, bottom });// eslint-disable-line @propelinc/no-explicit-any
     return element;
   }
 

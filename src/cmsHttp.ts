@@ -1,4 +1,4 @@
-import Axios, { AxiosInstance } from 'axios';
+import Axios, { AxiosInstance, AxiosResponse } from 'axios';
 import { pluginOptions, Content } from './main';
 
 interface CmsStyleSheet {
@@ -45,10 +45,8 @@ class CmsClient {
     }
 
     if (!this.globalCssPromise) {
-      console.info('Fetching global CMS styles');
       this.globalCssPromise = this.axios.get('/cms/styles')
-        // eslint-disable-next-line @propelinc/no-explicit-any
-        .then((response: any): void => {
+        .then((response: AxiosResponse<{styles: CmsStyleSheet[]}>): void => {
           response.data.styles.forEach((stylesheet: CmsStyleSheet) => {
             this.updateStyleSheet(stylesheet);
           });
