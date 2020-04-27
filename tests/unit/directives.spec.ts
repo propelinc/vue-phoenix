@@ -34,8 +34,8 @@ describe('v-track-click directives', (): void => {
     };
 
     const component = Vue.extend({
-      template: testCase.template,
       data: () => ({ eventProps: testCase.eventProps }),
+      template: testCase.template,
     });
     const wrapper = shallowMount(component, { localVue });
     expect(pluginOptions.trackClickHandler).not.toHaveBeenCalled();
@@ -58,8 +58,8 @@ describe('v-track-click directives', (): void => {
     };
 
     const component = Vue.extend({
-      template: testCase.template,
       data: () => ({ eventProps: testCase.eventProps }),
+      template: testCase.template,
     });
     const wrapper = shallowMount(component, { localVue });
     expect(pluginOptions.trackClickHandler).not.toHaveBeenCalled();

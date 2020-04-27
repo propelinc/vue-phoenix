@@ -20,6 +20,18 @@ describe('CmsContent.vue', (): void => {
     expect(wrapper.text()).toMatch('Content bar');
   });
 
+  it('allows invoking functions from the context', async (): Promise<void> => {
+    const context = { bus: jest.fn(() => 'bar') };
+    const html = '<div>Content {{ context.bus() }}</div>';
+    const wrapper = mount(CmsContent, {
+      localVue,
+      propsData: { html, context },
+    });
+
+    await Vue.nextTick();
+    expect(wrapper.text()).toMatch('Content bar');
+  });
+
   it('shows the default slot when html is empty', async (): Promise<void> => {
     const wrapper = mount(CmsContent, {
       localVue,
