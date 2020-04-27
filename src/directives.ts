@@ -101,7 +101,7 @@ const trackClick: DirectiveOptions =  {
     el.$destroy = (): void => {
       el.removeEventListener('click', wrappedHandler);
       delete el.attrs;
-    }
+    };
   },
   update(el: DestroyHTMLElementWithAttrs, binding: DirectiveBinding, vnode: VNode): void {
     el.attrs = vnode.data && vnode.data.attrs ? vnode.data.attrs: {};

@@ -41,6 +41,7 @@ describe('CmsZone.vue', (): void => {
     });
 
     cmsClient.trackZone = jest.fn();
+    // eslint-disable-next-line @propelinc/no-explicit-any
     cmsClient.fetchZone = jest.fn().mockImplementation((options: any) => {
       requestOptions = options;
       return response;
