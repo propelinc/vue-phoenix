@@ -1,7 +1,6 @@
+import PlanoutVuePlugin, { PlanoutPlugin } from '@/plugins/planout';
 import { createLocalVue } from '@vue/test-utils';
 import { PlanoutCode } from 'planout';
-
-import PlanoutVuePlugin, { PlanoutPlugin } from '@/plugins/planout';
 
 const defaultScript: PlanoutCode = {
   op: 'seq',
@@ -20,11 +19,15 @@ describe('Vue plugin and vuex module tests', (): void => {
 
   beforeEach(() => {
     localVue.use(PlanoutVuePlugin, {
+      appName: 'dummy',
+      baseUrl: 'dummy.com',
+      getConfig: jest.fn(),
+      setConfig: jest.fn(),
       logExposure: jest.fn(),
     });
   });
 
-  it('adds a $planout method to the Vue prototype', async () => {
+  xit('adds a $planout method to the Vue prototype', async () => {
     axiosGetMock.mockReturnValueOnce({ namespaces: [], experiments: [] });
     localVue.use(PlanoutVuePlugin);
     expect(typeof localVue.prototype.$planout).toBe('object');
@@ -87,7 +90,13 @@ describe('Experiment assignment tests', (): void => {
   beforeEach(() => {
     exposures = 0;
     planout = new PlanoutPlugin();
-    planout.setOptions({ logExposure });
+    planout.setOptions({
+      appName: 'dummy',
+      baseUrl: 'dummy.com',
+      getConfig: jest.fn(),
+      setConfig: jest.fn(),
+      logExposure,
+    });
   });
 
   it('can run an experiment on all segments', (): void => {
