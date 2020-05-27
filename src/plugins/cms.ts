@@ -13,7 +13,7 @@ interface DestroyHTMLElement extends HTMLElement {
   $destroy: () => void;
 }
 
-export interface CmsOptions {
+export interface CmsPluginOptions {
   baseUrl?: string;
   globalCssCacheMs?: number;
   router?: Router;
@@ -31,7 +31,7 @@ export interface CmsOptions {
   trackClickHandler?: (eventName: string, eventProps: {[key: string]: any}) => void;
 }
 
-export interface PluginOptions extends CmsOptions {
+export interface PluginOptions extends CmsPluginOptions {
   baseUrl: string;
   checkConnection: (() => boolean);
   getCaptable: (() => Captable);
@@ -69,7 +69,7 @@ export const pluginOptions: PluginOptions = {
 };
 export var finalPluginOptions: PluginOptions;
 
-const plugin = function install(Vue: typeof _Vue, options?: CmsOptions) {
+const plugin = function install(Vue: typeof _Vue, options?: CmsPluginOptions) {
   Object.assign(pluginOptions, options);
   Vue.component('yield-to', YieldTo);
   Vue.component('content-for', ContentFor);
