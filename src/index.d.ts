@@ -1,6 +1,6 @@
 import Vue from 'vue';
 
-import CmsPlugin, { CmsOptions } from './main';
+import _CmsPlugin, { CmsOptions } from './plugins/cms';
 import './components/capture';
 import './directives';
 import './utils';

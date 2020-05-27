@@ -2,12 +2,12 @@ import _Vue, { VNode } from 'vue';
 import Router from 'vue-router';
 import { DirectiveBinding } from 'vue/types/options';
 
-import { Captable } from './api';
-import CmsCarousel from './components/CmsCarousel.vue';
-import CmsContent from './components/CmsContent';
-import CmsZone from './components/CmsZone.vue';
-import { ContentFor, YieldTo } from './components/capture';
-import { addDirectives } from './directives';
+import { Captable } from '../api';
+import CmsCarousel from '../components/CmsCarousel.vue';
+import CmsContent from '../components/CmsContent';
+import CmsZone from '../components/CmsZone.vue';
+import { ContentFor, YieldTo } from '../components/capture';
+import { addDirectives } from '../directives';
 
 interface DestroyHTMLElement extends HTMLElement {
   $destroy: () => void;
