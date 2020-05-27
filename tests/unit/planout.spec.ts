@@ -1,6 +1,7 @@
-import PlanoutVuePlugin, { PlanoutPlugin } from '@/plugins/planout';
 import { createLocalVue } from '@vue/test-utils';
 import { PlanoutCode } from 'planout';
+
+import PlanoutVuePlugin, { PlanoutPlugin } from '@/plugins/planout';
 
 const defaultScript: PlanoutCode = {
   op: 'seq',
@@ -15,7 +16,7 @@ const defaultScript: PlanoutCode = {
 
 describe('Vue plugin and vuex module tests', (): void => {
   const localVue = createLocalVue();
-  let axiosGetMock = jest.fn();
+  const axiosGetMock = jest.fn();
 
   beforeEach(() => {
     localVue.use(PlanoutVuePlugin, {

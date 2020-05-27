@@ -1,6 +1,7 @@
-import { ContentFor, YieldTo } from '@/components/capture';
 import { mount, createLocalVue } from '@vue/test-utils';
 import Vue from 'vue';
+
+import { ContentFor, YieldTo } from '@/components/capture';
 
 const localVue = createLocalVue();
 

@@ -1,7 +1,8 @@
-import CmsContent from '@/components/CmsContent';
 import { mount, createLocalVue } from '@vue/test-utils';
 import Vue from 'vue';
 import { compileToFunctions } from 'vue-template-compiler';
+
+import CmsContent from '@/components/CmsContent';
 
 Vue.compile = compileToFunctions;
 const localVue = createLocalVue();
