@@ -1,8 +1,8 @@
 import { VNode, VueConstructor } from 'vue';
 import { DirectiveBinding, DirectiveOptions } from 'vue/types/options';
 
-import { getClosest } from './utils';
 import { pluginOptions } from './main';
+import { getClosest } from './utils';
 
 interface DestroyHTMLElement extends HTMLElement {
     $destroy: () => void;
@@ -88,9 +88,9 @@ interface DestroyHTMLElementWithAttrs extends DestroyHTMLElement {
  * Example usage:
  * <div v-track-click event-name="foo" :event-props="{ bar: 'tzar' }">Click me</div>
  */
-const trackClick: DirectiveOptions =  {
+const trackClick: DirectiveOptions = {
   bind(el: DestroyHTMLElementWithAttrs, binding: DirectiveBinding, vnode: VNode): void {
-    el.attrs = vnode.data && vnode.data.attrs ? vnode.data.attrs: {};
+    el.attrs = vnode.data && vnode.data.attrs ? vnode.data.attrs : {};
     const wrappedHandler = (): void => {
       if (!el.attrs || !el.attrs['event-name']) {
         throw new Error('v-track-click: "event-name" attribute is required.');
@@ -104,7 +104,7 @@ const trackClick: DirectiveOptions =  {
     };
   },
   update(el: DestroyHTMLElementWithAttrs, binding: DirectiveBinding, vnode: VNode): void {
-    el.attrs = vnode.data && vnode.data.attrs ? vnode.data.attrs: {};
+    el.attrs = vnode.data && vnode.data.attrs ? vnode.data.attrs : {};
   },
   unbind(el: DestroyHTMLElementWithAttrs): void {
     // A race condition occurs when using both a v-track-click directive and an @click handler.

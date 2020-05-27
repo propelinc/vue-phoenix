@@ -1,14 +1,12 @@
-import { shallowMount, createLocalVue } from '@vue/test-utils';
-import Vue from 'vue';
-
 import { addDirectives } from '@/directives';
 import { pluginOptions } from '@/main';
+import { shallowMount, createLocalVue } from '@vue/test-utils';
+import Vue from 'vue';
 
 const localVue = createLocalVue();
 addDirectives(localVue);
 
 describe('v-track-click directives', (): void => {
-
   beforeEach((): void => {
     window.onerror = jest.fn();
     pluginOptions.trackClickHandler = jest.fn();

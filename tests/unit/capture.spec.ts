@@ -1,16 +1,14 @@
+import { ContentFor, YieldTo } from '@/components/capture';
 import { mount, createLocalVue } from '@vue/test-utils';
 import Vue from 'vue';
-
-import { ContentFor, YieldTo } from '@/components/capture';
 
 const localVue = createLocalVue();
 
 describe('CmsZone.vue', (): void => {
-
   it('content-for specifies yield-to', async (): Promise<void> => {
     const component = Vue.extend({
       components: { ContentFor, YieldTo },
-      data: (): any => ({ replace: false }), // eslint-disable-line @propelinc/no-explicit-any
+      data: (): any => ({ replace: false }), // eslint-disable-line @typescript-eslint/no-explicit-any
       template: `
         <div>
           <yield-to name="foo">Default Content</yield-to>
