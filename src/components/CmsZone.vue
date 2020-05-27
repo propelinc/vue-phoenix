@@ -67,7 +67,7 @@ import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
 
 import { Content } from '../api';
 import cmsClient from '../cmsHttp';
-import { pluginOptions } from '../main';
+import { pluginOptions } from '../plugins/cms';
 
 import CmsCarousel from './CmsCarousel.vue';
 import CmsContent from './CmsContent';

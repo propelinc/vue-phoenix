@@ -11,6 +11,7 @@
     "axios": ">= 0.18.0",
     "jquery": "^3.3.1",
     "lodash": "^4.17.11",
+    "planout": "^4.0.0",
     "vue": "^2.6.8",
     "vue-template-compiler": "^2.6.8",
     "vue-slick": "^1.1.15"

@@ -8,7 +8,7 @@
 import { Vue, Component, Prop } from 'vue-property-decorator';
 import Slick from 'vue-slick';
 
-import { pluginOptions } from '../main';
+import { pluginOptions } from '../plugins/cms';
 
 type Slick = typeof Slick;
 

@@ -1,7 +1,7 @@
 import { VNode, VueConstructor } from 'vue';
 import { DirectiveBinding, DirectiveOptions } from 'vue/types/options';
 
-import { pluginOptions } from './main';
+import { pluginOptions } from './plugins/cms';
 import { getClosest } from './utils';
 
 interface DestroyHTMLElement extends HTMLElement {

@@ -1,5 +1,5 @@
 import { addDirectives } from '@/directives';
-import { pluginOptions } from '@/main';
+import { pluginOptions } from '@/plugins/cms';
 import { shallowMount, createLocalVue } from '@vue/test-utils';
 import Vue from 'vue';
 
