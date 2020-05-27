@@ -9,6 +9,7 @@ import {
 import _Vue from 'vue';
 
 export interface PlanoutPluginOptions {
+  appName: string;
   baseUrl: string;
   getConfig: () => Promise<PlanoutConfig>;
   setConfig: (config: PlanoutConfig) => void;
@@ -332,7 +333,7 @@ export class PlanoutPlugin {
 
   async fetchConfig() {
     try {
-      const response = await this.axios.get<PlanoutConfig>('/cms/planout/config/freshebt');
+      const response = await this.axios.get<PlanoutConfig>(`/cms/planout/config/${options.appName}`);
       const config = await options.getConfig();
       if (!isEqual(response.data, config)) {
         console.info('Planout: Experiment config updated. Re-initializing.');
