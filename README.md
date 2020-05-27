@@ -23,17 +23,17 @@ Vue.use(CmsPlugin, {
 ## Basic usage
 
 ```html
-<div cms-zone="5" />
+<cms-zone zone-id="5" />
 ```
 
 ## Advanced usage
 
 ```html
-<div cms-zone="5">
+<cms-zone zone-id="5">
  <div class="cms-loading">Loading...</div>
  <div class="cms-error">Error</div>
  <div class="cms-offline">Offline</div>
-</div>
+</cms-zone>
 ```
 
 ## Plugin options
