@@ -60,13 +60,15 @@
 </style>
 
 <script lang="ts">
+import { isEqual } from 'lodash';
 import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
 
-import { isEqual } from 'lodash';
+import { Content } from '../api';
 import cmsClient from '../cmsHttp';
-import { pluginOptions, Content } from '../main';
-import CmsContent from './CmsContent';
+import { pluginOptions } from '../main';
+
 import CmsCarousel from './CmsCarousel.vue';
+import CmsContent from './CmsContent';
 
 const durationVisibleToBeTrackedMs = 1000;
 const percentVisible = 50;

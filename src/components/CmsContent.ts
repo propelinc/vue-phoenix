@@ -1,7 +1,6 @@
 import { CreateElement, Component as ComponentType, VNode } from 'vue';
 import { Vue, Component, Prop } from 'vue-property-decorator';
 
-
 @Component({ name: 'cms-content' })
 export default class CmsContent extends Vue {
   @Prop(String) public html!: string;

@@ -15,19 +15,9 @@ module.exports = {
     'plugin:import/typescript',
   ],
   rules: {
-    'import/no-unresolved': ['error'],
+    'import/no-unresolved': 'off',
     'import/order': ['error', {
-      'groups': ['builtin', 'external', 'internal', 'parent', 'sibling', 'unknown'],
-      'pathGroups': [
-        {
-          pattern: '@/less/**',
-          group: 'unknown',
-        },
-        {
-          pattern: '@/**',
-          group: 'internal',
-        },
-      ],
+      'groups': ['builtin', 'external', 'parent', 'sibling'],
       'newlines-between': 'always',
       'alphabetize': { order: 'asc' },
     }],

@@ -46,7 +46,6 @@ export class YieldTo extends Vue {
   }
 }
 
-
 @Component({ name: 'content-for' })
 export class ContentFor extends Vue {
   @Prop(String) public name!: string;
