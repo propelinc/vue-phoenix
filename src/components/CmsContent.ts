@@ -1,5 +1,5 @@
 import { CreateElement, Component as ComponentType, VNode } from 'vue';
-import { Vue, Component, Prop } from 'vue-property-decorator';
+import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
 
 @Component({ name: 'cms-content' })
 export default class CmsContent extends Vue {
@@ -9,9 +9,27 @@ export default class CmsContent extends Vue {
   @Prop(String) public zoneId!: string;
   @Prop({ default: '' }) public tag!: string;
 
-  private get _context() {
-    return {
+  private _context: object = {};
+
+  private beforeMount(): void {
+    this._context = {
       ...this.context,
+      ...this.extra,
+    }
+  }
+
+  @Watch('context', { deep: true, immediate: true })
+  private onContextChanged(): void {
+    this._context = {
+      ...this._context,
+      ...this.context,
+    };
+  }
+
+  @Watch('extra', { deep: true, immediate: true })
+  private onExtraChanged(): void {
+    this._context = {
+      ...this._context,
       ...this.extra,
     };
   }
