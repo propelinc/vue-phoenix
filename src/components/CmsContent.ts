@@ -5,33 +5,14 @@ import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
 export default class CmsContent extends Vue {
   @Prop(String) public html!: string;
   @Prop(Object) public extra!: {};
-  @Prop(Object) public context!: {};
   @Prop(String) public zoneId!: string;
   @Prop({ default: '' }) public tag!: string;
 
-  private _context: object = {};
-
-  private beforeMount(): void {
-    this._context = {
-      ...this.context,
-      ...this.extra,
-    }
-  }
-
-  @Watch('context', { deep: true, immediate: true })
-  private onContextChanged(): void {
-    this._context = {
-      ...this._context,
-      ...this.context,
-    };
-  }
+  public context: object = {};
 
   @Watch('extra', { deep: true, immediate: true })
   private onExtraChanged(): void {
-    this._context = {
-      ...this._context,
-      ...this.extra,
-    };
+    Object.assign(this.context, this.extra);
   }
 
   private render(h: CreateElement): VNode {
@@ -54,7 +35,7 @@ export default class CmsContent extends Vue {
     };
 
     return h(dynamic, {
-      props: { context: this._context, zoneId: this.zoneId },
+      props: { context: this.context, zoneId: this.zoneId },
     });
   }
 
