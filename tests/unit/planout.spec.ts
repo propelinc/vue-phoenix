@@ -28,6 +28,7 @@ describe('Vue plugin and vuex module tests', (): void => {
     });
   });
 
+  // TODO(ram): Make test wait for config load.
   xit('adds a $planout method to the Vue prototype', async () => {
     axiosGetMock.mockReturnValueOnce({ namespaces: [], experiments: [] });
     localVue.use(PlanoutVuePlugin);
