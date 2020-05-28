@@ -16,8 +16,7 @@
           class="cms-zone-carousel-content"
           tag="div"
           :html="content.html"
-          :extra="extra"
-          :context="context"
+          :extra="_extra"
           :zone-id="zoneId"
         />
       </cms-carousel>
@@ -28,8 +27,7 @@
           :class="`cms-zone-content-${zoneId}-${index}`"
           tag="div"
           :html="content.html"
-          :extra="extra"
-          :context="context"
+          :extra="_extra"
           :zone-id="zoneId"
         />
       </div>
@@ -114,6 +112,13 @@ export default class CmsZone extends Vue {
     this.$root.$off('cms.refresh', this.refresh);
     this.$root.$off(`cms.refresh.${this.zoneId}`, this.refresh);
     this.removeScrollListeners();
+  }
+
+  private get _extra(): object {
+    return {
+      ...this.extra,
+      ...this.context,
+    };
   }
 
   private removeScrollListeners(): void {
