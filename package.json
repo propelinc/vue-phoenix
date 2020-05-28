@@ -42,7 +42,7 @@
     "jest": "25.1.0",
     "jquery": "3.5.1",
     "lodash": "4.17.15",
-    "planout": "git://github.com/propelinc/Planout.js.git#28137a33f59f3d1c45929f436c2f984413373821",
+    "planout": "git://github.com/propelinc/Planout.js.git#4097d751a1b81d82b996569d9d029f08bc35e355",
     "ts-jest": "25.2.1",
     "typescript": "3.4.3",
     "vue": "2.6.10",
