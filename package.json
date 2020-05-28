@@ -11,7 +11,7 @@
     "axios": ">= 0.18.0",
     "jquery": "^3.3.1",
     "lodash": "^4.17.11",
-    "planout": "git://github.com/propelinc/Planout.js.git#28137a33f59f3d1c45929f436c2f984413373821",
+    "planout": "git://github.com/propelinc/Planout.js.git#4097d751a1b81d82b996569d9d029f08bc35e355",
     "vue": "^2.6.8",
     "vue-template-compiler": "^2.6.8",
     "vue-slick": "^1.1.15"
