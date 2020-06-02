@@ -11,9 +11,8 @@ export default class CmsContent extends Vue {
 
   public context: object = {};
 
-  @Watch('extra', { deep: true, immediate: true })
-  private onExtraChanged(): void {
-    Object.assign(this.context, this.extra);
+  private created(): void {
+    this.context = { ...this.extra };
   }
 
   private render(h: CreateElement): VNode {

@@ -16,7 +16,7 @@
           class="cms-zone-carousel-content"
           tag="div"
           :html="content.html"
-          :extra="_extra"
+          :extra="extra"
           :zone-id="zoneId"
         />
       </cms-carousel>
@@ -27,7 +27,7 @@
           :class="`cms-zone-content-${zoneId}-${index}`"
           tag="div"
           :html="content.html"
-          :extra="_extra"
+          :extra="extra"
           :zone-id="zoneId"
         />
       </div>
@@ -88,7 +88,6 @@ export function getClosest(elm: Element, selector: string): HTMLElement | null {
 export default class CmsZone extends Vue {
   @Prop(String) public zoneId!: string;
   @Prop(Object) public extra!: {};
-  @Prop(Object) public context!: {};
 
   public zoneType: string = '';
   public zoneHeader: string = '';
