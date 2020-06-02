@@ -88,7 +88,7 @@ interface DestroyHTMLElementWithAttrs extends DestroyHTMLElement {
  * Example usage:
  * <div v-track-click event-name="foo" :event-props="{ bar: 'tzar' }">Click me</div>
  */
-const trackClick: DirectiveOptions =  {
+const trackClick: DirectiveOptions = {
   bind(el: DestroyHTMLElementWithAttrs, binding: DirectiveBinding, vnode: VNode): void {
     el.attrs = vnode.data && vnode.data.attrs ? vnode.data.attrs: {};
     const wrappedHandler = (): void => {
