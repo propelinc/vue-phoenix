@@ -111,13 +111,6 @@ export default class CmsZone extends Vue {
     this.removeScrollListeners();
   }
 
-  private get _extra(): object {
-    return {
-      ...this.extra,
-      ...this.context,
-    };
-  }
-
   private removeScrollListeners(): void {
     if (this.scrollable) {
       for (const h of this.scrollableListeners) {
