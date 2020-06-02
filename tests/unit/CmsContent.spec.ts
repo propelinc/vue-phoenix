@@ -21,11 +21,11 @@ describe('CmsContent.vue', (): void => {
   });
 
   it('allows invoking functions from the context', async (): Promise<void> => {
-    const context = { bus: jest.fn(() => 'bar') };
+    const extra = { bus: jest.fn(() => 'bar') };
     const html = '<div>Content {{ context.bus() }}</div>';
     const wrapper = mount(CmsContent, {
       localVue,
-      propsData: { html, context },
+      propsData: { html, extra },
     });
 
     await Vue.nextTick();
