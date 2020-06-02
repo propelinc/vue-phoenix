@@ -28,11 +28,13 @@ export interface HTMLContent {
 }
 
 export interface Content extends HTMLContent {
+  delivery: number;
   tracker: string;
   track_on?: string;
   tracked?: boolean;
   extra?: {
     track_on?: string;
+    track_analytics?: boolean;
     external_trackers?: string[];
   }
 }
