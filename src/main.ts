@@ -63,7 +63,7 @@ export interface CmsOptions {
   checkConnection?: (() => boolean);
   onCarouselSwipe?: ((zoneId: string, index: number) => void);
 
-  trackClickHandler?: (eventName: string, eventProps: {[key: string]: any}) => void; // eslint-disable-line @propelinc/no-explicit-any
+  trackAnalytics?: (eventName: string, eventProps: {[key: string]: any}) => void; // eslint-disable-line @propelinc/no-explicit-any
 }
 
 export interface PluginOptions extends CmsOptions {
@@ -73,7 +73,7 @@ export interface PluginOptions extends CmsOptions {
   getSiteVars: (() => object);
   globalCssCacheMs: number;
   setCaptable: ((captable: Captable) => void);
-  trackClickHandler: (eventName: string, eventProps: {[key: string]: any}) => void; // eslint-disable-line @propelinc/no-explicit-any
+  trackAnalytics: (eventName: string, eventProps: {[key: string]: any}) => void; // eslint-disable-line @propelinc/no-explicit-any
 }
 
 export const pluginOptions: PluginOptions = {
@@ -96,7 +96,7 @@ export const pluginOptions: PluginOptions = {
   getSiteVars(): object {
     return {};
   },
-  trackClickHandler(): void {
+  trackAnalytics(): void {
     return;
   },
 };
