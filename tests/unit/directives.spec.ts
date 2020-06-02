@@ -71,3 +71,30 @@ describe('v-track-click directives', (): void => {
     expect(pluginOptions.trackClickHandler).toHaveBeenCalledWith(testCase.eventName, { foo: 'car' });
   });
 });
+
+describe('v-track-render tests', (): void => {
+  beforeEach((): void => {
+    pluginOptions.trackClickHandler = jest.fn();
+  });
+
+  it('tracks an event when inserted into the DOM (technically, its parent'), async (): Promise<void> => {
+    const testCase = {
+      template: `<div v-if="eventProps.foo == 'car'" v-track-render @click="eventProps.foo = 'bar'" event-name="kamehameha" :event-props="eventProps"></div>`,
+      eventName: 'kamehameha',
+      eventProps: { foo: 'bar' },
+    };
+
+    const component = Vue.extend({
+      data: () => ({ eventProps: testCase.eventProps }),
+      template: testCase.template,
+    });
+    const wrapper = shallowMount(component, { localVue });
+
+    expect(pluginOptions.trackClickHandler).not.toHaveBeenCalled();
+
+    wrapper.setData({ eventProps: { foo: 'car' } });
+
+    await Vue.nextTick();
+    expect(pluginOptions.trackClickHandler).toHaveBeenCalledWith(testCase.eventName, { foo: 'car' });
+  });
+});
