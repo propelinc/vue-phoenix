@@ -88,14 +88,15 @@ interface DestroyHTMLElementWithAttrs extends DestroyHTMLElement {
  * Example usage:
  * <div v-track-click event-name="foo" :event-props="{ bar: 'tzar' }">Click me</div>
  */
-const trackClick: DirectiveOptions =  {
+const trackClick: DirectiveOptions = {
   bind(el: DestroyHTMLElementWithAttrs, binding: DirectiveBinding, vnode: VNode): void {
     el.attrs = vnode.data && vnode.data.attrs ? vnode.data.attrs: {};
+    const eventName = binding.value || el.attrs['event-name'];
     const wrappedHandler = (): void => {
-      if (!el.attrs || !el.attrs['event-name']) {
+      if (!eventName) {
         throw new Error('v-track-click: "event-name" attribute is required.');
       }
-      pluginOptions.trackClickHandler(el.attrs['event-name'], el.attrs['event-props'] || {});
+      pluginOptions.trackClickHandler(eventName, (el.attrs || {})['event-props'] || {});
     };
     el.addEventListener('click', wrappedHandler);
     el.$destroy = (): void => {
@@ -119,8 +120,26 @@ const trackClick: DirectiveOptions =  {
   },
 };
 
+/**
+ * Track an event to amplitude on render (or, more specifically, when it's inserted into its parent).
+ *
+ * Example usage:
+ * <div v-track-render event-name="foo" :event-props="{ bar: 'tzar' }">I rendered.</div>
+ */
+const trackRender: DirectiveOptions = {
+  inserted(el: DestroyHTMLElementWithAttrs, binding: DirectiveBinding, vnode: VNode): void {
+    el.attrs = vnode.data && vnode.data.attrs ? vnode.data.attrs : {};
+    const eventName = binding.value || el.attrs['event-name'];
+    if (!eventName) {
+      throw new Error('v-track-render: "event-name" attribute is required.');
+    }
+    pluginOptions.trackClickHandler(eventName, el.attrs['event-props'] || {});
+  },
+};
+
 export function addDirectives(Vue: VueConstructor): void {
   Vue.directive('infinite-scroll', infiniteScroll);
   Vue.directive('scroll-on-focus', scrollOnFocus);
   Vue.directive('track-click', trackClick);
+  Vue.directive('track-render', trackRender);
 }
