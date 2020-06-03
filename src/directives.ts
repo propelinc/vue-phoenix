@@ -91,11 +91,12 @@ interface DestroyHTMLElementWithAttrs extends DestroyHTMLElement {
 const trackClick: DirectiveOptions = {
   bind(el: DestroyHTMLElementWithAttrs, binding: DirectiveBinding, vnode: VNode): void {
     el.attrs = vnode.data && vnode.data.attrs ? vnode.data.attrs: {};
+    const eventName = binding.value || el.attrs['event-name'];
     const wrappedHandler = (): void => {
-      if (!el.attrs || !el.attrs['event-name']) {
+      if (!eventName) {
         throw new Error('v-track-click: "event-name" attribute is required.');
       }
-      pluginOptions.trackClickHandler(el.attrs['event-name'], el.attrs['event-props'] || {});
+      pluginOptions.trackClickHandler(eventName, (el.attrs || {})['event-props'] || {});
     };
     el.addEventListener('click', wrappedHandler);
     el.$destroy = (): void => {
@@ -128,10 +129,11 @@ const trackClick: DirectiveOptions = {
 const trackRender: DirectiveOptions = {
   inserted(el: DestroyHTMLElementWithAttrs, binding: DirectiveBinding, vnode: VNode): void {
     el.attrs = vnode.data && vnode.data.attrs ? vnode.data.attrs : {};
-    if (!el.attrs || !el.attrs['event-name']) {
+    const eventName = binding.value || el.attrs['event-name'];
+    if (!eventName) {
       throw new Error('v-track-render: "event-name" attribute is required.');
     }
-    pluginOptions.trackClickHandler(el.attrs['event-name'], el.attrs['event-props'] || {});
+    pluginOptions.trackClickHandler(eventName, el.attrs['event-props'] || {});
   },
 };
 

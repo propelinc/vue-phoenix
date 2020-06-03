@@ -51,7 +51,28 @@ describe('v-track-click tests', (): void => {
 
   it('tracks an event on click even if element is removed from the DOM', async (): Promise<void> => {
     const testCase = {
-      template: `<div v-if="eventProps.foo == 'bar'" v-track-click @click="eventProps.foo = 'car'" event-name="kamehameha" :event-props="eventProps"></div>`,
+      template: `<div v-if="eventProps.foo == 'bar'" @click="eventProps.foo = 'car'" v-track-click event-name="kamehameha" :event-props="eventProps"></div>`,
+      eventName: 'kamehameha',
+      eventProps: { foo: 'bar' },
+    };
+
+    const component = Vue.extend({
+      data: () => ({ eventProps: testCase.eventProps }),
+      template: testCase.template,
+    });
+    const wrapper = shallowMount(component, { localVue });
+    expect(pluginOptions.trackClickHandler).not.toHaveBeenCalled();
+
+    console.error = jest.fn();
+    wrapper.find('div').trigger('click');
+
+    await Vue.nextTick();
+    expect(pluginOptions.trackClickHandler).toHaveBeenCalledWith(testCase.eventName, { foo: 'car' });
+  });
+
+  it('tracks when the event name is the value of the directive', async (): Promise<void> => {
+    const testCase = {
+      template: `<div v-if="eventProps.foo == 'bar'" @click="eventProps.foo = 'car'" v-track-click="'kamehameha'" :event-props="eventProps"></div>`,
       eventName: 'kamehameha',
       eventProps: { foo: 'bar' },
     };
@@ -76,9 +97,9 @@ describe('v-track-render tests', (): void => {
     pluginOptions.trackClickHandler = jest.fn();
   });
 
-  it('tracks an event when inserted into the DOM (technically, its parent'), async (): Promise<void> => {
+  it('tracks an event when inserted into the DOM (technically, its parent)', async (): Promise<void> => {
     const testCase = {
-      template: `<div v-if="eventProps.foo == 'car'" v-track-render @click="eventProps.foo = 'bar'" event-name="kamehameha" :event-props="eventProps"></div>`,
+      template: `<div v-if="eventProps.foo == 'car'" @click="eventProps.foo = 'bar'" v-track-render="'kamehameha'" :event-props="eventProps"></div>`,
       eventName: 'kamehameha',
       eventProps: { foo: 'bar' },
     };
