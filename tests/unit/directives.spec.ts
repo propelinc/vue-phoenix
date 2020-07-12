@@ -6,7 +6,7 @@ import Vue from 'vue';
 const localVue = createLocalVue();
 addDirectives(localVue);
 
-describe('v-track-click directives', (): void => {
+describe('v-track-click tests', (): void => {
   beforeEach((): void => {
     window.onerror = jest.fn();
     pluginOptions.trackClickHandler = jest.fn();
