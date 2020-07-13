@@ -11,7 +11,7 @@
     "axios": ">= 0.18.0",
     "jquery": "^3.3.1",
     "lodash": "^4.17.11",
-    "planout": "git://github.com/propelinc/Planout.js.git#4097d751a1b81d82b996569d9d029f08bc35e355",
+    "planout": "git://github.com/rawls238/Planout.js.git#97807c149d01031b972d9c3df7fb93558a166120",
     "vue": "^2.6.8",
     "vue-template-compiler": "^2.6.8",
     "vue-slick": "^1.1.15"
@@ -42,7 +42,7 @@
     "jest": "25.1.0",
     "jquery": "3.5.1",
     "lodash": "4.17.15",
-    "planout": "git://github.com/propelinc/Planout.js.git#4097d751a1b81d82b996569d9d029f08bc35e355",
+    "planout": "git://github.com/rawls238/Planout.js.git#97807c149d01031b972d9c3df7fb93558a166120",
     "ts-jest": "25.2.1",
     "typescript": "3.4.3",
     "vue": "2.6.10",
