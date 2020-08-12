@@ -1,4 +1,4 @@
-import { VNode, VueConstructor } from 'vue';
+import Vue, { VNode, VueConstructor } from 'vue';
 import { DirectiveBinding, DirectiveOptions } from 'vue/types/options';
 
 import { getClosest } from './utils';
@@ -137,9 +137,28 @@ const trackRender: DirectiveOptions = {
   },
 };
 
+/**
+ * Directive used by the CMS to initialize new data.
+ *
+ * Example usage:
+ * <div v-init="{context: context, value: {k: 'Hi'}}">
+ *   <span v-if="context.k" v-html="context.k"></span>
+ * </div>
+ */
+const init: DirectiveOptions = {
+  bind(el: HTMLElement, binding: DirectiveBinding): void {
+    if (binding.value) {
+      Object.keys(binding.value.value).forEach((k): void => {
+        Vue.set(binding.value.context, k, binding.value.value[k]);
+      });
+    }
+  },
+};
+
 export function addDirectives(Vue: VueConstructor): void {
   Vue.directive('infinite-scroll', infiniteScroll);
   Vue.directive('scroll-on-focus', scrollOnFocus);
   Vue.directive('track-click', trackClick);
   Vue.directive('track-render', trackRender);
+  Vue.directive('init', init);
 }
