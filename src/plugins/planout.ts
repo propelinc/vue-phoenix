@@ -356,7 +356,6 @@ export default (Vue: typeof _Vue, options: PlanoutPluginOptions): void => {
   Object.defineProperties(Vue.prototype, {
     $planout: {
       get() {
-        planout.fetchConfig();
         return planout;
       },
     },
