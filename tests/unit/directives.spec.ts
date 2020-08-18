@@ -10,19 +10,19 @@ addDirectives(localVue);
 describe('v-track-click tests', (): void => {
   beforeEach((): void => {
     window.onerror = jest.fn();
-    pluginOptions.trackClickHandler = jest.fn();
+    pluginOptions.trackAnalytics = jest.fn();
   });
 
   it('does not track an event on click', (): void => {
     const component = Vue.extend({ template: '<div v-track-click></div>' });
     const wrapper = shallowMount(component, { localVue });
-    expect(pluginOptions.trackClickHandler).not.toHaveBeenCalled();
+    expect(pluginOptions.trackAnalytics).not.toHaveBeenCalled();
 
     console.error = jest.fn();
     wrapper.find('div').trigger('click');
 
     expect(window.onerror).toHaveBeenCalled();
-    expect(pluginOptions.trackClickHandler).not.toHaveBeenCalled();
+    expect(pluginOptions.trackAnalytics).not.toHaveBeenCalled();
   });
 
   it('tracks an event on click', async (): Promise<void> => {
@@ -37,16 +37,16 @@ describe('v-track-click tests', (): void => {
       template: testCase.template,
     });
     const wrapper = shallowMount(component, { localVue });
-    expect(pluginOptions.trackClickHandler).not.toHaveBeenCalled();
+    expect(pluginOptions.trackAnalytics).not.toHaveBeenCalled();
 
     console.error = jest.fn();
     wrapper.find('div').trigger('click');
 
-    expect(pluginOptions.trackClickHandler).toHaveBeenCalledWith(testCase.eventName, { foo: 'bar' });
+    expect(pluginOptions.trackAnalytics).toHaveBeenCalledWith(testCase.eventName, { foo: 'bar' });
     testCase.eventProps.foo = 'car';
     await Vue.nextTick();
 
-    expect(pluginOptions.trackClickHandler).toHaveBeenCalledWith(testCase.eventName, { foo: 'car' });
+    expect(pluginOptions.trackAnalytics).toHaveBeenCalledWith(testCase.eventName, { foo: 'car' });
   });
 
   it('tracks an event on click even if element is removed from the DOM', async (): Promise<void> => {
@@ -61,13 +61,13 @@ describe('v-track-click tests', (): void => {
       template: testCase.template,
     });
     const wrapper = shallowMount(component, { localVue });
-    expect(pluginOptions.trackClickHandler).not.toHaveBeenCalled();
+    expect(pluginOptions.trackAnalytics).not.toHaveBeenCalled();
 
     console.error = jest.fn();
     wrapper.find('div').trigger('click');
 
     await Vue.nextTick();
-    expect(pluginOptions.trackClickHandler).toHaveBeenCalledWith(testCase.eventName, { foo: 'car' });
+    expect(pluginOptions.trackAnalytics).toHaveBeenCalledWith(testCase.eventName, { foo: 'car' });
   });
 
   it('tracks when the event name is the value of the directive', async (): Promise<void> => {
@@ -82,19 +82,19 @@ describe('v-track-click tests', (): void => {
       template: testCase.template,
     });
     const wrapper = shallowMount(component, { localVue });
-    expect(pluginOptions.trackClickHandler).not.toHaveBeenCalled();
+    expect(pluginOptions.trackAnalytics).not.toHaveBeenCalled();
 
     console.error = jest.fn();
     wrapper.find('div').trigger('click');
 
     await Vue.nextTick();
-    expect(pluginOptions.trackClickHandler).toHaveBeenCalledWith(testCase.eventName, { foo: 'car' });
+    expect(pluginOptions.trackAnalytics).toHaveBeenCalledWith(testCase.eventName, { foo: 'car' });
   });
 });
 
 describe('v-track-render tests', (): void => {
   beforeEach((): void => {
-    pluginOptions.trackClickHandler = jest.fn();
+    pluginOptions.trackAnalytics = jest.fn();
   });
 
   it('tracks an event when inserted into the DOM (technically, its parent)', async (): Promise<void> => {
@@ -110,12 +110,12 @@ describe('v-track-render tests', (): void => {
     });
     const wrapper = shallowMount(component, { localVue });
 
-    expect(pluginOptions.trackClickHandler).not.toHaveBeenCalled();
+    expect(pluginOptions.trackAnalytics).not.toHaveBeenCalled();
 
     wrapper.setData({ eventProps: { foo: 'car' } });
 
     await Vue.nextTick();
-    expect(pluginOptions.trackClickHandler).toHaveBeenCalledWith(testCase.eventName, { foo: 'car' });
+    expect(pluginOptions.trackAnalytics).toHaveBeenCalledWith(testCase.eventName, { foo: 'car' });
   });
 });
 

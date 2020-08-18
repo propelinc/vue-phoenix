@@ -96,7 +96,7 @@ const trackClick: DirectiveOptions = {
       if (!eventName) {
         throw new Error('v-track-click: "event-name" attribute is required.');
       }
-      pluginOptions.trackClickHandler(eventName, (el.attrs || {})['event-props'] || {});
+      pluginOptions.trackAnalytics(eventName, (el.attrs || {})['event-props'] || {});
     };
     el.addEventListener('click', wrappedHandler);
     el.$destroy = (): void => {
@@ -133,7 +133,7 @@ const trackRender: DirectiveOptions = {
     if (!eventName) {
       throw new Error('v-track-render: "event-name" attribute is required.');
     }
-    pluginOptions.trackClickHandler(eventName, el.attrs['event-props'] || {});
+    pluginOptions.trackAnalytics(eventName, el.attrs['event-props'] || {});
   },
 };
 
