@@ -11,8 +11,6 @@ import _Vue from 'vue';
 export interface PlanoutPluginOptions {
   appName: string;
   baseUrl: string;
-  getConfig: () => Promise<PlanoutConfig>;
-  setConfig: (config: PlanoutConfig) => void;
   logExposure: (event: PlanoutEvent) => void;
   localOverrides?: PlanoutOverrides;
 }
@@ -203,6 +201,8 @@ export class PlanoutPlugin {
 
   _axios: AxiosInstance | undefined;
 
+  _config: PlanoutConfig | undefined;
+
   get axios(): AxiosInstance {
     if (!this._axios) {
       this._axios = Axios.create({
@@ -300,6 +300,13 @@ export class PlanoutPlugin {
   }
 
   useConfig(config: PlanoutConfig) {
+    if (isEqual(config, this._config)) {
+      console.info('Planout: Experiment config unchanged.');
+      return;
+    }
+
+    console.info('Planout: Experiment config updated. Re-initializing.');
+    this._config = config;
     this.resetNamespaces();
     config.namespaces.forEach((nsConfig) => {
       this.addNamespace(
@@ -331,20 +338,8 @@ export class PlanoutPlugin {
     }
   }
 
-  async fetchConfig() {
-    try {
-      const response = await this.axios.get<PlanoutConfig>(`/cms/planout/config/${options.appName}`);
-      const config = await options.getConfig();
-      if (!isEqual(response.data, config)) {
-        console.info('Planout: Experiment config updated. Re-initializing.');
-        options.setConfig(response.data);
-        this.useConfig(response.data);
-      } else {
-        console.info('Planout: Experiment config unchanged.');
-      }
-    } catch (error) {
-      console.error(error);
-    }
+  fetchRemoteConfig() {
+    return this.axios.get<PlanoutConfig>(`/cms/planout/config/${options.appName}`);
   }
 }
 
