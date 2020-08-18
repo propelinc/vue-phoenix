@@ -1,14 +1,9 @@
 import Axios, { AxiosInstance, AxiosResponse } from 'axios';
-import { pluginOptions, Content } from './main';
 
-interface CmsStyleSheet {
-  url: string;
-  css_hash: string;
-  sheet?: HTMLLinkElement;
-}
+import { Content, CmsStyleSheet } from './api';
+import { pluginOptions } from './plugins/cms';
 
 class CmsClient {
-
   private _axios: null | AxiosInstance = null;
 
   private cssUpdatedAt = 0;
@@ -120,7 +115,6 @@ class CmsClient {
 
     await this.http({ zoneId, url: content.tracker });
   }
-
 }
 
 export default new CmsClient();

@@ -1,6 +1,6 @@
 import { mount, createLocalVue } from '@vue/test-utils';
-import { compileToFunctions } from 'vue-template-compiler';
 import Vue from 'vue';
+import { compileToFunctions } from 'vue-template-compiler';
 
 import CmsContent from '@/components/CmsContent';
 

@@ -7,7 +7,8 @@
 <script lang="ts">
 import { Vue, Component, Prop } from 'vue-property-decorator';
 import Slick from 'vue-slick';
-import { pluginOptions } from '../main';
+
+import { pluginOptions } from '../plugins/cms';
 
 type Slick = typeof Slick;
 
@@ -30,7 +31,7 @@ export default class CmsCarousel extends Vue {
       arrows: false,
       currentIndex: this.index,
       centerMode: true,
-      dots: this.$slots.default && this.$slots.default.length > 1 ? true: false,
+      dots: !!(this.$slots.default && this.$slots.default.length > 1),
       centerPadding: this.centerPadding || '0',
     };
   }

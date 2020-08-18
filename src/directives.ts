@@ -1,8 +1,8 @@
 import Vue, { VNode, VueConstructor } from 'vue';
 import { DirectiveBinding, DirectiveOptions } from 'vue/types/options';
 
+import { pluginOptions } from './plugins/cms';
 import { getClosest } from './utils';
-import { pluginOptions } from './main';
 
 interface DestroyHTMLElement extends HTMLElement {
     $destroy: () => void;
@@ -105,7 +105,7 @@ const trackClick: DirectiveOptions = {
     };
   },
   update(el: DestroyHTMLElementWithAttrs, binding: DirectiveBinding, vnode: VNode): void {
-    el.attrs = vnode.data && vnode.data.attrs ? vnode.data.attrs: {};
+    el.attrs = vnode.data && vnode.data.attrs ? vnode.data.attrs : {};
   },
   unbind(el: DestroyHTMLElementWithAttrs): void {
     // A race condition occurs when using both a v-track-click directive and an @click handler.

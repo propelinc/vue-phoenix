@@ -1,7 +1,8 @@
 module.exports = {
   root: true,
   plugins: [
-    '@propelinc',
+    '@typescript-eslint',
+    'no-only-tests',
   ],
   extends: [
     'plugin:vue/essential',
@@ -10,8 +11,17 @@ module.exports = {
     '@vue/standard',
     '@vue/typescript',
     'eslint:recommended',
+    'plugin:import/errors',
+    'plugin:import/typescript',
   ],
   rules: {
+    'import/no-unresolved': 'off',
+    'import/order': ['error', {
+      'groups': ['builtin', 'external', 'parent', 'sibling'],
+      'newlines-between': 'always',
+      'alphabetize': { order: 'asc' },
+    }],
+    'no-only-tests/no-only-tests': 'error',
     'object-curly-spacing': ['error', 'always'],
     'brace-style': ['error', '1tbs'],
     'quote-props': ['error', 'consistent-as-needed'],
@@ -22,10 +32,18 @@ module.exports = {
     'no-debugger': 'error',
     'comma-dangle': ['error', 'always-multiline'],
     'no-unused-vars': 'off',
-    '@propelinc/no-unused-vars': 'error',
-    '@propelinc/no-explicit-any': 'error',
+    'no-useless-constructor': 'off',
+    '@typescript-eslint/no-unused-vars': 'error',
+    '@typescript-eslint/no-explicit-any': 'error',
+    '@typescript-eslint/no-useless-constructor': 'error',
     'eqeqeq': ['error', 'always'],
     'semi': ['error', 'always'],
+    'prefer-promise-reject-errors': ['error', { allowEmptyReject: true }],
+    'space-before-function-paren': ['error', {
+      anonymous: 'never',
+      named: 'never',
+      asyncArrow: 'always',
+    }],
     'vue/max-attributes-per-line': ['error', {
       singleline: 3,
       multiline: {
@@ -35,6 +53,6 @@ module.exports = {
     }],
   },
   parserOptions: {
-    parser: '@propelinc/parser',
+    parser: '@typescript-eslint/parser',
   },
 };
