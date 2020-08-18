@@ -118,14 +118,6 @@ class CmsClient {
       });
     }
 
-    const trackAnalytics = (content.extra || {}).track_analytics;
-    if (trackAnalytics) {
-      pluginOptions.trackAnalytics('cms impression', {
-        zoneId,
-        deliveryId: content.delivery,
-      });
-    }
-
     await this.http({ zoneId, url: content.tracker });
   }
 

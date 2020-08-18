@@ -34,7 +34,6 @@ export interface Content extends HTMLContent {
   tracked?: boolean;
   extra?: {
     track_on?: string;
-    track_analytics?: boolean;
     external_trackers?: string[];
   }
 }
