@@ -1,8 +1,8 @@
-import { VNode, VueConstructor } from 'vue';
+import Vue, { VNode, VueConstructor } from 'vue';
 import { DirectiveBinding, DirectiveOptions } from 'vue/types/options';
 
+import { pluginOptions } from './plugins/cms';
 import { getClosest } from './utils';
-import { pluginOptions } from './main';
 
 interface DestroyHTMLElement extends HTMLElement {
     $destroy: () => void;
@@ -105,7 +105,7 @@ const trackClick: DirectiveOptions = {
     };
   },
   update(el: DestroyHTMLElementWithAttrs, binding: DirectiveBinding, vnode: VNode): void {
-    el.attrs = vnode.data && vnode.data.attrs ? vnode.data.attrs: {};
+    el.attrs = vnode.data && vnode.data.attrs ? vnode.data.attrs : {};
   },
   unbind(el: DestroyHTMLElementWithAttrs): void {
     // A race condition occurs when using both a v-track-click directive and an @click handler.
@@ -137,9 +137,28 @@ const trackRender: DirectiveOptions = {
   },
 };
 
+/**
+ * Directive used by the CMS to initialize new data.
+ *
+ * Example usage:
+ * <div v-init="{context: context, value: {k: 'Hi'}}">
+ *   <span v-if="context.k" v-html="context.k"></span>
+ * </div>
+ */
+const init: DirectiveOptions = {
+  bind(el: HTMLElement, binding: DirectiveBinding): void {
+    if (binding.value) {
+      Object.keys(binding.value.value).forEach((k): void => {
+        Vue.set(binding.value.context, k, binding.value.value[k]);
+      });
+    }
+  },
+};
+
 export function addDirectives(Vue: VueConstructor): void {
   Vue.directive('infinite-scroll', infiniteScroll);
   Vue.directive('scroll-on-focus', scrollOnFocus);
   Vue.directive('track-click', trackClick);
   Vue.directive('track-render', trackRender);
+  Vue.directive('init', init);
 }

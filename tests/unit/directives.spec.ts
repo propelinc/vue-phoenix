@@ -2,7 +2,7 @@ import { shallowMount, createLocalVue } from '@vue/test-utils';
 import Vue from 'vue';
 
 import { addDirectives } from '@/directives';
-import { pluginOptions } from '@/main';
+import { pluginOptions } from '@/plugins/cms';
 
 const localVue = createLocalVue();
 addDirectives(localVue);
@@ -116,5 +116,18 @@ describe('v-track-render tests', (): void => {
 
     await Vue.nextTick();
     expect(pluginOptions.trackClickHandler).toHaveBeenCalledWith(testCase.eventName, { foo: 'car' });
+  });
+});
+
+describe('v-init', () => {
+  it('v-init sets the correct values', () => {
+    const testComponent = Vue.extend({
+      data: function() {
+        return { context: {} };
+      },
+      template: '<div v-init="{ context: context, value: { hello: \'world\'}}"></div>',
+    });
+    const wrapper = shallowMount(testComponent, { localVue });
+    expect(wrapper.vm.$data.context).toEqual({ hello: 'world' });
   });
 });

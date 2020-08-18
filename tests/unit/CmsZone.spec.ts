@@ -1,20 +1,21 @@
+import { Content } from '@/api';
 import { shallowMount, mount, createLocalVue } from '@vue/test-utils';
-import { compileToFunctions } from 'vue-template-compiler';
 import Vue from 'vue';
+import { compileToFunctions } from 'vue-template-compiler';
 
 import cmsClient from '@/cmsHttp';
-import CmsPlugin, { Content } from '@/main';
 import CmsZone from '@/components/CmsZone.vue';
+import CmsPlugin from '@/plugins/cms';
 
 Vue.compile = compileToFunctions;
 const localVue = createLocalVue();
 localVue.use(CmsPlugin);
 
 describe('CmsZone.vue', (): void => {
-  let response: any; // eslint-disable-line @propelinc/no-explicit-any
-  let requestOptions: any; // eslint-disable-line @propelinc/no-explicit-any
-  let resolvePromise: any; // eslint-disable-line @propelinc/no-explicit-any
-  let rejectPromise: any; // eslint-disable-line @propelinc/no-explicit-any
+  let response: any; // eslint-disable-line @typescript-eslint/no-explicit-any
+  let requestOptions: any; // eslint-disable-line @typescript-eslint/no-explicit-any
+  let resolvePromise: any; // eslint-disable-line @typescript-eslint/no-explicit-any
+  let rejectPromise: any; // eslint-disable-line @typescript-eslint/no-explicit-any
 
   function makeResponse(zoneType: string, content: Content[]) {
     return {
@@ -41,7 +42,7 @@ describe('CmsZone.vue', (): void => {
     });
 
     cmsClient.trackZone = jest.fn();
-    // eslint-disable-next-line @propelinc/no-explicit-any
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     cmsClient.fetchZone = jest.fn().mockImplementation((options: any) => {
       requestOptions = options;
       return response;
@@ -193,11 +194,11 @@ describe('CmsZone.vue', (): void => {
 });
 
 describe('CmsZone.vue isContentVisible tests:', (): void => {
-  let cms: any; // eslint-disable-line @propelinc/no-explicit-any
+  let cms: any; // eslint-disable-line @typescript-eslint/no-explicit-any
 
   function getElementWithRect(height: number, top: number, bottom: number): Element {
     const element = document.createElement('div');
-    (element as any).getBoundingClientRect = () => ({ height, top, bottom });// eslint-disable-line @propelinc/no-explicit-any
+    (element as any).getBoundingClientRect = () => ({ height, top, bottom });// eslint-disable-line @typescript-eslint/no-explicit-any
     return element;
   }
 

@@ -6,11 +6,10 @@ import { ContentFor, YieldTo } from '@/components/capture';
 const localVue = createLocalVue();
 
 describe('CmsZone.vue', (): void => {
-
   it('content-for specifies yield-to', async (): Promise<void> => {
     const component = Vue.extend({
       components: { ContentFor, YieldTo },
-      data: (): any => ({ replace: false }), // eslint-disable-line @propelinc/no-explicit-any
+      data: (): any => ({ replace: false }), // eslint-disable-line @typescript-eslint/no-explicit-any
       template: `
         <div>
           <yield-to name="foo">Default Content</yield-to>
@@ -23,9 +22,11 @@ describe('CmsZone.vue', (): void => {
     expect(wrapper.text()).toMatch('Default Content');
 
     wrapper.vm.replace = true;
+    await localVue.nextTick();
     expect(wrapper.text()).toMatch('New Content');
 
     wrapper.vm.replace = false;
+    await localVue.nextTick();
     expect(wrapper.text()).toMatch('Default Content');
   });
 });
