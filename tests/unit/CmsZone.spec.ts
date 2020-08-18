@@ -1,10 +1,11 @@
 import { Content } from '@/api';
-import cmsClient from '@/cmsHttp';
-import CmsZone from '@/components/CmsZone.vue';
-import CmsPlugin from '@/main';
 import { shallowMount, mount, createLocalVue } from '@vue/test-utils';
 import Vue from 'vue';
 import { compileToFunctions } from 'vue-template-compiler';
+
+import cmsClient from '@/cmsHttp';
+import CmsZone from '@/components/CmsZone.vue';
+import CmsPlugin from '@/plugins/cms';
 
 Vue.compile = compileToFunctions;
 const localVue = createLocalVue();

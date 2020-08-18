@@ -1,6 +1,7 @@
-import { ContentFor, YieldTo } from '@/components/capture';
 import { mount, createLocalVue } from '@vue/test-utils';
 import Vue from 'vue';
+
+import { ContentFor, YieldTo } from '@/components/capture';
 
 const localVue = createLocalVue();
 
@@ -21,9 +22,11 @@ describe('CmsZone.vue', (): void => {
     expect(wrapper.text()).toMatch('Default Content');
 
     wrapper.vm.replace = true;
+    await localVue.nextTick();
     expect(wrapper.text()).toMatch('New Content');
 
     wrapper.vm.replace = false;
+    await localVue.nextTick();
     expect(wrapper.text()).toMatch('Default Content');
   });
 });

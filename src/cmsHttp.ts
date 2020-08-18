@@ -1,7 +1,7 @@
 import Axios, { AxiosInstance, AxiosResponse } from 'axios';
 
 import { Content, CmsStyleSheet } from './api';
-import { pluginOptions } from './main';
+import { pluginOptions } from './plugins/cms';
 
 class CmsClient {
   private _axios: null | AxiosInstance = null;

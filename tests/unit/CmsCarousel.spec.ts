@@ -1,5 +1,6 @@
-import CmsCarousel from '@/components/CmsCarousel.vue';
 import { mount, createLocalVue } from '@vue/test-utils';
+
+import CmsCarousel from '@/components/CmsCarousel.vue';
 
 const localVue = createLocalVue();
 

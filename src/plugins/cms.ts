@@ -2,18 +2,18 @@ import _Vue, { VNode } from 'vue';
 import Router from 'vue-router';
 import { DirectiveBinding } from 'vue/types/options';
 
-import { Captable } from './api';
-import CmsCarousel from './components/CmsCarousel.vue';
-import CmsContent from './components/CmsContent';
-import CmsZone from './components/CmsZone.vue';
-import { ContentFor, YieldTo } from './components/capture';
-import { addDirectives } from './directives';
+import { Captable } from '../api';
+import CmsCarousel from '../components/CmsCarousel.vue';
+import CmsContent from '../components/CmsContent';
+import CmsZone from '../components/CmsZone.vue';
+import { ContentFor, YieldTo } from '../components/capture';
+import { addDirectives } from '../directives';
 
 interface DestroyHTMLElement extends HTMLElement {
   $destroy: () => void;
 }
 
-export interface CmsOptions {
+export interface CmsPluginOptions {
   baseUrl?: string;
   globalCssCacheMs?: number;
   router?: Router;
@@ -31,7 +31,7 @@ export interface CmsOptions {
   trackClickHandler?: (eventName: string, eventProps: {[key: string]: any}) => void;
 }
 
-export interface PluginOptions extends CmsOptions {
+export interface PluginOptions extends CmsPluginOptions {
   baseUrl: string;
   checkConnection: (() => boolean);
   getCaptable: (() => Captable);
@@ -69,7 +69,7 @@ export const pluginOptions: PluginOptions = {
 };
 export var finalPluginOptions: PluginOptions;
 
-const plugin = function install(Vue: typeof _Vue, options?: CmsOptions) {
+const plugin = function install(Vue: typeof _Vue, options?: CmsPluginOptions) {
   Object.assign(pluginOptions, options);
   Vue.component('yield-to', YieldTo);
   Vue.component('content-for', ContentFor);

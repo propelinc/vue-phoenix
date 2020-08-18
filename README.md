@@ -12,11 +12,19 @@ npm install --save git@github.com:propelinc/vue-phoenix.git
 
 ```typescript
 import Vue, { VNode } from 'vue';
-import CmsPlugin from 'vue-phoenix';
+import phoenix from 'vue-phoenix';
 
-Vue.use(CmsPlugin, {
-  baseUrl: process.env.VUE_APP_SERVER,
-  getSiteVars: (): object => ({ test: '1' }),
+const baseUrl = 'https://phoenix-url';
+
+Vue.use(phoenix.planout, {
+  appName: 'freshebt',
+  baseUrl: baseUrl,
+  logExposure: console.log,
+});
+
+Vue.use(phoenix.cms, {
+  router,
+  baseUrl: baseUrl,
 });
 ```
 
@@ -36,7 +44,8 @@ Vue.use(CmsPlugin, {
 </cms-zone>
 ```
 
-## Plugin options
+
+## Plugin options (cms)
 
 * `baseUrl`: URL for the phoenix server.
 * `router`: Router object (required for badging support).
@@ -44,6 +53,15 @@ Vue.use(CmsPlugin, {
 * `getCaptable`: Overrides how the captable is restored.
 * `setCaptable`: Overrides how the captable is saved.
 * `checkConnection`: Overrides how network connection status is assessed.
+
+
+## Plugin options (planout)
+
+* `appName`: App name used for planout namespace management.
+* `baseUrl`: URL for the phoenix server.
+* `logExposure`: Function called when planout logs exposure for a variant.
+* `localOverrides`: Use to override experiment and variable assignment during development.
+
 
 ## Project setup
 ```
