@@ -90,7 +90,7 @@ interface DestroyHTMLElementWithAttrs extends DestroyHTMLElement {
  */
 const trackClick: DirectiveOptions = {
   bind(el: DestroyHTMLElementWithAttrs, binding: DirectiveBinding, vnode: VNode): void {
-    el.attrs = vnode.data && vnode.data.attrs ? vnode.data.attrs: {};
+    el.attrs = vnode.data && vnode.data.attrs ? vnode.data.attrs : {};
     const eventName = binding.value || el.attrs['event-name'];
     const wrappedHandler = (): void => {
       if (!eventName) {
