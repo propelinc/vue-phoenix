@@ -22,8 +22,6 @@ describe('Vue plugin and vuex module tests', (): void => {
     localVue.use(PlanoutVuePlugin, {
       appName: 'dummy',
       baseUrl: 'dummy.com',
-      getConfig: jest.fn(),
-      setConfig: jest.fn(),
       logExposure: jest.fn(),
     });
   });
@@ -95,8 +93,6 @@ describe('Experiment assignment tests', (): void => {
     planout.setOptions({
       appName: 'dummy',
       baseUrl: 'dummy.com',
-      getConfig: jest.fn(),
-      setConfig: jest.fn(),
       logExposure,
     });
   });
