@@ -10,11 +10,11 @@ export default class CmsContent extends Vue {
 
   public context: object = {};
 
-  private created(): void {
+  public created(): void {
     this.context = { ...this.extra };
   }
 
-  private render(h: CreateElement): VNode {
+  public render(h: CreateElement): VNode {
     if (!this.html) {
       return h('div', this.$slots.default);
     }
@@ -38,7 +38,7 @@ export default class CmsContent extends Vue {
     });
   }
 
-  private renderError(h: CreateElement, err: Error): VNode {
+  public renderError(h: CreateElement, err: Error): VNode {
     return h('pre', { style: { color: 'red' } }, err.stack);
   }
 }
