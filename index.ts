@@ -9,9 +9,9 @@ import {
 } from 'planout';
 import { Content, HTMLContent } from './src/api';
 
+export * from './src/components';
 export { getClosest } from './src/utils';
 export { planout } from './src/plugins/planout';
-export CmsZone from './src/components/CmsZone.vue';
 
 export type CmsContent = Content;
 export type CmsHtmlContent = HTMLContent;

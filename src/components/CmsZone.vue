@@ -98,22 +98,22 @@ export default class CmsZone extends Vue {
   public scrollable: Element | null = null;
   public scrollableListeners: EventListener[] = [];
 
-  private created(): void {
+  public created(): void {
     this.$root.$on('cms.refresh', this.refresh);
     this.$root.$on(`cms.refresh.${this.zoneId}`, this.refresh);
   }
 
-  private mounted(): void {
+  public mounted(): void {
     this.refresh();
   }
 
-  private beforeDestroy(): void {
+  public beforeDestroy(): void {
     this.$root.$off('cms.refresh', this.refresh);
     this.$root.$off(`cms.refresh.${this.zoneId}`, this.refresh);
     this.removeScrollListeners();
   }
 
-  private removeScrollListeners(): void {
+  public removeScrollListeners(): void {
     if (this.scrollable) {
       for (const h of this.scrollableListeners) {
         this.scrollable.removeEventListener('scroll', h);
@@ -124,12 +124,12 @@ export default class CmsZone extends Vue {
   }
 
   @Watch('zoneId')
-  private onZoneIdChanged(): void {
+  public onZoneIdChanged(): void {
     this.refresh();
   }
 
   @Watch('extra', { deep: true, immediate: true })
-  private async onExtraChanged(value?: object, oldValue?: object): Promise<void> {
+  public async onExtraChanged(value?: object, oldValue?: object): Promise<void> {
     // Prevent deep watcher for extra from firing too often.
     // See: https://github.com/vuejs/vue/issues/5776
     if (oldValue !== undefined && !isEqual(value, oldValue)) {
@@ -138,7 +138,7 @@ export default class CmsZone extends Vue {
     }
   }
 
-  private async refresh(): Promise<void> {
+  public async refresh(): Promise<void> {
     if (!pluginOptions.checkConnection()) {
       this.$el.classList.add('cms-zone-offline');
       this.$el.classList.remove('cms-zone-error');
@@ -189,7 +189,7 @@ export default class CmsZone extends Vue {
     }
   }
 
-  private trackIndex(index: number): void {
+  public trackIndex(index: number): void {
     const content = this.contents[index];
     if (!content || content.tracked) {
       return;
@@ -215,7 +215,7 @@ export default class CmsZone extends Vue {
     cmsClient.trackZone({ content, zoneId: this.zoneId });
   }
 
-  private trackScrollable(contents: Content[], scrollable: Element): void {
+  public trackScrollable(contents: Content[], scrollable: Element): void {
     if (this.zoneType === 'carousel') {
       let timeout: number;
       const listener = (): void => {
@@ -254,7 +254,7 @@ export default class CmsZone extends Vue {
     });
   }
 
-  private isContentVisible(el: Element, viewport: Element, minPercentVisible: number): boolean {
+  public isContentVisible(el: Element, viewport: Element, minPercentVisible: number): boolean {
     const elRect = el.getBoundingClientRect();
     const elTop = elRect.top;
     const elBottom = elRect.bottom;

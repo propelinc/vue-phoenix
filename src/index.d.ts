@@ -2,7 +2,6 @@ import Vue from 'vue';
 
 import CmsPlugin, { CmsPluginOptions } from './plugins/cms';
 import './components/capture';
-import './components/CmsZone';
 import './directives';
 import './utils';
 
