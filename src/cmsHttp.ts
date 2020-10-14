@@ -95,7 +95,7 @@ class CmsClient {
       url: `/cms/zone/${zoneId}`,
       params: {
         cb: Math.floor(Math.random() * 999999999),
-        ...pluginOptions.getSiteVars(),
+        ...pluginOptions.getExtraArgs(),
         ...extra,
       },
     });

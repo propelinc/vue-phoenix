@@ -49,7 +49,7 @@ Vue.use(phoenix.cms, {
 
 * `baseUrl`: URL for the phoenix server.
 * `router`: Router object (required for badging support).
-* `getSiteVars`: Function that provides query parameters.
+* `getExtraArgs`: Function that provides query parameters.
 * `getCaptable`: Overrides how the captable is restored.
 * `setCaptable`: Overrides how the captable is saved.
 * `checkConnection`: Overrides how network connection status is assessed.

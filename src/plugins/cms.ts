@@ -20,7 +20,7 @@ export interface CmsPluginOptions {
 
   setCaptable?: ((captable: Captable) => void);
   getCaptable?: (() => Captable);
-  getSiteVars?: (() => object);
+  getExtraArgs?: (() => object);
 
   /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
   beforeFetchZone?: null | (() => Promise<any>);
@@ -34,7 +34,7 @@ export interface PluginOptions extends CmsPluginOptions {
   baseUrl: string;
   checkConnection: (() => boolean);
   getCaptable: (() => Captable);
-  getSiteVars: (() => object);
+  getExtraArgs: (() => object);
   globalCssCacheMs: number;
   setCaptable: ((captable: Captable) => void);
   trackAnalytics: (eventName: string, eventProps: {[key: string]: any}) => void; // eslint-disable-line @typescript-eslint/no-explicit-any
@@ -57,7 +57,7 @@ export const pluginOptions: PluginOptions = {
       return {};
     }
   },
-  getSiteVars(): object {
+  getExtraArgs(): object {
     return {};
   },
   trackAnalytics(): void {
