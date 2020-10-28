@@ -2,6 +2,7 @@ import Axios, { AxiosInstance, AxiosResponse } from 'axios';
 
 import { Content, CmsStyleSheet } from './api';
 import { pluginOptions } from './plugins/cms';
+import { alternateAxiosSerializer } from './utils';
 
 class CmsClient {
   private _axios: null | AxiosInstance = null;
@@ -17,6 +18,7 @@ class CmsClient {
       this._axios = Axios.create({
         baseURL: pluginOptions.baseUrl,
         timeout: 30 * 1000, // Timeout
+        paramsSerializer: alternateAxiosSerializer,
       });
     }
     return this._axios;

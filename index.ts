@@ -9,7 +9,7 @@ import {
 } from 'planout';
 import { Content, HTMLContent } from './src/api';
 
-export { getClosest } from './src/utils';
+export { getClosest, alternateAxiosSerializer } from './src/utils';
 export { planout } from './src/plugins/planout';
 
 export type CmsContent = Content;
