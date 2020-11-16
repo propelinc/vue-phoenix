@@ -83,7 +83,7 @@ class CmsClient {
     }
   }
 
-  async fetchZone({ zoneId, extra }: { zoneId: string, extra: object }) {
+  async fetchZone({ zoneId, extra, page }: { zoneId: string, extra: object, page?: number }) {
     if (pluginOptions.beforeFetchZone) {
       await pluginOptions.beforeFetchZone();
     }
@@ -95,6 +95,7 @@ class CmsClient {
       url: `/cms/zone/${zoneId}`,
       params: {
         cb: Math.floor(Math.random() * 999999999),
+        page: page,
         ...pluginOptions.getSiteVars(),
         ...extra,
       },

@@ -1,5 +1,5 @@
 import Axios, { AxiosInstance } from 'axios';
-import { isEqual } from 'lodash';
+import isEqual from 'lodash/isEqual';
 import {
   Assignment, Experiment, ExperimentSetup,
   Inputs, Interpreter, PlanoutCode, Namespace,

@@ -74,7 +74,7 @@ describe('CmsZone.vue', (): void => {
     }
   });
 
-  ['default', 'carousel'].forEach((zoneType): void => {
+  ['default', 'carousel', 'scrolling'].forEach((zoneType): void => {
     it(`renders empty state for ${zoneType} zone`, async (): Promise<void> => {
       const zoneId = '5';
       const extra = { foo: 'bar' };

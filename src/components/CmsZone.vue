@@ -20,6 +20,17 @@
           :zone-id="zoneId"
         />
       </cms-carousel>
+      <div v-else-if="zoneType === 'scrolling'" v-infinite-scroll="next" class="scrollable-content zone-contents">
+        <cms-content
+          v-for="(content, index) in contents"
+          :key="index"
+          :class="`cms-zone-content-${zoneId}-${index}`"
+          tag="div"
+          :html="content.html"
+          :extra="extra"
+          :zone-id="zoneId"
+        />
+      </div>
       <div v-else class="zone-contents">
         <cms-content
           v-for="(content, index) in contents"
@@ -60,7 +71,8 @@
 </style>
 
 <script lang="ts">
-import { isEqual } from 'lodash';
+import isEqual from 'lodash/isEqual';
+import debounce from 'lodash/debounce';
 import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
 
 import { Content } from '../api';
@@ -95,8 +107,10 @@ export default class CmsZone extends Vue {
   public zoneHeader: string = '';
   public zoneFooter: string = '';
   public contents: Content[] = [];
+  public page: number = 0;
   public scrollable: Element | null = null;
   public scrollableListeners: EventListener[] = [];
+  public next = debounce(this.getNextPage, 400);
 
   private created(): void {
     this.$root.$on('cms.refresh', this.refresh);
@@ -252,6 +266,15 @@ export default class CmsZone extends Vue {
       this.scrollableListeners.push(listener);
       Vue.nextTick(listener);
     });
+  }
+
+  private async getNextPage() {
+    this.page++;
+    const response = await cmsClient.fetchZone({ zoneId: this.zoneId, extra: this.extra, page: this.page });
+    if (!response.data || !response.data.content) {
+      throw new Error('No data');
+    }
+    this.contents.push(...response.data.content as Content[]);
   }
 
   private isContentVisible(el: Element, viewport: Element, minPercentVisible: number): boolean {
