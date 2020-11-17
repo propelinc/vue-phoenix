@@ -120,7 +120,8 @@ export default class CmsZone extends Vue {
   }
 
   private get isInfiniteScrollDisabled() {
-    return this.isScrolling ? '-' : '';
+    // Setting the tolerance to '-' disables the v-infinite-scroll directive.
+    return this.isScrolling ? '' : '-';
   }
 
   private created(): void {
