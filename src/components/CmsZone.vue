@@ -1,7 +1,7 @@
 <template>
   <div
     :class="{ 'scrollable-content': isScrolling }"
-    v-infinite-scroll:[isInfiniteScrollDisabled]="next"
+    v-infinite-scroll="{ action: next, enabled: isScrolling }"
   >
     <slot v-if="!zoneType && !contents.length" />
     <div v-if="contents.length">
@@ -113,15 +113,10 @@ export default class CmsZone extends Vue {
   public cursor: string = '';
   public scrollable: Element | null = null;
   public scrollableListeners: EventListener[] = [];
-  public next = debounce(this.getNextPage, 400);
+  public next = debounce(() => this.getNextPage(), 400);
 
   private get isScrolling() {
     return this.zoneType === 'scrolling'; 
-  }
-
-  private get isInfiniteScrollDisabled() {
-    // Setting the tolerance to '-' disables the v-infinite-scroll directive.
-    return this.isScrolling ? '' : '-';
   }
 
   private created(): void {
