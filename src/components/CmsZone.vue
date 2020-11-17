@@ -277,12 +277,27 @@ export default class CmsZone extends Vue {
   }
 
   private async getNextPage() {
-    const response = await cmsClient.fetchZone({ zoneId: this.zoneId, extra: this.extra, cursor: this.cursor });
-    if (!response.data || !response.data.content) {
-      throw new Error('No data');
+    if (!pluginOptions.checkConnection()) {
+      return;
     }
-    this.cursor = response.data.cursor;
-    this.contents.push(...response.data.content as Content[]);
+
+    this.$el.classList.add('cms-zone-cursor-loading');
+
+    let response;
+    try {
+      response = await cmsClient.fetchZone({ zoneId: this.zoneId, extra: this.extra, cursor: this.cursor });
+      if (!response.data || !response.data.content) {
+        throw new Error('No data');
+      }
+      this.cursor = response.data.cursor;
+      const newContents = response.data.content as Content[];
+      this.contents.push(...newContents);
+      if (this.scrollable) {
+        this.trackScrollable(newContents, this.scrollable);
+      }
+    } catch (error) {
+      this.$el.classList.remove('cms-zone-cursor-loading');
+    }
   }
 
   private isContentVisible(el: Element, viewport: Element, minPercentVisible: number): boolean {
