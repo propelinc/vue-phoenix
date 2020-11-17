@@ -1,5 +1,8 @@
 <template>
-  <div>
+  <div
+    :class="{ 'scrollable-content': isScrolling }"
+    v-infinite-scroll[isInfiniteScrollDisabled]="next"
+  >
     <slot v-if="!zoneType && !contents.length" />
     <div v-if="contents.length">
       <cms-content v-if="zoneHeader" :html="zoneHeader" :zone-id="zoneId" />
@@ -20,7 +23,7 @@
           :zone-id="zoneId"
         />
       </cms-carousel>
-      <div v-else-if="zoneType === 'scrolling'" v-infinite-scroll="next" class="scrollable-content zone-contents">
+      <div v-else-if="zoneType === 'scrolling'" class="zone-contents">
         <cms-content
           v-for="(content, index) in contents"
           :key="index"
@@ -111,6 +114,14 @@ export default class CmsZone extends Vue {
   public scrollable: Element | null = null;
   public scrollableListeners: EventListener[] = [];
   public next = debounce(this.getNextPage, 400);
+
+  private get isScrolling() {
+    return this.zoneType === 'scrolling'; 
+  }
+
+  private get isInfiniteScrollDisabled() {
+    return this.isScrolling ? '-' : '';
+  }
 
   private created(): void {
     this.$root.$on('cms.refresh', this.refresh);

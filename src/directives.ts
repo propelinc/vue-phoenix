@@ -20,6 +20,9 @@ interface DestroyHTMLInputElement extends HTMLInputElement {
  */
 const infiniteScroll: DirectiveOptions = {
   bind(el: DestroyHTMLElement, binding: DirectiveBinding): void {
+    if (binding.arg === '-') {
+      return;
+    }
     const tolerance = parseInt(binding.arg || '100', 10);
     const action = binding.value;
 
