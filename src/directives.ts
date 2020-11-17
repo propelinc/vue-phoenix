@@ -5,11 +5,17 @@ import { pluginOptions } from './plugins/cms';
 import { getClosest } from './utils';
 
 interface DestroyHTMLElement extends HTMLElement {
-    $destroy: () => void;
+  $destroy: () => void;
+  bound?: boolean;
+  attrs?: object;
 }
 
 interface DestroyHTMLInputElement extends HTMLInputElement {
   $destroy: () => void;
+}
+
+function destroy(el: DestroyHTMLElement): void {
+  el.$destroy();
 }
 
 /**
@@ -19,30 +25,47 @@ interface DestroyHTMLInputElement extends HTMLInputElement {
  * <div v-infinite-scroll="action()">Scroll me</div>
  */
 const infiniteScroll: DirectiveOptions = {
-  bind(el: DestroyHTMLElement, binding: DirectiveBinding): void {
-    const params = typeof binding.value === 'object'
-      ? binding.value
-      : { action: binding.value, enabled: true };
-
-    if (!params.enabled) {
-      console.info('DISABLED inf scrolling');
-      return;
-    }
-
-    const tolerance = parseInt(binding.arg || '100', 10);
-    const action = params.action;
-
-    console.info('SETUP inf scrolling');
-    el.addEventListener('scroll', (): void => {
-      console.info('SCROLLEVENT inf scrolling');
-      const height = (el.firstChild as DestroyHTMLElement).clientHeight;
-      if (el.scrollTop >= height - el.clientHeight - tolerance) {
-        console.info('CALC SUCCESS inf scrolling');
-        action();
-      }
-    });
-  },
+  bind: setupInfiniteScroll,
+  update: setupInfiniteScroll,
+  unbind: destroy,
 };
+
+function setupInfiniteScroll(el: DestroyHTMLElement, binding: DirectiveBinding) {
+  const params = typeof binding.value === 'object'
+    ? binding.value
+    : { action: binding.value, enabled: true };
+
+  if (!params.enabled) {
+    if (el.bound) {
+      destroy(el);
+    }
+    return;
+  }
+
+  if (el.bound) {
+    return;
+  }
+
+  const tolerance = parseInt(binding.arg || '100', 10);
+  const action = params.action;
+
+  console.info('SETUP inf scrolling');
+  const handler = (): void => {
+    console.info('SCROLLEVENT inf scrolling');
+    const height = (el.firstChild as DestroyHTMLElement).clientHeight;
+    if (el.scrollTop >= height - el.clientHeight - tolerance) {
+      console.info('CALC SUCCESS inf scrolling');
+      action();
+    }
+  }
+
+  el.bound = true;
+  el.addEventListener('scroll', handler);
+  el.$destroy = (): void => {
+    el.removeEventListener('scroll', handler);
+    el.bound = false;
+  };
+}
 
 /**
  * Scroll input into view when focused.
@@ -85,14 +108,8 @@ const scrollOnFocus: DirectiveOptions = {
       target.removeEventListener('focus', handler);
     };
   },
-  unbind(el: DestroyHTMLElement): void {
-    el.$destroy();
-  },
+  unbind: destroy,
 };
-
-interface DestroyHTMLElementWithAttrs extends DestroyHTMLElement {
-  attrs?: object;
-}
 
 /**
  * Track an event to amplitude on click.
@@ -101,7 +118,7 @@ interface DestroyHTMLElementWithAttrs extends DestroyHTMLElement {
  * <div v-track-click event-name="foo" :event-props="{ bar: 'tzar' }">Click me</div>
  */
 const trackClick: DirectiveOptions = {
-  bind(el: DestroyHTMLElementWithAttrs, binding: DirectiveBinding, vnode: VNode): void {
+  bind(el: DestroyHTMLElement, binding: DirectiveBinding, vnode: VNode): void {
     el.attrs = vnode.data && vnode.data.attrs ? vnode.data.attrs : {};
     const eventName = binding.value || el.attrs['event-name'];
     const wrappedHandler = (): void => {
@@ -116,19 +133,17 @@ const trackClick: DirectiveOptions = {
       delete el.attrs;
     };
   },
-  update(el: DestroyHTMLElementWithAttrs, binding: DirectiveBinding, vnode: VNode): void {
+  update(el: DestroyHTMLElement, binding: DirectiveBinding, vnode: VNode): void {
     el.attrs = vnode.data && vnode.data.attrs ? vnode.data.attrs : {};
   },
-  unbind(el: DestroyHTMLElementWithAttrs): void {
+  unbind(el: DestroyHTMLElement): void {
     // A race condition occurs when using both a v-track-click directive and an @click handler.
     // If the @click handler removes the element from the DOM, the directive unbind
     // runs before the track-click handler can run. This leads to the v-track-click handler
     // being removed before it can fire.
 
     // The setTimeout allows the click handler to execute before it is removed.
-    setTimeout((): void => {
-      el.$destroy();
-    }, 0);
+    setTimeout((): void => destroy(el), 0);
   },
 };
 
@@ -139,7 +154,7 @@ const trackClick: DirectiveOptions = {
  * <div v-track-render event-name="foo" :event-props="{ bar: 'tzar' }">I rendered.</div>
  */
 const trackRender: DirectiveOptions = {
-  inserted(el: DestroyHTMLElementWithAttrs, binding: DirectiveBinding, vnode: VNode): void {
+  inserted(el: DestroyHTMLElement, binding: DirectiveBinding, vnode: VNode): void {
     el.attrs = vnode.data && vnode.data.attrs ? vnode.data.attrs : {};
     const eventName = binding.value || el.attrs['event-name'];
     if (!eventName) {
