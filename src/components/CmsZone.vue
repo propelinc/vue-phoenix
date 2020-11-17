@@ -107,7 +107,7 @@ export default class CmsZone extends Vue {
   public zoneHeader: string = '';
   public zoneFooter: string = '';
   public contents: Content[] = [];
-  public page: number = 0;
+  public cursor: string = '';
   public scrollable: Element | null = null;
   public scrollableListeners: EventListener[] = [];
   public next = debounce(this.getNextPage, 400);
@@ -182,6 +182,7 @@ export default class CmsZone extends Vue {
     const data = response.data;
     this.zoneType = data.zone_type;
     this.contents = data.content as Content[];
+    this.cursor = data.cursor;
     this.zoneHeader = data.zone_header ? `<div class="zone-header">${data.zone_header || ''}</div>` : '';
     this.zoneFooter = data.zone_footer ? `<div class="zone-footer">${data.zone_footer || ''}</div>` : '';
 
@@ -269,11 +270,11 @@ export default class CmsZone extends Vue {
   }
 
   private async getNextPage() {
-    this.page++;
-    const response = await cmsClient.fetchZone({ zoneId: this.zoneId, extra: this.extra, page: this.page });
+    const response = await cmsClient.fetchZone({ zoneId: this.zoneId, extra: this.extra, cursor: this.cursor });
     if (!response.data || !response.data.content) {
       throw new Error('No data');
     }
+    this.cursor = response.data.cursor;
     this.contents.push(...response.data.content as Content[]);
   }
 
