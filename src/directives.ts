@@ -25,15 +25,19 @@ const infiniteScroll: DirectiveOptions = {
       : { action: binding.value, enabled: true };
 
     if (!params.enabled) {
+      console.info('DISABLED inf scrolling');
       return;
     }
 
     const tolerance = parseInt(binding.arg || '100', 10);
     const action = params.action;
 
+    console.info('SETUP inf scrolling');
     el.addEventListener('scroll', (): void => {
+      console.info('SCROLLEVENT inf scrolling');
       const height = (el.firstChild as DestroyHTMLElement).clientHeight;
       if (el.scrollTop >= height - el.clientHeight - tolerance) {
+        console.info('CALC SUCCESS inf scrolling');
         action();
       }
     });
