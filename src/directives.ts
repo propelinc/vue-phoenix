@@ -5,17 +5,19 @@ import { pluginOptions } from './plugins/cms';
 import { getClosest } from './utils';
 
 interface DestroyHTMLElement extends HTMLElement {
-  $destroy: () => void;
+  $destroy?: () => void;
   bound?: boolean;
   attrs?: object;
 }
 
 interface DestroyHTMLInputElement extends HTMLInputElement {
-  $destroy: () => void;
+  $destroy?: () => void;
 }
 
 function destroy(el: DestroyHTMLElement): void {
-  el.$destroy();
+  if (el.$destroy) {
+    el.$destroy();
+  }
 }
 
 /**
