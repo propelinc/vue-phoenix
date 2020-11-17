@@ -3,7 +3,13 @@
     :class="{ 'scrollable-content': isScrolling }"
     v-infinite-scroll="{ action: next, enabled: isScrolling }"
   >
+    <!-- Default slot uses css classes. Deprecated, use the named slots instead. -->
     <slot v-if="!zoneType && !contents.length" />
+
+    <slot v-if="zoneStatus === 'error'" name="error"></slot>
+    <slot v-if="zoneStatus === 'offline'" name="offline"></slot>
+    <slot v-if="zoneStatus === 'loading'" name="loading"></slot>
+
     <div v-if="contents.length">
       <cms-content v-if="zoneHeader" :html="zoneHeader" :zone-id="zoneId" />
       <cms-carousel
@@ -45,6 +51,9 @@
           :zone-id="zoneId"
         />
       </div>
+
+      <slot v-if="cursorLoading" name="cursor"></slot>
+
       <cms-content v-if="zoneFooter" :html="zoneFooter" :zone-id="zoneId" />
     </div>
   </div>
@@ -106,6 +115,7 @@ export default class CmsZone extends Vue {
   @Prop(String) public zoneId!: string;
   @Prop(Object) public extra!: {};
 
+  public zoneStatus: string | null = null;
   public zoneType: string = '';
   public zoneHeader: string = '';
   public zoneFooter: string = '';
@@ -113,6 +123,8 @@ export default class CmsZone extends Vue {
   public cursor: string = '';
   public scrollable: Element | null = null;
   public scrollableListeners: EventListener[] = [];
+
+  public cursorLoading: boolean = false;
   public next = debounce(() => this.getNextPage(), 400);
 
   private get isScrolling() {
@@ -161,6 +173,7 @@ export default class CmsZone extends Vue {
 
   private async refresh(): Promise<void> {
     if (!pluginOptions.checkConnection()) {
+      this.zoneStatus = 'offline';
       this.$el.classList.add('cms-zone-offline');
       this.$el.classList.remove('cms-zone-error');
       this.$el.classList.remove('cms-zone-loading');
@@ -168,6 +181,7 @@ export default class CmsZone extends Vue {
       return;
     }
 
+    this.zoneStatus = 'loading';
     this.$el.classList.add('cms-zone-loading');
     this.$el.classList.remove('cms-zone-error');
     this.$el.classList.remove('cms-zone-offline');
@@ -180,6 +194,7 @@ export default class CmsZone extends Vue {
         throw new Error('No data');
       }
     } catch (error) {
+      this.zoneStatus = 'error';
       this.$el.classList.remove('cms-zone-loading');
       this.$el.classList.add('cms-zone-error');
       this.zoneType = '';
@@ -192,6 +207,7 @@ export default class CmsZone extends Vue {
     this.cursor = data.cursor;
     this.zoneHeader = data.zone_header ? `<div class="zone-header">${data.zone_header || ''}</div>` : '';
     this.zoneFooter = data.zone_footer ? `<div class="zone-footer">${data.zone_footer || ''}</div>` : '';
+    this.zoneStatus = null;
 
     if (!this.contents.length) {
       return;
@@ -281,7 +297,7 @@ export default class CmsZone extends Vue {
       return;
     }
 
-    this.$el.classList.add('cms-zone-cursor-loading');
+    this.cursorLoading = true;
 
     let response;
     try {
@@ -296,7 +312,7 @@ export default class CmsZone extends Vue {
         this.trackScrollable(newContents, this.scrollable);
       }
     } catch (error) {
-      this.$el.classList.remove('cms-zone-cursor-loading');
+      this.cursorLoading = false;
     }
   }
 
