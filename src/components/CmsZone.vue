@@ -311,7 +311,7 @@ export default class CmsZone extends Vue {
       if (this.scrollable) {
         this.trackScrollable(newContents, this.scrollable);
       }
-    } catch (error) {
+    } finally {
       this.cursorLoading = false;
     }
   }

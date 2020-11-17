@@ -87,7 +87,8 @@ describe('CmsZone.vue', (): void => {
       resolvePromise(makeResponse(zoneType, []));
       await response;
       await localVue.nextTick();
-      expect(wrapper.classes()).toEqual([]);
+      const expectedClasses = zoneType === 'scrolling' ? ['scrollable-content'] : [];
+      expect(wrapper.classes()).toEqual(expectedClasses);
       expect(wrapper.text()).toBe('');
       expect(wrapper.text()).not.toMatch('Some header');
       expect(wrapper.text()).not.toMatch('Some footer');
@@ -105,7 +106,8 @@ describe('CmsZone.vue', (): void => {
       resolvePromise(makeResponse(zoneType, [{ html: '<div>Some Content</div>', tracker: 'foo' }]));
       await response;
       await localVue.nextTick();
-      expect(wrapper.classes()).toEqual([]);
+      const expectedClasses = zoneType === 'scrolling' ? ['scrollable-content'] : [];
+      expect(wrapper.classes()).toEqual(expectedClasses);
       expect(cmsClient.trackZone).toHaveBeenCalled();
       expect(wrapper.find('.cms-zone-contents-5-0')).toBeTruthy();
       expect(wrapper.text()).toMatch('Some header');
