@@ -1,7 +1,7 @@
 <template>
   <div
     :class="{ 'scrollable-content': isScrolling }"
-    v-infinite-scroll[isInfiniteScrollDisabled]="next"
+    v-infinite-scroll:[isInfiniteScrollDisabled]="next"
   >
     <slot v-if="!zoneType && !contents.length" />
     <div v-if="contents.length">
