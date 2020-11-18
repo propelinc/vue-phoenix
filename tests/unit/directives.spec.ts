@@ -120,7 +120,7 @@ describe('v-track-render tests', (): void => {
 });
 
 describe('v-init', () => {
-  it('v-init sets the correct values', () => {
+  it('sets the correct values', () => {
     const testComponent = Vue.extend({
       data: function() {
         return { context: {} };
@@ -129,5 +129,46 @@ describe('v-init', () => {
     });
     const wrapper = shallowMount(testComponent, { localVue });
     expect(wrapper.vm.$data.context).toEqual({ hello: 'world' });
+  });
+});
+
+describe('v-infinite-scroll', () => {
+
+  function createComponent(enabled: boolean = true) {
+    return Vue.extend({
+      data: function() {
+        return {
+          text: 'before',
+          enabled,
+        };
+      },
+      methods: {
+        action() {
+          this.text = 'after';
+        },
+      },
+      template: `
+        <div class="scrollable">
+          <div v-infinite-scroll="{ enabled, action }" class="scrollable-content">
+            {{ text }}
+          </div>
+        </div>`,
+    });
+  }
+
+  it('invokes the action method on scroll', () => {
+    const testComponent = createComponent();
+    const wrapper = shallowMount(testComponent, { localVue });
+    expect(wrapper.vm.$data.text).toEqual('before');
+    wrapper.find('.scrollable-content').trigger('scroll');
+    expect(wrapper.vm.$data.text).toEqual('after');
+  });
+
+  it('does nothing when disabled', () => {
+    const testComponent = createComponent(false);
+    const wrapper = shallowMount(testComponent, { localVue });
+    expect(wrapper.vm.$data.text).toEqual('before');
+    wrapper.find('.scrollable-content').trigger('scroll');
+    expect(wrapper.vm.$data.text).toEqual('before');
   });
 });
