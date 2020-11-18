@@ -3,13 +3,10 @@
     :class="{ 'scrollable-content': isScrolling }"
     v-infinite-scroll="{ action: next, enabled: isScrolling }"
   >
-    <!-- Default slot uses css classes. Deprecated, use the named slots instead. -->
     <slot v-if="!zoneType && !contents.length" />
-
     <slot v-if="zoneStatus === 'error'" name="error"></slot>
     <slot v-if="zoneStatus === 'offline'" name="offline"></slot>
     <slot v-if="zoneStatus === 'loading'" name="loading"></slot>
-
     <div v-if="contents.length">
       <cms-content v-if="zoneHeader" :html="zoneHeader" :zone-id="zoneId" />
       <cms-carousel
@@ -40,9 +37,7 @@
           :zone-id="zoneId"
         />
       </div>
-
       <slot v-if="cursorLoading" name="cursor"></slot>
-
       <cms-content v-if="zoneFooter" :html="zoneFooter" :zone-id="zoneId" />
     </div>
   </div>
