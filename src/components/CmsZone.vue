@@ -281,6 +281,10 @@ export default class CmsZone extends Vue {
       return;
     }
 
+    if (this.cursorLoading) {
+      return;
+    }
+
     this.cursorLoading = true;
 
     let response;
