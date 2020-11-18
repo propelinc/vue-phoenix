@@ -29,17 +29,6 @@
           :zone-id="zoneId"
         />
       </cms-carousel>
-      <div v-else-if="zoneType === 'scrolling'" class="zone-contents">
-        <cms-content
-          v-for="(content, index) in contents"
-          :key="index"
-          :class="`cms-zone-content-${zoneId}-${index}`"
-          tag="div"
-          :html="content.html"
-          :extra="extra"
-          :zone-id="zoneId"
-        />
-      </div>
       <div v-else class="zone-contents">
         <cms-content
           v-for="(content, index) in contents"
