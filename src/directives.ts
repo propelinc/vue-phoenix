@@ -55,7 +55,7 @@ function setupInfiniteScroll(el: DestroyHTMLElement, binding: DirectiveBinding) 
     if (el.scrollTop >= el.clientHeight - tolerance) {
       action();
     }
-  }
+  };
 
   el.bound = true;
   el.addEventListener('scroll', handler);

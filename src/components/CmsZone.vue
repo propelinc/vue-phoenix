@@ -1,12 +1,12 @@
 <template>
   <div
-    :class="{ 'scrollable-content': isScrolling }"
     v-infinite-scroll="{ action: next, enabled: isScrolling }"
+    :class="{ 'scrollable-content': isScrolling }"
   >
     <slot v-if="!zoneType && !contents.length" />
-    <slot v-if="zoneStatus === 'error'" name="error"></slot>
-    <slot v-if="zoneStatus === 'offline'" name="offline"></slot>
-    <slot v-if="zoneStatus === 'loading'" name="loading"></slot>
+    <slot v-if="zoneStatus === 'error'" name="error" />
+    <slot v-if="zoneStatus === 'offline'" name="offline" />
+    <slot v-if="zoneStatus === 'loading'" name="loading" />
     <div v-if="contents.length">
       <cms-content v-if="zoneHeader" :html="zoneHeader" :zone-id="zoneId" />
       <cms-carousel
@@ -37,7 +37,7 @@
           :zone-id="zoneId"
         />
       </div>
-      <slot v-if="cursorLoading" name="cursor"></slot>
+      <slot v-if="cursorLoading" name="cursor" />
       <cms-content v-if="zoneFooter" :html="zoneFooter" :zone-id="zoneId" />
     </div>
   </div>
@@ -67,8 +67,8 @@
 </style>
 
 <script lang="ts">
-import isEqual from 'lodash/isEqual';
 import debounce from 'lodash/debounce';
+import isEqual from 'lodash/isEqual';
 import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
 
 import { Content } from '../api';
@@ -112,7 +112,7 @@ export default class CmsZone extends Vue {
   public next = debounce(() => this.getNextPage(), 400);
 
   private get isScrolling() {
-    return this.zoneType === 'scrolling'; 
+    return this.zoneType === 'scrolling';
   }
 
   private created(): void {

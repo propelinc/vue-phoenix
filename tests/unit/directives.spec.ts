@@ -133,7 +133,6 @@ describe('v-init', () => {
 });
 
 describe('v-infinite-scroll', () => {
-
   function createComponent(template?: string, enabled: boolean = true) {
     return Vue.extend({
       data: function() {
@@ -177,7 +176,7 @@ describe('v-infinite-scroll', () => {
       <div class="scrollable">
         <div v-infinite-scroll="action" class="scrollable-content">{{ text }}
         </div>
-      </div>`
+      </div>`;
     const testComponent = createComponent(template);
     const wrapper = shallowMount(testComponent, { localVue });
     expect(wrapper.vm.$data.text).toEqual('before');
