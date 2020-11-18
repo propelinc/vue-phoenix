@@ -134,7 +134,7 @@ describe('v-init', () => {
 
 describe('v-infinite-scroll', () => {
 
-  function createComponent(enabled: boolean = true) {
+  function createComponent(template?: string, enabled: boolean = true) {
     return Vue.extend({
       data: function() {
         return {
@@ -147,7 +147,7 @@ describe('v-infinite-scroll', () => {
           this.text = 'after';
         },
       },
-      template: `
+      template: template || `
         <div class="scrollable">
           <div v-infinite-scroll="{ enabled, action }" class="scrollable-content">
             {{ text }}
@@ -165,10 +165,23 @@ describe('v-infinite-scroll', () => {
   });
 
   it('does nothing when disabled', () => {
-    const testComponent = createComponent(false);
+    const testComponent = createComponent(undefined, false);
     const wrapper = shallowMount(testComponent, { localVue });
     expect(wrapper.vm.$data.text).toEqual('before');
     wrapper.find('.scrollable-content').trigger('scroll');
     expect(wrapper.vm.$data.text).toEqual('before');
+  });
+
+  it('invokes the action when binding value is a function', () => {
+    const template = `
+      <div class="scrollable">
+        <div v-infinite-scroll="action" class="scrollable-content">{{ text }}
+        </div>
+      </div>`
+    const testComponent = createComponent(template);
+    const wrapper = shallowMount(testComponent, { localVue });
+    expect(wrapper.vm.$data.text).toEqual('before');
+    wrapper.find('.scrollable-content').trigger('scroll');
+    expect(wrapper.vm.$data.text).toEqual('after');
   });
 });
