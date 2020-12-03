@@ -4,7 +4,8 @@ import { DirectiveBinding } from 'vue/types/options';
 
 import { Captable } from '../api';
 import CmsCarousel from '../components/CmsCarousel.vue';
-import CmsContent from '../components/CmsContent.vue';
+import CmsComponentContent from '../components/CmsComponentContent.vue';
+import CmsContent from '../components/CmsContent';
 import CmsZone from '../components/CmsZone.vue';
 import { ContentFor, YieldTo } from '../components/capture';
 import { addDirectives } from '../directives';
@@ -70,6 +71,7 @@ const plugin = function install(Vue: typeof _Vue, options?: CmsPluginOptions) {
   Vue.component('yield-to', YieldTo);
   Vue.component('content-for', ContentFor);
   Vue.component('cms-content', CmsContent);
+  Vue.component('cms-component-content', CmsComponentContent);
   Vue.component('cms-carousel', CmsCarousel);
   Vue.component('cms-zone', CmsZone);
 
