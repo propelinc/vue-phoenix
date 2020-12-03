@@ -1,6 +1,12 @@
 <template>
-  <div>
+  <div
+    v-infinite-scroll="{ action: next, enabled: isScrolling }"
+    :class="{ 'scrollable-content': isScrolling }"
+  >
     <slot v-if="!zoneType && !contents.length" />
+    <slot v-if="zoneStatus === 'error'" name="error" />
+    <slot v-if="zoneStatus === 'offline'" name="offline" />
+    <slot v-if="zoneStatus === 'loading'" name="loading" />
     <div v-if="contents.length">
       <cms-content v-if="zoneHeader" :html="zoneHeader" :zone-id="zoneId" />
       <cms-carousel
@@ -31,6 +37,7 @@
           :zone-id="zoneId"
         />
       </div>
+      <slot v-if="cursorLoading" name="cursor" />
       <cms-content v-if="zoneFooter" :html="zoneFooter" :zone-id="zoneId" />
     </div>
   </div>
@@ -60,7 +67,8 @@
 </style>
 
 <script lang="ts">
-import { isEqual } from 'lodash';
+import debounce from 'lodash/debounce';
+import isEqual from 'lodash/isEqual';
 import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
 
 import { Content } from '../api';
@@ -91,12 +99,21 @@ export default class CmsZone extends Vue {
   @Prop(String) public zoneId!: string;
   @Prop(Object) public extra!: {};
 
+  public zoneStatus: string | null = null;
   public zoneType: string = '';
   public zoneHeader: string = '';
   public zoneFooter: string = '';
   public contents: Content[] = [];
+  public cursor: string = '';
   public scrollable: Element | null = null;
   public scrollableListeners: EventListener[] = [];
+
+  public cursorLoading: boolean = false;
+  public next = debounce(() => this.getNextPage(), 400);
+
+  private get isScrolling() {
+    return this.zoneType === 'scrolling';
+  }
 
   private created(): void {
     this.$root.$on('cms.refresh', this.refresh);
@@ -140,6 +157,7 @@ export default class CmsZone extends Vue {
 
   private async refresh(): Promise<void> {
     if (!pluginOptions.checkConnection()) {
+      this.zoneStatus = 'offline';
       this.$el.classList.add('cms-zone-offline');
       this.$el.classList.remove('cms-zone-error');
       this.$el.classList.remove('cms-zone-loading');
@@ -147,6 +165,7 @@ export default class CmsZone extends Vue {
       return;
     }
 
+    this.zoneStatus = 'loading';
     this.$el.classList.add('cms-zone-loading');
     this.$el.classList.remove('cms-zone-error');
     this.$el.classList.remove('cms-zone-offline');
@@ -159,6 +178,7 @@ export default class CmsZone extends Vue {
         throw new Error('No data');
       }
     } catch (error) {
+      this.zoneStatus = 'error';
       this.$el.classList.remove('cms-zone-loading');
       this.$el.classList.add('cms-zone-error');
       this.zoneType = '';
@@ -168,8 +188,10 @@ export default class CmsZone extends Vue {
     const data = response.data;
     this.zoneType = data.zone_type;
     this.contents = data.content as Content[];
+    this.cursor = data.cursor;
     this.zoneHeader = data.zone_header ? `<div class="zone-header">${data.zone_header || ''}</div>` : '';
     this.zoneFooter = data.zone_footer ? `<div class="zone-footer">${data.zone_footer || ''}</div>` : '';
+    this.zoneStatus = null;
 
     if (!this.contents.length) {
       return;
@@ -252,6 +274,34 @@ export default class CmsZone extends Vue {
       this.scrollableListeners.push(listener);
       Vue.nextTick(listener);
     });
+  }
+
+  private async getNextPage() {
+    if (!pluginOptions.checkConnection()) {
+      return;
+    }
+
+    if (this.cursorLoading) {
+      return;
+    }
+
+    this.cursorLoading = true;
+
+    let response;
+    try {
+      response = await cmsClient.fetchZone({ zoneId: this.zoneId, extra: this.extra, cursor: this.cursor });
+      if (!response.data || !response.data.content) {
+        throw new Error('No data');
+      }
+      this.cursor = response.data.cursor;
+      const newContents = response.data.content as Content[];
+      this.contents.push(...newContents);
+      if (this.scrollable) {
+        this.trackScrollable(newContents, this.scrollable);
+      }
+    } finally {
+      this.cursorLoading = false;
+    }
   }
 
   private isContentVisible(el: Element, viewport: Element, minPercentVisible: number): boolean {
