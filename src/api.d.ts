@@ -18,7 +18,9 @@ export interface HTMLContent {
   html: string;
 }
 
-export interface Content extends HTMLContent {
+export interface Content {
+  url: string;
+  delivery: number;
   tracker: string;
   track_on?: string;
   tracked?: boolean;

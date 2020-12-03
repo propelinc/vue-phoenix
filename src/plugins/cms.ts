@@ -4,7 +4,7 @@ import { DirectiveBinding } from 'vue/types/options';
 
 import { Captable } from '../api';
 import CmsCarousel from '../components/CmsCarousel.vue';
-import CmsContent from '../components/CmsContent';
+import CmsContent from '../components/CmsContent.vue';
 import CmsZone from '../components/CmsZone.vue';
 import { ContentFor, YieldTo } from '../components/capture';
 import { addDirectives } from '../directives';

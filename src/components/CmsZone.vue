@@ -2,7 +2,11 @@
   <div>
     <slot v-if="!zoneType && !contents.length" />
     <div v-if="contents.length">
-      <cms-content v-if="zoneHeader" :html="zoneHeader" :zone-id="zoneId" />
+      <cms-content
+        v-if="zoneHeader"
+        id="header"
+        :zone-id="zoneId"
+      />
       <cms-carousel
         v-if="zoneType === 'carousel'"
         :center-padding="contents.length > 1 ? '20px' : '0'"
@@ -11,27 +15,31 @@
       >
         <cms-content
           v-for="(content, index) in contents"
+          :id="String(content.delivery)"
           :key="index"
           :class="`cms-zone-content-${zoneId}-${index}`"
           class="cms-zone-carousel-content"
-          tag="div"
-          :html="content.html"
-          :extra="extra"
+          :url="content.url"
+          v-bind="extra"
           :zone-id="zoneId"
         />
       </cms-carousel>
       <div v-else class="zone-contents">
         <cms-content
           v-for="(content, index) in contents"
+          :id="String(content.delivery)"
           :key="index"
           :class="`cms-zone-content-${zoneId}-${index}`"
-          tag="div"
-          :html="content.html"
-          :extra="extra"
+          :url="content.url"
+          v-bind="extra"
           :zone-id="zoneId"
         />
       </div>
-      <cms-content v-if="zoneFooter" :html="zoneFooter" :zone-id="zoneId" />
+      <cms-content
+        v-if="zoneFooter"
+        id="footer"
+        :zone-id="zoneId"
+      />
     </div>
   </div>
 </template>
@@ -68,7 +76,7 @@ import cmsClient from '../cmsHttp';
 import { pluginOptions } from '../plugins/cms';
 
 import CmsCarousel from './CmsCarousel.vue';
-import CmsContent from './CmsContent';
+import CmsContent from './CmsContent.vue';
 
 const durationVisibleToBeTrackedMs = 1000;
 const percentVisible = 50;
@@ -168,8 +176,8 @@ export default class CmsZone extends Vue {
     const data = response.data;
     this.zoneType = data.zone_type;
     this.contents = data.content as Content[];
-    this.zoneHeader = data.zone_header ? `<div class="zone-header">${data.zone_header || ''}</div>` : '';
-    this.zoneFooter = data.zone_footer ? `<div class="zone-footer">${data.zone_footer || ''}</div>` : '';
+    this.zoneHeader = data.zone_header || '';
+    this.zoneFooter = data.zone_footer || '';
 
     if (!this.contents.length) {
       return;
