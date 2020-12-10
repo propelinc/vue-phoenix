@@ -24,6 +24,7 @@
           :html="content.html"
           :extra="extra"
           :zone-id="zoneId"
+          @click.stop.prevent="onLogoTapped()"
         />
       </cms-carousel>
       <div v-else class="zone-contents">
@@ -112,7 +113,7 @@ export default class CmsZone extends Vue {
   public next = debounce(() => this.getNextPage(), 400);
 
   private get isScrolling() {
-    return this.zoneType === 'scrolling';
+    return this.zoneType === 'srolling';
   }
 
   private created(): void {
@@ -137,6 +138,15 @@ export default class CmsZone extends Vue {
       }
       this.scrollableListeners = [];
       this.scrollable = null;
+    }
+  }
+
+  private onLogoTapped(): void {
+    console.log("HEREE")
+    this.logoTapCount++;
+    if (this.logoTapCount === 1) {
+      this.logoTapCount = 0;
+      alert(`Debug mode`);
     }
   }
 
