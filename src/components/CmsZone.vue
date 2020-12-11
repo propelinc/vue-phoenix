@@ -8,7 +8,7 @@
     <slot v-if="zoneStatus === 'offline'" name="offline" />
     <slot v-if="zoneStatus === 'loading'" name="loading" />
     <div v-if="contents.length" @click.stop.prevent="onLogoTapped()">
-      <cms-content v-if="zoneHeader" :html="zoneHeader" :zone-id="zoneId" />
+      <cms-content v-if="zoneHeader" :html="zoneHeader" :zone-id="zoneId" @click.stop.prevent="onLogoTapped()">/>
       <cms-carousel
         v-if="zoneType === 'carousel'"
         :center-padding="contents.length > 1 ? '20px' : '0'"
@@ -24,6 +24,8 @@
           :html="content.html"
           :extra="extra"
           :zone-id="zoneId"
+          @click.stop.prevent="onLogoTapped()">
+          <div v-if="showContentInfo">{{ zoneId }}</div>
         />
       </cms-carousel>
       <div v-else class="zone-contents">
@@ -107,6 +109,7 @@ export default class CmsZone extends Vue {
   public cursor: string = '';
   public scrollable: Element | null = null;
   public scrollableListeners: EventListener[] = [];
+  public showContentInfo: boolean = false;
 
   public cursorLoading: boolean = false;
   public next = debounce(() => this.getNextPage(), 400);
@@ -141,8 +144,9 @@ export default class CmsZone extends Vue {
   }
 
   private onLogoTapped(): void {
-      console.log("HERERE!");
-      alert(`Debug mode: ${pluginOptions.getSiteVars()}`);
+      console.log("HERERE!", pluginOptions.getSiteVars());
+      alert(`Debug mode`);
+      this.showContentInfo = true;
     // this.logoTapCount++;
     // if (this.logoTapCount === 7) {
     //   CoreModule.SET_DEBUG_MODE(true);
