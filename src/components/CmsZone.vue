@@ -24,12 +24,7 @@
           :html="content.html"
           :extra="extra"
           :zone-id="zoneId"
-<<<<<<< Updated upstream
-          @click.stop.prevent="onLogoTapped()">
-          <div v-if="contentInfo">{{ zoneId }}</div>
-=======
           @click.stop.prevent="onLogoTapped(content.id, zoneId)">
->>>>>>> Stashed changes
         </cms-content>
       </cms-carousel>
       <div v-else class="zone-contents">
