@@ -113,10 +113,11 @@ export default class CmsZone extends Vue {
   public next = debounce(() => this.getNextPage(), 400);
 
   private get isScrolling() {
-    return this.zoneType === 'srolling';
+    return this.zoneType === 'scrolling';
   }
 
   private created(): void {
+    console.log("WHATS GOING ON??!")
     this.$root.$on('cms.refresh', this.refresh);
     this.$root.$on(`cms.refresh.${this.zoneId}`, this.refresh);
   }
@@ -142,7 +143,13 @@ export default class CmsZone extends Vue {
   }
 
   private onLogoTapped(): void {
-    alert(`Debug mode`);
+      console.log("HERERE!");
+      alert(`Debug mode: ${pluginOptions.getSiteVars()}`);
+    // this.logoTapCount++;
+    // if (this.logoTapCount === 7) {
+    //   CoreModule.SET_DEBUG_MODE(true);
+    //   this.logoTapCount = 0;
+    // }
   }
 
   @Watch('zoneId')
