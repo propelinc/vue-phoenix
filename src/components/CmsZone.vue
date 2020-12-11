@@ -25,8 +25,8 @@
           :extra="extra"
           :zone-id="zoneId"
           @click.stop.prevent="onLogoTapped()">
-          <div v-if="showContentInfo">{{ zoneId }}</div>
-        />
+          <div v-if="contentInfo">{{ zoneId }}</div>
+        </cms-content>
       </cms-carousel>
       <div v-else class="zone-contents">
         <cms-content

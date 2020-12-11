@@ -35,7 +35,7 @@ export default class CmsContent extends Vue {
 
     return h(dynamic, {
       props: { context: this.context, zoneId: this.zoneId },
-    });
+    }, this.$slots.default);
   }
 
   private renderError(h: CreateElement, err: Error): VNode {
