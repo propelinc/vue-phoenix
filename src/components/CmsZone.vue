@@ -8,7 +8,7 @@
     <slot v-if="zoneStatus === 'offline'" name="offline" />
     <slot v-if="zoneStatus === 'loading'" name="loading" />
     <div v-if="contents.length" @click.stop.prevent="onLogoTapped()">
-      <cms-content v-if="zoneHeader" :html="zoneHeader" :zone-id="zoneId" @click.stop.prevent="onLogoTapped()">/>
+      <cms-content v-if="zoneHeader" :html="zoneHeader" :zone-id="zoneId" @click.stop.prevent="onLogoTapped()"/>
       <cms-carousel
         v-if="zoneType === 'carousel'"
         :center-padding="contents.length > 1 ? '20px' : '0'"
