@@ -24,8 +24,12 @@
           :html="content.html"
           :extra="extra"
           :zone-id="zoneId"
+<<<<<<< Updated upstream
           @click.stop.prevent="onLogoTapped()">
           <div v-if="contentInfo">{{ zoneId }}</div>
+=======
+          @click.stop.prevent="onLogoTapped(content.id, zoneId)">
+>>>>>>> Stashed changes
         </cms-content>
       </cms-carousel>
       <div v-else class="zone-contents">
@@ -143,10 +147,9 @@ export default class CmsZone extends Vue {
     }
   }
 
-  private onLogoTapped(): void {
-      console.log("HERERE!", pluginOptions.getSiteVars());
-      alert(`Debug mode`);
-      this.showContentInfo = true;
+  private onLogoTapped(delivery_id?: any, zone_id?: any): void {
+      // console.log("HERERE!", pluginOptions.getSiteVars());
+    alert("Delivery id: " + delivery_id + " Zone id: " +zone_id);
     // this.logoTapCount++;
     // if (this.logoTapCount === 7) {
     //   CoreModule.SET_DEBUG_MODE(true);
