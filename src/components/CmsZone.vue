@@ -7,8 +7,8 @@
     <slot v-if="zoneStatus === 'error'" name="error" />
     <slot v-if="zoneStatus === 'offline'" name="offline" />
     <slot v-if="zoneStatus === 'loading'" name="loading" />
-    <div v-if="contents.length" @click.stop.prevent="onLogoTapped()">
-      <cms-content v-if="zoneHeader" :html="zoneHeader" :zone-id="zoneId" @click.stop.prevent="onLogoTapped()"/>
+    <div v-if="contents.length" >
+      <cms-content v-if="zoneHeader" :html="zoneHeader" :zone-id="zoneId" />
       <cms-carousel
         v-if="zoneType === 'carousel'"
         :center-padding="contents.length > 1 ? '20px' : '0'"
@@ -117,7 +117,6 @@ export default class CmsZone extends Vue {
   }
 
   private created(): void {
-    console.log("WHATS GOING ON??!")
     this.$root.$on('cms.refresh', this.refresh);
     this.$root.$on(`cms.refresh.${this.zoneId}`, this.refresh);
   }
