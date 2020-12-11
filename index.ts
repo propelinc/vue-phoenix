@@ -23,3 +23,5 @@ export default {
   cms: VueCmsPlugin,
   planout: VuePlanoutPlugin,
 };
+
+console.log("STARTED");
