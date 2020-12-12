@@ -24,7 +24,7 @@
           :html="content.html"
           :extra="extra"
           :zone-id="zoneId"
-          @click.native.stop.prevent="onLogoTapped(content.id, zoneId)">
+          @click.native.stop.prevent="onLogoTapped(content.delivery, zoneId)">
         </cms-content>
       </cms-carousel>
       <div v-else class="zone-contents">
@@ -143,7 +143,7 @@ export default class CmsZone extends Vue {
   }
 
   private onLogoTapped(delivery_id?: any, zone_id?: any): void {
-      // console.log("HERERE!", pluginOptions.getSiteVars());
+    // alert()
     alert("Delivery id: " + delivery_id + " Zone id: " +zone_id);
     // this.logoTapCount++;
     // if (this.logoTapCount === 7) {
