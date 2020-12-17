@@ -22,6 +22,7 @@
           class="cms-zone-carousel-content"
           tag="div"
           :html="content.html"
+          :css="content.css"
           :extra="extra"
           :zone-id="zoneId"
         />
@@ -33,6 +34,7 @@
           :class="`cms-zone-content-${zoneId}-${index}`"
           tag="div"
           :html="content.html"
+          :css="content.css"
           :extra="extra"
           :zone-id="zoneId"
         />

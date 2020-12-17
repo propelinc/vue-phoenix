@@ -16,6 +16,7 @@ export interface CMSZoneResponse {
 
 export interface HTMLContent {
   html: string;
+  css?: string;
 }
 
 export interface Content extends HTMLContent {
