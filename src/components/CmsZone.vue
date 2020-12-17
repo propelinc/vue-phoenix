@@ -52,6 +52,7 @@
           class="cms-zone-content cms-zone-carousel-content"
           tag="div"
           :html="content.html"
+          :css="content.css"
           :context="renderContext"
           :zone-id="zoneId"
         />
@@ -69,6 +70,7 @@
           }"
           tag="div"
           :html="content.html"
+          :css="content.css"
           :context="renderContext"
           :zone-id="zoneId"
         />

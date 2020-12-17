@@ -7,6 +7,7 @@ export interface ZoneCaptable {
 
 export interface HTMLContent {
   html: string;
+  css?: string;
 }
 
 export interface Content extends HTMLContent {
