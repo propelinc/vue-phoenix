@@ -24,7 +24,7 @@
           :html="content.html"
           :extra="extra"
           :zone-id="zoneId"
-          @click.capture="displayIds(content.delivery, zoneId, $event)"
+          @click="displayIds(content.delivery, zoneId, $event)"
         />
       </cms-carousel>
       <div v-else class="zone-contents">
@@ -145,13 +145,13 @@ export default class CmsZone extends Vue {
 
   private displayIds(deliveryId?: string, zoneId?: string, event?: any): void {
     console.log('HERE!' , event);
-    debugger;
-    this.tapped++;
-    if (this.tapped === 1) {
-      // alert('Delivery id: ' + deliveryId + ' Zone id: ' + zoneId); 
-      // CoreModule.SET_DEBUG_MODE(true);
-      this.tapped = 0;
-    }
+    // debugger;
+    // this.tapped++;
+    // if (this.tapped === 1) {
+    //   alert('Delivery id: ' + deliveryId + ' Zone id: ' + zoneId); 
+    //   // CoreModule.SET_DEBUG_MODE(true);
+    //   this.tapped = 0;
+    // }
   }
 
   @Watch('zoneId')
