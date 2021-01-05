@@ -97,13 +97,18 @@ describe('CmsZone.vue', (): void => {
     it(`renders and tracks received content for '${zoneType}' zones`, async (): Promise<void> => {
       const zoneId = '5';
       const extra = { foo: 'bar' };
+      const context = { bar: 'car' };
       const wrapper = mount(CmsZone, {
         localVue,
         slots: { default: '<div>Default Content</div>' },
-        propsData: { zoneId, extra },
+        propsData: { zoneId, extra, context },
       });
 
-      resolvePromise(makeResponse(zoneType, [{ html: '<div>Some Content</div>', tracker: 'foo' }]));
+      resolvePromise(makeResponse(zoneType, [{
+        html: '<div>Some Content {{ context.bar }}</div>',
+        tracker: 'foo',
+      }]));
+
       await response;
       await localVue.nextTick();
       const expectedClasses = zoneType === 'scrolling' ? ['scrollable-content'] : [];
@@ -111,8 +116,12 @@ describe('CmsZone.vue', (): void => {
       expect(cmsClient.trackZone).toHaveBeenCalled();
       expect(wrapper.find('.cms-zone-contents-5-0')).toBeTruthy();
       expect(wrapper.text()).toMatch('Some header');
-      expect(wrapper.text()).toMatch('Some Content');
+      expect(wrapper.text()).toMatch('Some Content car');
       expect(wrapper.text()).toMatch('Some footer');
+
+      wrapper.setProps({ context: { bar: 'tzar' } });
+      await localVue.nextTick();
+      expect(wrapper.text()).toMatch('Some Content tzar');
     });
 
     it(`renders but does not track content in scrollable for '${zoneType}' zones`, async (): Promise<void> => {
