@@ -24,7 +24,7 @@
           :html="content.html"
           :extra="extra"
           :zone-id="zoneId"
-          @click.native.stop.prevent="displayIds(content.delivery, zoneId, $event)"
+          @click.capture="displayIds(content.delivery, zoneId, $event)"
         />
       </cms-carousel>
       <div v-else class="zone-contents">
