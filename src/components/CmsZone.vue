@@ -145,6 +145,7 @@ export default class CmsZone extends Vue {
 
   private displayIds(deliveryId?: string, zoneId?: string, event?: any): void {
     console.log('HERE!' , event);
+    debugger;
     this.tapped++;
     if (this.tapped === 1) {
       // alert('Delivery id: ' + deliveryId + ' Zone id: ' + zoneId); 
