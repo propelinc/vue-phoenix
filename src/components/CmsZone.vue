@@ -24,7 +24,7 @@
           :html="content.html"
           :extra="extra"
           :zone-id="zoneId"
-          @click.native.stop.prevent="displayIds(content.delivery, zoneId)"
+          @click.native.stop.prevent="displayIds(content.delivery, zoneId, $event)"
         />
       </cms-carousel>
       <div v-else class="zone-contents">
@@ -143,8 +143,8 @@ export default class CmsZone extends Vue {
     }
   }
 
-  private displayIds(deliveryId?: string, zoneId?: string): void {
-    console.log('HERE!');
+  private displayIds(deliveryId?: string, zoneId?: string, event?: any): void {
+    console.log('HERE!' , event);
     this.tapped++;
     if (this.tapped === 1) {
       alert('Delivery id: ' + deliveryId + ' Zone id: ' + zoneId); 
