@@ -8,7 +8,7 @@
     <slot v-if="zoneStatus === 'offline'" name="offline" />
     <slot v-if="zoneStatus === 'loading'" name="loading" />
     <div v-if="contents.length">
-      <cms-content v-if="zoneHeader" :html="zoneHeader" :zone-id="zoneId"/>
+      <cms-content v-if="zoneHeader" :html="zoneHeader" :zone-id="zoneId" />
       <cms-carousel
         v-if="zoneType === 'carousel'"
         :center-padding="contents.length > 1 ? '20px' : '0'"
@@ -24,8 +24,8 @@
           :html="content.html"
           :extra="extra"
           :zone-id="zoneId"
-          @click.native.stop.prevent="onLogoTapped(content.delivery, zoneId)">
-        </cms-content>
+          @click.native.stop.prevent="displayIds(content.delivery, zoneId)"
+        />
       </cms-carousel>
       <div v-else class="zone-contents">
         <cms-content
@@ -109,6 +109,7 @@ export default class CmsZone extends Vue {
   public scrollable: Element | null = null;
   public scrollableListeners: EventListener[] = [];
   public showContentInfo: boolean = false;
+  public tapped: number = 0;
 
   public cursorLoading: boolean = false;
   public next = debounce(() => this.getNextPage(), 400);
@@ -142,14 +143,14 @@ export default class CmsZone extends Vue {
     }
   }
 
-  private onLogoTapped(delivery_id?: any, zone_id?: any): void {
-    // alert()
-    alert("Delivery id: " + delivery_id + " Zone id: " +zone_id);
-    // this.logoTapCount++;
-    // if (this.logoTapCount === 7) {
-    //   CoreModule.SET_DEBUG_MODE(true);
-    //   this.logoTapCount = 0;
-    // }
+  private displayIds(deliveryId?: string, zoneId?: string): void {
+    console.log('HERE!');
+    this.tapped++;
+    if (this.tapped === 1) {
+      alert('Delivery id: ' + deliveryId + ' Zone id: ' + zoneId); 
+      // CoreModule.SET_DEBUG_MODE(true);
+      this.tapped = 0;
+    }
   }
 
   @Watch('zoneId')
