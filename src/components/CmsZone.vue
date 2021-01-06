@@ -8,7 +8,12 @@
     <slot v-if="zoneStatus === 'offline'" name="offline" />
     <slot v-if="zoneStatus === 'loading'" name="loading" />
     <div v-if="contents.length">
-      <cms-content v-if="zoneHeader" :html="zoneHeader" :zone-id="zoneId" />
+      <cms-content
+        v-if="zoneHeader"
+        :html="zoneHeader"
+        :render-context="context"
+        :zone-id="zoneId"
+      />
       <cms-carousel
         v-if="zoneType === 'carousel'"
         :center-padding="contents.length > 1 ? '20px' : '0'"
@@ -23,6 +28,7 @@
           tag="div"
           :html="content.html"
           :extra="extra"
+          :render-context="context"
           :zone-id="zoneId"
         />
       </cms-carousel>
@@ -34,11 +40,17 @@
           tag="div"
           :html="content.html"
           :extra="extra"
+          :render-context="context"
           :zone-id="zoneId"
         />
       </div>
       <slot v-if="cursorLoading" name="cursor" />
-      <cms-content v-if="zoneFooter" :html="zoneFooter" :zone-id="zoneId" />
+      <cms-content
+        v-if="zoneFooter"
+        :html="zoneFooter"
+        :render-context="context"
+        :zone-id="zoneId"
+      />
     </div>
   </div>
 </template>
@@ -98,6 +110,7 @@ export function getClosest(elm: Element, selector: string): HTMLElement | null {
 export default class CmsZone extends Vue {
   @Prop(String) public zoneId!: string;
   @Prop(Object) public extra!: {};
+  @Prop(Object) public context!: {};
 
   public zoneStatus: string | null = null;
   public zoneType: string = '';
