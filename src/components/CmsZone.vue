@@ -139,7 +139,7 @@ export default class CmsZone extends Vue {
     console.log("FUNCTION GETS CALLED")
     this.tapped++;
     if (this.tapped === 1) {
-      alert('Delivery id: ' + deliveryId + ' Zone id: ' + zoneId);
+      alert('DELIVERY: ' + deliveryId + ' ZONE: ' + zoneId);
     }
   }
 
