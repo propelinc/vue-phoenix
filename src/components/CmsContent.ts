@@ -38,6 +38,7 @@ export default class CmsContent extends Vue {
       html = `<${this.tag}>${html}</${this.tag}>`;
     }
 
+    html = `<div>hey${html}</div>`
     const compiled = Vue.compile(html);
     const dynamic: ComponentType = {
       name: 'CmsDynamicContent',
