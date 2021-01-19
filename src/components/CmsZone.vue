@@ -30,6 +30,7 @@
           :extra="extra"
           :render-context="context"
           :zone-id="zoneId"
+          @click.native.stop.prevent="displayIds(content.delivery, zoneId, $event)"
         />
       </cms-carousel>
       <div v-else class="zone-contents">
@@ -120,6 +121,7 @@ export default class CmsZone extends Vue {
   public cursor: string = '';
   public scrollable: Element | null = null;
   public scrollableListeners: EventListener[] = [];
+  public tapped: number = 0;
 
   public cursorLoading: boolean = false;
   public next = debounce(() => this.getNextPage(), 400);
@@ -131,6 +133,14 @@ export default class CmsZone extends Vue {
   private created(): void {
     this.$root.$on('cms.refresh', this.refresh);
     this.$root.$on(`cms.refresh.${this.zoneId}`, this.refresh);
+  }
+
+  private displayIds(deliveryId?: string, zoneId?: string, event?: any): void {
+    console.log("FUNCTION GETS CALLED")
+    this.tapped++;
+    if (this.tapped === 1) {
+      alert('Delivery id: ' + deliveryId + ' Zone id: ' + zoneId);
+    }
   }
 
   private mounted(): void {
