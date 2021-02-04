@@ -1,4 +1,3 @@
-import { AxiosRequestConfig } from 'axios';
 import isEqual from 'lodash/isEqual';
 import { CreateElement, Component as ComponentType, VNode } from 'vue';
 import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
