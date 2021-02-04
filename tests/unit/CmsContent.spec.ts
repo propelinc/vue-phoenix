@@ -3,7 +3,7 @@ import Vue from 'vue';
 import { compileToFunctions } from 'vue-template-compiler';
 
 import CmsContent from '@/components/CmsContent';
-import { pluginOptions } from '@/plugins/cms';
+import cms, { pluginOptions } from '@/plugins/cms';
 
 Vue.compile = compileToFunctions;
 const localVue = createLocalVue();
@@ -48,7 +48,7 @@ describe('CmsContent.vue', (): void => {
     expect(wrapper.text()).toMatch('Default Content');
   });
 
-  it('can initialize the context by calling setup', async (): Promise<void> => {
+  it('initializes the context by calling setup', async (): Promise<void> => {
     const html = '<div :run="setup({k: 5})">Content {{ context.k }}</div>';
     const wrapper = mount(CmsContent, { localVue, propsData: { html } });
     await Vue.nextTick();
@@ -62,12 +62,46 @@ describe('CmsContent.vue', (): void => {
     expect(wrapper.text()).toMatch('Content 5');
   });
 
-  it('can track analytics events', async (): Promise<void> => {
+  it('tracks analytics events', async (): Promise<void> => {
     pluginOptions.trackAnalytics = jest.fn();
     const html = `<div :run="setup({k: 5})"><div :run="trackEvent('foo', context)">Foo</div></div>`;
     const wrapper = mount(CmsContent, { localVue, propsData: { html } });
     await Vue.nextTick();
     expect(wrapper.text()).toMatch('Foo');
     expect(pluginOptions.trackAnalytics).toHaveBeenCalled();
+  });
+
+  it('can dispatch zone refresh events', async (): Promise<void> => {
+    pluginOptions.trackAnalytics = jest.fn();
+    const html = `<div @click="refresh()">button</div>`;
+    const wrapper = mount(CmsContent, { localVue, propsData: { html, zoneId: '1' } });
+    const cb = jest.fn();
+    wrapper.vm.$root.$on('cms.refresh.1', cb);
+    wrapper.find('div').trigger('click');
+    await Vue.nextTick();
+    expect(cb).toHaveBeenCalled();
+  });
+
+  it('can dispatch zone refresh events for specified zones', async (): Promise<void> => {
+    pluginOptions.trackAnalytics = jest.fn();
+    const html = `<div @click="refreshZones([1, 2])">button</div>`;
+    const wrapper = mount(CmsContent, { localVue, propsData: { html, zoneId: '1' } });
+    const cb = jest.fn();
+    wrapper.vm.$root.$on('cms.refresh.1', cb);
+    wrapper.vm.$root.$on('cms.refresh.2', cb);
+    wrapper.find('div').trigger('click');
+    await Vue.nextTick();
+    expect(cb).toHaveBeenCalledTimes(2);
+  });
+
+  it('can dispatch an event to refresh all zones', async (): Promise<void> => {
+    pluginOptions.trackAnalytics = jest.fn();
+    const html = `<div @click="refreshAllZones()">button</div>`;
+    const wrapper = mount(CmsContent, { localVue, propsData: { html } });
+    const cb = jest.fn();
+    wrapper.vm.$root.$on('cms.refresh', cb);
+    wrapper.find('div').trigger('click');
+    await Vue.nextTick();
+    expect(cb).toHaveBeenCalled();
   });
 });

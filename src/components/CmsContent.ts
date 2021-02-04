@@ -1,3 +1,4 @@
+import { AxiosRequestConfig } from 'axios';
 import isEqual from 'lodash/isEqual';
 import { CreateElement, Component as ComponentType, VNode } from 'vue';
 import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
@@ -35,6 +36,22 @@ export default class CmsContent extends Vue {
     }
   }
 
+  private refreshAllZones(): void {
+    this.$root.$emit('cms.refresh');
+  }
+
+  private refreshZones(zoneIds: string[]): void {
+    zoneIds.forEach((zoneId) => {
+      this.$root.$emit(`cms.refresh.${zoneId}`);
+    });
+  }
+
+  private refresh(): void {
+    if (this.zoneId) {
+      this.$root.$emit(`cms.refresh.${this.zoneId}`);
+    }
+  }
+
   @Watch('renderContext', { deep: true, immediate: true })
   private updateContext(value?: object, oldValue?: object): void {
     // Prevent deep watcher for extra from firing too often.
@@ -63,6 +80,9 @@ export default class CmsContent extends Vue {
       methods: {
         setup: this.setup,
         trackEvent: this.trackEvent,
+        refresh: this.refresh,
+        refreshAllZones: this.refreshAllZones,
+        refreshZones: this.refreshZones,
       },
       ...compiled,
     };
