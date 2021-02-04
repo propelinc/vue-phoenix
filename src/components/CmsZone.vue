@@ -55,7 +55,7 @@
   </div>
 </template>
 
-<style>
+<style scoped>
 .scrollable {
   display: flex;
   flex-direction: column;
