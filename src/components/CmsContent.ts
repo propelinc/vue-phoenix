@@ -1,6 +1,7 @@
 import isEqual from 'lodash/isEqual';
 import { CreateElement, Component as ComponentType, VNode } from 'vue';
 import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
+import { pluginOptions } from '../plugins/cms';
 
 @Component({ name: 'cms-content' })
 export default class CmsContent extends Vue {
@@ -12,11 +13,26 @@ export default class CmsContent extends Vue {
 
   public context: object = {};
 
+  public setupComplete: boolean = false;
+
   private created(): void {
     this.context = {
       ...this.extra,
       ...this.renderContext,
      };
+  }
+
+  private trackEvent(event: string, props: object): void {
+    pluginOptions.trackAnalytics(event, props);
+  }
+
+  private setup(props: object): void {
+    if (!this.setupComplete) {
+      Object.keys(props).forEach((k): void => {
+        this.$set(this.context, k, props[k]);
+      });
+      this.setupComplete = true;
+    }
   }
 
   @Watch('renderContext', { deep: true, immediate: true })
@@ -44,6 +60,10 @@ export default class CmsContent extends Vue {
       props: { context: Object, zoneId: String },
       computed: {},
       components: {},
+      methods: {
+        setup: this.setup,
+        trackEvent: this.trackEvent,
+      },
       ...compiled,
     };
 
