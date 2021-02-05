@@ -5,13 +5,14 @@
 </template>
 
 <script lang="ts">
+import { AxiosRequestConfig } from 'axios';
 import { Vue, Component } from 'vue-property-decorator';
 
-import cmsClient, { CmsRemoteActionRequest } from '../cmsHttp';
+import cmsClient from '../cmsHttp';
 
 @Component({ name: 'cms-remote-action' })
 export default class CmsRemoteAction extends Vue {
-  private async action(options: CmsRemoteActionRequest): Promise<void> {
+  private async action(options: AxiosRequestConfig): Promise<void> {
     try {
       this.$emit('loading');
       const response = await cmsClient.cmsAction(options);
