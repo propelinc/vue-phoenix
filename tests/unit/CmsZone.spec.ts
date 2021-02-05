@@ -6,6 +6,7 @@ import { compileToFunctions } from 'vue-template-compiler';
 import cmsClient from '@/cmsHttp';
 import CmsZone from '@/components/CmsZone.vue';
 import CmsPlugin from '@/plugins/cms';
+import { supressPromiseRejection } from './util';
 
 Vue.compile = compileToFunctions;
 const localVue = createLocalVue();
@@ -55,6 +56,7 @@ describe('CmsZone.vue', (): void => {
     expect(wrapper.text()).toMatch('Default Content');
     expect(wrapper.classes()).toContain('cms-zone-loading');
     rejectPromise({});
+    supressPromiseRejection(response);
     await localVue.nextTick();
     expect(wrapper.text()).toMatch('Default Content');
     expect(wrapper.classes()).toContain('cms-zone-error');

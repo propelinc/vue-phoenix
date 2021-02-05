@@ -1,6 +1,6 @@
 <template>
   <div>
-    <slot :action="action" />
+    <slot :request="request" />
   </div>
 </template>
 

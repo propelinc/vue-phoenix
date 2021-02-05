@@ -9,7 +9,7 @@ export default class CmsContent extends Vue {
   @Prop(String) public html!: string;
   @Prop(String) public zoneId!: string;
   @Prop(Object) public context!: {};
-  @Prop({ default: '' }) public tag!: string;
+  @Prop(String) public tag!: string;
 
   public mutableContext: object = {};
 

@@ -3,6 +3,7 @@ import { shallowMount, createLocalVue } from '@vue/test-utils';
 import cmsClient from '@/cmsHttp';
 import CmsServerRequest from '@/components/CmsServerRequest.vue';
 import CmsPlugin from '@/plugins/cms';
+import { supressPromiseRejection } from './util';
 
 const localVue = createLocalVue();
 localVue.use(CmsPlugin);
@@ -15,11 +16,12 @@ const template = `
   >Click</div>`;
 
 describe('CmsServerRequest.vue', (): void => {
+  let response: any; // eslint-disable-line @typescript-eslint/no-explicit-any
   let resolvePromise: any; // eslint-disable-line @typescript-eslint/no-explicit-any
   let rejectPromise: any; // eslint-disable-line @typescript-eslint/no-explicit-any
 
   beforeEach((): void => {
-    const response = new Promise((resolve, reject): void => {
+    response = new Promise((resolve, reject): void => {
       resolvePromise = resolve;
       rejectPromise = reject;
     });
@@ -55,6 +57,7 @@ describe('CmsServerRequest.vue', (): void => {
     expect(wrapper.text()).toMatch('Click');
     wrapper.find('div.test').trigger('click');
     rejectPromise({});
+    supressPromiseRejection(response);
 
     await localVue.nextTick();
     expect(cmsClient.axios.request).toHaveBeenCalledWith({ url: '/foo' });
