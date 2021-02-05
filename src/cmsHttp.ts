@@ -1,4 +1,4 @@
-import Axios, { AxiosInstance, AxiosRequestConfig, AxiosResponse } from 'axios';
+import Axios, { AxiosInstance, AxiosResponse } from 'axios';
 
 import { Content, CmsStyleSheet } from './api';
 import { pluginOptions } from './plugins/cms';
@@ -115,10 +115,6 @@ class CmsClient {
     }
 
     await this.http({ zoneId, url: content.tracker });
-  }
-
-  async cmsAction(request: AxiosRequestConfig) {
-    return this.axios.request(request);
   }
 }
 

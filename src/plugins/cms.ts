@@ -5,7 +5,7 @@ import { DirectiveBinding } from 'vue/types/options';
 import { Captable } from '../api';
 import CmsCarousel from '../components/CmsCarousel.vue';
 import CmsContent from '../components/CmsContent';
-import CmsRemoteAction from '../components/CmsRemoteAction.vue';
+import CmsServerRequest from '../components/CmsServerRequest.vue';
 import CmsZone from '../components/CmsZone.vue';
 import { ContentFor, YieldTo } from '../components/capture';
 import { addDirectives } from '../directives';
@@ -73,7 +73,7 @@ const plugin = function install(Vue: typeof _Vue, options?: CmsPluginOptions) {
   Vue.component('content-for', ContentFor);
   Vue.component('cms-content', CmsContent);
   Vue.component('cms-carousel', CmsCarousel);
-  Vue.component('cms-remote-action', CmsRemoteAction);
+  Vue.component('cms-server-request', CmsServerRequest);
   Vue.component('cms-zone', CmsZone);
 
   /**
