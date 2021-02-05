@@ -11,7 +11,7 @@
       <cms-content
         v-if="zoneHeader"
         :html="zoneHeader"
-        :extra="renderContext"
+        :context="renderContext"
         :zone-id="zoneId"
       />
       <cms-carousel
@@ -27,7 +27,7 @@
           class="cms-zone-carousel-content"
           tag="div"
           :html="content.html"
-          :extra="renderContext"
+          :context="renderContext"
           :zone-id="zoneId"
         />
       </cms-carousel>
@@ -38,7 +38,7 @@
           :class="`cms-zone-content-${zoneId}-${index}`"
           tag="div"
           :html="content.html"
-          :extra="renderContext"
+          :context="renderContext"
           :zone-id="zoneId"
         />
       </div>
@@ -46,7 +46,7 @@
       <cms-content
         v-if="zoneFooter"
         :html="zoneFooter"
-        :extra="renderContext"
+        :context="renderContext"
         :zone-id="zoneId"
       />
     </div>

@@ -10,27 +10,27 @@ const localVue = createLocalVue();
 
 describe('CmsContent.vue', (): void => {
   it('creates a dynamic component that allows templating variables', async (): Promise<void> => {
-    const extra = { foo: 'bar' };
+    const context = { foo: 'bar' };
     const html = '<div>Content {{ context.foo }}</div>';
     const wrapper = mount(CmsContent, {
       localVue,
-      propsData: { html, extra },
+      propsData: { html, context },
     });
 
     await Vue.nextTick();
     expect(wrapper.text()).toMatch('Content bar');
 
-    wrapper.setProps({ extra: { foo: 'tar' } });
+    wrapper.setProps({ context: { foo: 'tar' } });
     await Vue.nextTick();
     expect(wrapper.text()).toMatch('Content tar');
   });
 
   it('allows invoking functions from the context', async (): Promise<void> => {
     const html = '<div>Content {{ context.bus() }}</div>';
-    const extra = { bus: jest.fn(() => 'bar') };
+    const context = { bus: jest.fn(() => 'bar') };
     const wrapper = mount(CmsContent, {
       localVue,
-      propsData: { html, extra },
+      propsData: { html, context },
     });
 
     await Vue.nextTick();
