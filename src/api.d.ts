@@ -19,6 +19,7 @@ export interface HTMLContent {
 }
 
 export interface Content extends HTMLContent {
+  delivery: number;
   tracker: string;
   track_on?: string;
   tracked?: boolean;
@@ -31,7 +32,7 @@ export interface Content extends HTMLContent {
 export interface ContentTracker {
   trackOn: string;
   content: any; // eslint-disable-line @typescript-eslint/no-explicit-any
-  zoneId: string;
+  zoneId: number;
 }
 
 export interface CmsStyleSheet {

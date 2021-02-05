@@ -1,7 +1,13 @@
-import Axios, { AxiosInstance, AxiosResponse } from 'axios';
+import Axios, { AxiosInstance, AxiosRequestConfig, AxiosResponse } from 'axios';
 
 import { Content, CmsStyleSheet } from './api';
 import { pluginOptions } from './plugins/cms';
+
+export interface CmsRemoteActionRequest {
+  url: string;
+  method: 'GET' | 'POST';
+  args: object;
+}
 
 class CmsClient {
   private _axios: null | AxiosInstance = null;
@@ -115,6 +121,16 @@ class CmsClient {
     }
 
     await this.http({ zoneId, url: content.tracker });
+  }
+
+  async cmsAction({ url, method, args }: CmsRemoteActionRequest) {
+    const request: AxiosRequestConfig = { url, method };
+    if (method === 'GET') {
+      request.params = args;
+    } else {
+      request.data = args;
+    }
+    return this.axios.request(request);
   }
 }
 

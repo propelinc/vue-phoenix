@@ -106,6 +106,7 @@ describe('CmsZone.vue', (): void => {
 
       resolvePromise(makeResponse(zoneType, [{
         html: '<div>Some Content {{ context.bar }}</div>',
+        delivery: 1,
         tracker: 'foo',
       }]));
 
@@ -136,7 +137,7 @@ describe('CmsZone.vue', (): void => {
         `,
       });
 
-      resolvePromise(makeResponse(zoneType, [{ html: '<div>Some Content</div>', tracker: 'foo' }]));
+      resolvePromise(makeResponse(zoneType, [{ html: '<div>Some Content</div>', delivery: 1, tracker: 'foo' }]));
       const wrapper = mount(component, { localVue });
       await response;
       await localVue.nextTick();
@@ -160,6 +161,7 @@ describe('CmsZone.vue', (): void => {
 
       resolvePromise(makeResponse(zoneType, [{
         html: '<div>Some Content</div>',
+        delivery: 1,
         tracker: 'foo',
         extra: { track_on: 'someroute' },
       }]));
@@ -187,6 +189,7 @@ describe('CmsZone.vue', (): void => {
 
       resolvePromise(makeResponse(zoneType, [{
         html: '<div>Some Content</div>',
+        delivery: 1,
         tracker: 'foo',
         extra: { track_on: 'click' },
       }]));
