@@ -11,7 +11,7 @@ const template = `
   <div
     slot-scope="props"
     class="test"
-    @click="props.action({ url: '/foo' })"
+    @click="props.request({ url: '/foo' })"
   >Click</div>`;
 
 describe('CmsServerRequest.vue', (): void => {
@@ -26,7 +26,7 @@ describe('CmsServerRequest.vue', (): void => {
     cmsClient.axios.request = jest.fn().mockImplementation(() => response);
   });
 
-  it('handles the remote action succeeding', async (): Promise<void> => {
+  it('handles the request succeeding', async (): Promise<void> => {
     const wrapper = shallowMount(CmsServerRequest, {
       localVue,
       scopedSlots: { default: template },
@@ -45,7 +45,7 @@ describe('CmsServerRequest.vue', (): void => {
     expect(wrapper.emitted().error).toBeFalsy();
   });
 
-  it('handles the remote action failing', async (): Promise<void> => {
+  it('handles the request failing', async (): Promise<void> => {
     const wrapper = shallowMount(CmsServerRequest, {
       localVue,
       scopedSlots: { default: template },

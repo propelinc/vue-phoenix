@@ -12,7 +12,7 @@ import cmsClient from '../cmsHttp';
 
 @Component({ name: 'cms-server-request' })
 export default class CmsServerRequest extends Vue {
-  private async action(options: AxiosRequestConfig): Promise<void> {
+  private async request(options: AxiosRequestConfig): Promise<void> {
     try {
       this.$emit('loading');
       const response = await cmsClient.axios.request(options);
