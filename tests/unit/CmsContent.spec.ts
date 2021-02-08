@@ -54,7 +54,8 @@ describe('CmsContent.vue', (): void => {
   });
 
   it('cannot re-initialize the context', async (): Promise<void> => {
-    const html = '<div :run="setup({k: 5})"><span :run="setup({k: 2})>Content {{ context.k }}</span></div>';
+    const html =
+      '<div :run="setup({k: 5})"><span :run="setup({k: 2})>Content {{ context.k }}</span></div>';
     const wrapper = mount(CmsContent, { localVue, propsData: { html } });
     await Vue.nextTick();
     expect(wrapper.text()).toMatch('Content 5');

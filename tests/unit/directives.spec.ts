@@ -122,7 +122,7 @@ describe('v-track-render tests', (): void => {
 describe('v-init', () => {
   it('sets the correct values', () => {
     const testComponent = Vue.extend({
-      data: function() {
+      data: function () {
         return { context: {} };
       },
       template: '<div v-init="{ context: context, value: { hello: \'world\'}}"></div>',
@@ -135,7 +135,7 @@ describe('v-init', () => {
 describe('v-infinite-scroll', () => {
   function createComponent(template?: string, enabled: boolean = true) {
     return Vue.extend({
-      data: function() {
+      data: function () {
         return {
           text: 'before',
           enabled,
@@ -146,7 +146,9 @@ describe('v-infinite-scroll', () => {
           this.text = 'after';
         },
       },
-      template: template || `
+      template:
+        template ||
+        `
         <div class="scrollable">
           <div v-infinite-scroll="{ enabled, action }" class="scrollable-content">
             {{ text }}

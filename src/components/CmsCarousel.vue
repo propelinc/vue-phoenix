@@ -22,7 +22,7 @@ export default class CmsCarousel extends Vue {
   @Prop(String) public centerPadding!: string;
   public index = 0;
 
-  public get slickOptions(): {[key:string]: string | boolean | number} {
+  public get slickOptions(): { [key: string]: string | boolean | number } {
     return {
       infinite: true,
       slidesToShow: 1,

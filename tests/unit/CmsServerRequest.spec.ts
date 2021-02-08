@@ -3,6 +3,7 @@ import { shallowMount, createLocalVue } from '@vue/test-utils';
 import cmsClient from '@/cmsHttp';
 import CmsServerRequest from '@/components/CmsServerRequest.vue';
 import CmsPlugin from '@/plugins/cms';
+
 import { supressPromiseRejection } from './util';
 
 const localVue = createLocalVue();
@@ -51,7 +52,7 @@ describe('CmsServerRequest.vue', (): void => {
     const wrapper = shallowMount(CmsServerRequest, {
       localVue,
       scopedSlots: { default: template },
-      propsData: { },
+      propsData: {},
     });
 
     expect(wrapper.text()).toMatch('Click');

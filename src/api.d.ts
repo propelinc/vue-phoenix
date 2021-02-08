@@ -1,6 +1,5 @@
 /* eslint-disable camelcase */
-export interface Captable {
-}
+export interface Captable {}
 
 export interface ZoneCaptable {
   zoneId?: Captable;
@@ -26,7 +25,7 @@ export interface Content extends HTMLContent {
   extra?: {
     track_on?: string;
     external_trackers?: string[];
-  }
+  };
 }
 
 export interface ContentTracker {

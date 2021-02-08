@@ -72,7 +72,12 @@ describe('Experiment assignment tests', (): void => {
     ],
   };
 
-  const addExperiment = (namespace: string, name: string, numSegments: number, compiled: PlanoutCode) => {
+  const addExperiment = (
+    namespace: string,
+    name: string,
+    numSegments: number,
+    compiled: PlanoutCode
+  ) => {
     planout.add({
       namespace_name: namespace,
       name: name,

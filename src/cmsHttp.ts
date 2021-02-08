@@ -22,7 +22,7 @@ class CmsClient {
     return this._axios;
   }
 
-  async http({ zoneId, url, params }: { zoneId: string, url: string, params?: object }) {
+  async http({ zoneId, url, params }: { zoneId: string; url: string; params?: object }) {
     const captable = pluginOptions.getCaptable();
     const zoneCaptable = captable[zoneId];
     const headers = zoneCaptable ? { Captable: zoneCaptable } : {};
@@ -40,8 +40,9 @@ class CmsClient {
     }
 
     if (!this.globalCssPromise) {
-      this.globalCssPromise = this.axios.get('/cms/styles')
-        .then((response: AxiosResponse<{styles: CmsStyleSheet[]}>): void => {
+      this.globalCssPromise = this.axios
+        .get('/cms/styles')
+        .then((response: AxiosResponse<{ styles: CmsStyleSheet[] }>): void => {
           response.data.styles.forEach((stylesheet: CmsStyleSheet) => {
             this.updateStyleSheet(stylesheet);
           });
@@ -65,11 +66,11 @@ class CmsClient {
   }
 
   addStyleSheet(stylesheet: CmsStyleSheet) {
-    var linkElement = document.createElement('link');
+    const linkElement = document.createElement('link');
     linkElement.setAttribute('rel', 'stylesheet');
     linkElement.setAttribute('type', 'text/css');
     linkElement.setAttribute('href', stylesheet.url);
-    var head = document.getElementsByTagName('head')[0];
+    const head = document.getElementsByTagName('head')[0];
     head.appendChild(linkElement);
   }
 
@@ -83,7 +84,7 @@ class CmsClient {
     }
   }
 
-  async fetchZone({ zoneId, extra, cursor }: { zoneId: string, extra: object, cursor?: string }) {
+  async fetchZone({ zoneId, extra, cursor }: { zoneId: string; extra: object; cursor?: string }) {
     if (pluginOptions.beforeFetchZone) {
       await pluginOptions.beforeFetchZone();
     }
@@ -102,7 +103,7 @@ class CmsClient {
     });
   }
 
-  async trackZone({ zoneId, content }: { zoneId: string, content: Content }) {
+  async trackZone({ zoneId, content }: { zoneId: string; content: Content }) {
     const externalTrackers = (content.extra || {}).external_trackers;
     if (externalTrackers && externalTrackers.length) {
       externalTrackers.forEach((src: string): void => {

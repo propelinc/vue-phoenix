@@ -1,11 +1,12 @@
-import { Content } from '@/api';
 import { shallowMount, mount, createLocalVue } from '@vue/test-utils';
 import Vue from 'vue';
 import { compileToFunctions } from 'vue-template-compiler';
 
+import { Content } from '@/api';
 import cmsClient from '@/cmsHttp';
 import CmsZone from '@/components/CmsZone.vue';
 import CmsPlugin from '@/plugins/cms';
+
 import { supressPromiseRejection } from './util';
 
 Vue.compile = compileToFunctions;
@@ -35,9 +36,11 @@ describe('CmsZone.vue', (): void => {
       rejectPromise = reject;
     });
 
-    Element.prototype.getBoundingClientRect = jest.fn((): DOMRect => {
-      return { width: 120, height: 120, top: 0, left: 0, bottom: 0, right: 0 } as DOMRect;
-    });
+    Element.prototype.getBoundingClientRect = jest.fn(
+      (): DOMRect => {
+        return { width: 120, height: 120, top: 0, left: 0, bottom: 0, right: 0 } as DOMRect;
+      }
+    );
 
     cmsClient.trackZone = jest.fn();
     cmsClient.fetchZone = jest.fn().mockImplementation(() => response);
@@ -92,11 +95,15 @@ describe('CmsZone.vue', (): void => {
         propsData: { zoneId, extra, context },
       });
 
-      resolvePromise(makeResponse(zoneType, [{
-        html: '<div>Some Content {{ context.bar }}</div>',
-        delivery: 1,
-        tracker: 'foo',
-      }]));
+      resolvePromise(
+        makeResponse(zoneType, [
+          {
+            html: '<div>Some Content {{ context.bar }}</div>',
+            delivery: 1,
+            tracker: 'foo',
+          },
+        ])
+      );
 
       await response;
       await localVue.nextTick();
@@ -125,7 +132,9 @@ describe('CmsZone.vue', (): void => {
         `,
       });
 
-      resolvePromise(makeResponse(zoneType, [{ html: '<div>Some Content</div>', delivery: 1, tracker: 'foo' }]));
+      resolvePromise(
+        makeResponse(zoneType, [{ html: '<div>Some Content</div>', delivery: 1, tracker: 'foo' }])
+      );
       const wrapper = mount(component, { localVue });
       await response;
       await localVue.nextTick();
@@ -147,12 +156,16 @@ describe('CmsZone.vue', (): void => {
         propsData: { zoneId, extra },
       });
 
-      resolvePromise(makeResponse(zoneType, [{
-        html: '<div>Some Content</div>',
-        delivery: 1,
-        tracker: 'foo',
-        extra: { track_on: 'someroute' },
-      }]));
+      resolvePromise(
+        makeResponse(zoneType, [
+          {
+            html: '<div>Some Content</div>',
+            delivery: 1,
+            tracker: 'foo',
+            extra: { track_on: 'someroute' },
+          },
+        ])
+      );
 
       await response;
       await localVue.nextTick();
@@ -175,12 +188,16 @@ describe('CmsZone.vue', (): void => {
         `,
       });
 
-      resolvePromise(makeResponse(zoneType, [{
-        html: '<div>Some Content</div>',
-        delivery: 1,
-        tracker: 'foo',
-        extra: { track_on: 'click' },
-      }]));
+      resolvePromise(
+        makeResponse(zoneType, [
+          {
+            html: '<div>Some Content</div>',
+            delivery: 1,
+            tracker: 'foo',
+            extra: { track_on: 'click' },
+          },
+        ])
+      );
 
       const wrapper = mount(component, { localVue });
       await response;
@@ -200,7 +217,7 @@ describe('CmsZone.vue isContentVisible tests:', (): void => {
 
   function getElementWithRect(height: number, top: number, bottom: number): Element {
     const element = document.createElement('div');
-    (element as any).getBoundingClientRect = () => ({ height, top, bottom });// eslint-disable-line @typescript-eslint/no-explicit-any
+    (element as any).getBoundingClientRect = () => ({ height, top, bottom }); // eslint-disable-line @typescript-eslint/no-explicit-any
     return element;
   }
 
