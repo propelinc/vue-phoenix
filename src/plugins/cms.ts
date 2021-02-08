@@ -64,7 +64,7 @@ export const pluginOptions: PluginOptions = {
   },
   trackAnalytics(): void {},
 };
-export var finalPluginOptions: PluginOptions;
+export let finalPluginOptions: PluginOptions;
 
 const plugin = function install(Vue: typeof _Vue, options?: CmsPluginOptions) {
   Object.assign(pluginOptions, options);

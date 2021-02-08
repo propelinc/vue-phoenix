@@ -16,19 +16,19 @@ import {
 } from 'planout';
 import _Vue from 'vue';
 
-export interface PlanoutPluginOptions {
-  appName: string;
-  baseUrl: string;
-  logExposure: (event: PlanoutEvent) => void;
-  localOverrides?: PlanoutOverrides;
-}
-
 export interface PlanoutOverride {
   variable: string;
   value: string | number | boolean;
 }
 
 export type PlanoutOverrides = { [namespace: string]: PlanoutOverride[] };
+
+export interface PlanoutPluginOptions {
+  appName: string;
+  baseUrl: string;
+  logExposure: (event: PlanoutEvent) => void;
+  localOverrides?: PlanoutOverrides;
+}
 
 let options: PlanoutPluginOptions;
 
@@ -194,7 +194,7 @@ class BaseNamespace extends Namespace.SimpleNamespace<Inputs, Params> {
     ns.numSegments = this.numSegments;
     ns.setPrimaryUnit(this.getPrimaryUnit());
     this.stack.forEach((nsOp) => {
-      ns[nsOp.op].apply(ns, nsOp.args);
+      ns[nsOp.op](...nsOp.args);
     });
     return ns;
   }
@@ -278,12 +278,7 @@ export class PlanoutPlugin {
     }
   }
 
-  addNamespace(
-    namespace: string,
-    numSegments: number = 1000,
-    primaryUnit: string = 'uid',
-    compiled?: PlanoutCode
-  ) {
+  addNamespace(namespace: string, numSegments = 1000, primaryUnit = 'uid', compiled?: PlanoutCode) {
     if (!this.namespaces[namespace]) {
       const ns = new BaseNamespace(namespace);
       this.namespaces[namespace] = ns;

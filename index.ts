@@ -1,13 +1,11 @@
+import { PlanoutEvent as PlanoutEventType, PlanoutConfig as PlanoutConfigType } from 'planout';
+
+import { Content, HTMLContent } from './src/api';
 import VueCmsPlugin from './src/plugins/cms';
 import VuePlanoutPlugin, {
   PlanoutPlugin as PlanoutPluginType,
   PlanoutOverrides as PlanoutOverridesType,
 } from './src/plugins/planout';
-import {
-  PlanoutEvent as PlanoutEventType,
-  PlanoutConfig as PlanoutConfigType,
-} from 'planout';
-import { Content, HTMLContent } from './src/api';
 
 export { getClosest } from './src/utils';
 export { planout } from './src/plugins/planout';

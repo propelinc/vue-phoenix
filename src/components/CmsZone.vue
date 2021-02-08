@@ -53,29 +53,6 @@
   </div>
 </template>
 
-<style>
-.scrollable {
-  display: flex;
-  flex-direction: column;
-  position: relative;
-  height: 100%;
-}
-
-.scrollable-header {
-  flex: 0 0 auto;
-  position: static;
-}
-
-.scrollable-content {
-  height: 100%;
-  width: 100%;
-  flex: 1 1 auto;
-  position: relative; /* need this to position inner content */
-  overflow-y: auto;
-  -webkit-overflow-scrolling: touch;
-}
-</style>
-
 <script lang="ts">
 import debounce from 'lodash/debounce';
 import isEqual from 'lodash/isEqual';
@@ -357,3 +334,26 @@ export default class CmsZone extends Vue {
   }
 }
 </script>
+
+<style>
+.scrollable {
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  height: 100%;
+}
+
+.scrollable-header {
+  flex: 0 0 auto;
+  position: static;
+}
+
+.scrollable-content {
+  height: 100%;
+  width: 100%;
+  flex: 1 1 auto;
+  position: relative; /* need this to position inner content */
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
+</style>

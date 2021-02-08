@@ -2,7 +2,7 @@ import { shallowMount, mount, createLocalVue } from '@vue/test-utils';
 import Vue from 'vue';
 import { compileToFunctions } from 'vue-template-compiler';
 
-import { Content } from '@/api';
+import { Content } from '@/api.d.ts';
 import cmsClient from '@/cmsHttp';
 import CmsZone from '@/components/CmsZone.vue';
 import CmsPlugin from '@/plugins/cms';

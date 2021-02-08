@@ -133,7 +133,7 @@ describe('v-init', () => {
 });
 
 describe('v-infinite-scroll', () => {
-  function createComponent(template?: string, enabled: boolean = true) {
+  function createComponent(template?: string, enabled = true) {
     return Vue.extend({
       data: function () {
         return {
