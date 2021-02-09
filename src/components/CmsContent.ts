@@ -19,7 +19,7 @@ export default class CmsContent extends Vue {
     this.mutableContext = { ...this.context };
   }
 
-  private trackEvent(event: string, props: object): void {
+  private track(event: string, props: object): void {
     pluginOptions.trackAnalytics(event, props);
   }
 
@@ -59,7 +59,7 @@ export default class CmsContent extends Vue {
       components: {},
       methods: {
         setup: this.setup,
-        trackEvent: this.trackEvent,
+        track: this.track,
         ...pluginOptions.extensions,
       },
       ...compiled,

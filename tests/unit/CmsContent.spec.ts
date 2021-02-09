@@ -62,7 +62,7 @@ describe('CmsContent.vue', (): void => {
 
   it('tracks analytics events', async (): Promise<void> => {
     pluginOptions.trackAnalytics = jest.fn();
-    const html = `<div :run="setup({k: 5})"><div :run="trackEvent('foo', context)">Foo</div></div>`;
+    const html = `<div :run="setup({k: 5})"><div :run="track('foo', context)">Foo</div></div>`;
     const wrapper = mount(CmsContent, { localVue, propsData: { html } });
     await Vue.nextTick();
     expect(wrapper.text()).toMatch('Foo');
