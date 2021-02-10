@@ -6,7 +6,8 @@ import './directives';
 import './utils';
 
 declare module 'vue/types/options' {
-  interface ComponentOptions<V extends Vue> extends CmsPluginOptions {}
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  type ComponentOptions<V extends Vue> = CmsPluginOptions;
 }
 
 export default CmsPlugin;

@@ -1,12 +1,27 @@
 import Axios, { AxiosInstance } from 'axios';
 import isEqual from 'lodash/isEqual';
 import {
-  Assignment, Experiment, ExperimentSetup,
-  Inputs, Interpreter, PlanoutCode, Namespace,
-  Params, ParamValue, PlanoutEvent, PlanoutConfig,
+  Assignment,
+  Experiment,
+  ExperimentSetup,
+  Inputs,
+  Interpreter,
+  PlanoutCode,
+  Namespace,
+  Params,
+  ParamValue,
+  PlanoutEvent,
+  PlanoutConfig,
   PlanoutExperimentConfig,
 } from 'planout';
 import _Vue from 'vue';
+
+export interface PlanoutOverride {
+  variable: string;
+  value: string | number | boolean;
+}
+
+export type PlanoutOverrides = { [namespace: string]: PlanoutOverride[] };
 
 export interface PlanoutPluginOptions {
   appName: string;
@@ -14,13 +29,6 @@ export interface PlanoutPluginOptions {
   logExposure: (event: PlanoutEvent) => void;
   localOverrides?: PlanoutOverrides;
 }
-
-export interface PlanoutOverride {
-  variable: string;
-  value: string | number | boolean;
-}
-
-export type PlanoutOverrides = { [namespace: string]: PlanoutOverride[] }
 
 let options: PlanoutPluginOptions;
 
@@ -81,9 +89,7 @@ class InterpretedExperiment extends Experiment<Inputs, Params> {
     return interpreter.inExperiment();
   }
 
-  configureLogger() {
-
-  }
+  configureLogger() {}
 
   log(event: PlanoutEvent) {
     if (event.event === 'exposure') {
@@ -107,7 +113,7 @@ class InterpretedExperiment extends Experiment<Inputs, Params> {
 
 class BaseNamespace extends Namespace.SimpleNamespace<Inputs, Params> {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  stack!: { op: string, args: any[] }[];
+  stack!: { op: string; args: any[] }[];
 
   _defaultExperiment?: InterpretedExperiment;
 
@@ -188,7 +194,7 @@ class BaseNamespace extends Namespace.SimpleNamespace<Inputs, Params> {
     ns.numSegments = this.numSegments;
     ns.setPrimaryUnit(this.getPrimaryUnit());
     this.stack.forEach((nsOp) => {
-      ns[nsOp.op].apply(ns, nsOp.args);
+      ns[nsOp.op](...nsOp.args);
     });
     return ns;
   }
@@ -218,7 +224,11 @@ export class PlanoutPlugin {
     return ns ? ns.get(key, defaultValue) : defaultValue;
   }
 
-  peek<K extends keyof Params>(namespace: string, key: string, defaultValue?: Params[K]): Params[K] {
+  peek<K extends keyof Params>(
+    namespace: string,
+    key: string,
+    defaultValue?: Params[K]
+  ): Params[K] {
     const experiment = this.getExperiment(namespace);
     return experiment ? experiment.peek(key, defaultValue) : defaultValue;
   }
@@ -268,7 +278,7 @@ export class PlanoutPlugin {
     }
   }
 
-  addNamespace(namespace: string, numSegments: number = 1000, primaryUnit: string = 'uid', compiled?: PlanoutCode) {
+  addNamespace(namespace: string, numSegments = 1000, primaryUnit = 'uid', compiled?: PlanoutCode) {
     if (!this.namespaces[namespace]) {
       const ns = new BaseNamespace(namespace);
       this.namespaces[namespace] = ns;
@@ -313,7 +323,8 @@ export class PlanoutPlugin {
         nsConfig.name,
         nsConfig.num_segments,
         nsConfig.primary_unit,
-        nsConfig.compiled);
+        nsConfig.compiled
+      );
     });
 
     config.experiments.forEach((nsOp) => {

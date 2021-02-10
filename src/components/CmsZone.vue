@@ -53,29 +53,6 @@
   </div>
 </template>
 
-<style>
-.scrollable {
-  display: flex;
-  flex-direction: column;
-  position: relative;
-  height: 100%;
-}
-
-.scrollable-header {
-  flex: 0 0 auto;
-  position: static;
-}
-
-.scrollable-content {
-  height: 100%;
-  width: 100%;
-  flex: 1 1 auto;
-  position: relative; /* need this to position inner content */
-  overflow-y: auto;
-  -webkit-overflow-scrolling: touch;
-}
-</style>
-
 <script lang="ts">
 import debounce from 'lodash/debounce';
 import isEqual from 'lodash/isEqual';
@@ -211,8 +188,12 @@ export default class CmsZone extends Vue {
     this.zoneType = data.zone_type;
     this.contents = data.content as Content[];
     this.cursor = data.cursor;
-    this.zoneHeader = data.zone_header ? `<div class="zone-header">${data.zone_header || ''}</div>` : '';
-    this.zoneFooter = data.zone_footer ? `<div class="zone-footer">${data.zone_footer || ''}</div>` : '';
+    this.zoneHeader = data.zone_header
+      ? `<div class="zone-header">${data.zone_header || ''}</div>`
+      : '';
+    this.zoneFooter = data.zone_footer
+      ? `<div class="zone-footer">${data.zone_footer || ''}</div>`
+      : '';
     this.zoneStatus = null;
 
     if (!this.contents.length) {
@@ -264,7 +245,7 @@ export default class CmsZone extends Vue {
       let timeout: number;
       const listener = (): void => {
         window.clearTimeout(timeout);
-        timeout = window.setTimeout(():void => {
+        timeout = window.setTimeout((): void => {
           const contentElm = this.$el.querySelector('.slick-current');
           if (contentElm && this.isContentVisible(contentElm, scrollable, percentVisible)) {
             this.trackIndex(0);
@@ -311,7 +292,11 @@ export default class CmsZone extends Vue {
 
     let response;
     try {
-      response = await cmsClient.fetchZone({ zoneId: this.zoneId, extra: this.extra, cursor: this.cursor });
+      response = await cmsClient.fetchZone({
+        zoneId: this.zoneId,
+        extra: this.extra,
+        cursor: this.cursor,
+      });
       if (!response.data || !response.data.content) {
         throw new Error('No data');
       }
@@ -345,7 +330,30 @@ export default class CmsZone extends Vue {
       invisibleHeight = vTop - elTop;
     }
     const visibleHeight = elHeight - invisibleHeight;
-    return visibleHeight / elHeight * 100 >= minPercentVisible;
+    return (visibleHeight / elHeight) * 100 >= minPercentVisible;
   }
 }
 </script>
+
+<style>
+.scrollable {
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  height: 100%;
+}
+
+.scrollable-header {
+  flex: 0 0 auto;
+  position: static;
+}
+
+.scrollable-content {
+  height: 100%;
+  width: 100%;
+  flex: 1 1 auto;
+  position: relative; /* need this to position inner content */
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
+</style>

@@ -20,22 +20,9 @@ function destroy(el: DestroyHTMLElement): void {
   }
 }
 
-/**
- * Triggers action when scroll gets close to the bottom.
- *
- * Example usage:
- * <div v-infinite-scroll="action()">Scroll me</div>
- */
-const infiniteScroll: DirectiveOptions = {
-  bind: setupInfiniteScroll,
-  update: setupInfiniteScroll,
-  unbind: destroy,
-};
-
 function setupInfiniteScroll(el: DestroyHTMLElement, binding: DirectiveBinding) {
-  const params = typeof binding.value === 'object'
-    ? binding.value
-    : { action: binding.value, enabled: true };
+  const params =
+    typeof binding.value === 'object' ? binding.value : { action: binding.value, enabled: true };
 
   if (!params.enabled) {
     if (el.bound) {
@@ -66,6 +53,18 @@ function setupInfiniteScroll(el: DestroyHTMLElement, binding: DirectiveBinding) 
 }
 
 /**
+ * Triggers action when scroll gets close to the bottom.
+ *
+ * Example usage:
+ * <div v-infinite-scroll="action()">Scroll me</div>
+ */
+const infiniteScroll: DirectiveOptions = {
+  bind: setupInfiniteScroll,
+  update: setupInfiniteScroll,
+  unbind: destroy,
+};
+
+/**
  * Scroll input into view when focused.
  *
  * Example usage:
@@ -78,7 +77,12 @@ const scrollOnFocus: DirectiveOptions = {
       return;
     }
 
-    const scrollTo = (target: HTMLElement, scrollable: HTMLElement, scrollableContent: HTMLElement, marginTop: number = 0): void => {
+    const scrollTo = (
+      target: HTMLElement,
+      scrollable: HTMLElement,
+      scrollableContent: HTMLElement,
+      marginTop = 0
+    ): void => {
       while (target.offsetParent && target.offsetParent !== scrollable) {
         marginTop -= target.offsetTop;
         target = target.offsetParent as HTMLElement;
@@ -92,7 +96,7 @@ const scrollOnFocus: DirectiveOptions = {
       if (scrollable && scrollableContent) {
         const height = scrollableContent.offsetHeight;
         setTimeout((): void => {
-          // if scrollableContent height is reduced in half second
+          // If scrollableContent height is reduced in half second
           // since an input got focus we assume soft keyboard is showing.
           if (height > scrollableContent.offsetHeight) {
             scrollTo(target as HTMLElement, scrollable, scrollableContent, 20);

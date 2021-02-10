@@ -10,7 +10,7 @@ import Slick from 'vue-slick';
 
 import { pluginOptions } from '../plugins/cms';
 
-type Slick = typeof Slick;
+type _Slick = typeof Slick;
 
 @Component({
   components: {
@@ -22,7 +22,7 @@ export default class CmsCarousel extends Vue {
   @Prop(String) public centerPadding!: string;
   public index = 0;
 
-  public get slickOptions(): {[key:string]: string | boolean | number} {
+  public get slickOptions(): { [key: string]: string | boolean | number } {
     return {
       infinite: true,
       slidesToShow: 1,
@@ -37,10 +37,10 @@ export default class CmsCarousel extends Vue {
   }
 
   public next(delay: number): void {
-    setTimeout((): void => (this.$refs.slick as Slick).next(), delay);
+    setTimeout((): void => (this.$refs.slick as _Slick).next(), delay);
   }
 
-  public onIndexChanged(event: object, slick: Slick, currentSlide: number): void {
+  public onIndexChanged(event: object, slick: _Slick, currentSlide: number): void {
     if (currentSlide !== this.index) {
       this.$emit('change', currentSlide);
       this.index = currentSlide;

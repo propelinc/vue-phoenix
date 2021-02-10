@@ -19,14 +19,14 @@ export interface CmsPluginOptions {
   globalCssCacheMs?: number;
   router?: Router;
 
-  setCaptable?: ((captable: Captable) => void);
-  getCaptable?: (() => Captable);
-  getSiteVars?: (() => object);
+  setCaptable?: (captable: Captable) => void;
+  getCaptable?: () => Captable;
+  getSiteVars?: () => object;
 
   /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
   beforeFetchZone?: null | (() => Promise<any>);
-  checkConnection?: (() => boolean);
-  onCarouselSwipe?: ((zoneId: string, index: number) => void);
+  checkConnection?: () => boolean;
+  onCarouselSwipe?: (zoneId: string, index: number) => void;
 
   trackAnalytics?: (eventName: string, eventProps: { [key: string]: any }) => void; // eslint-disable-line @typescript-eslint/no-explicit-any
   extensions?: { [key: string]: (this: never, ...args: any[]) => any }; // eslint-disable-line @typescript-eslint/no-explicit-any
@@ -34,12 +34,12 @@ export interface CmsPluginOptions {
 
 export interface PluginOptions extends CmsPluginOptions {
   baseUrl: string;
-  checkConnection: (() => boolean);
-  getCaptable: (() => Captable);
-  getSiteVars: (() => object);
+  checkConnection: () => boolean;
+  getCaptable: () => Captable;
+  getSiteVars: () => object;
   globalCssCacheMs: number;
-  setCaptable: ((captable: Captable) => void);
-  trackAnalytics: (eventName: string, eventProps: {[key: string]: any}) => void; // eslint-disable-line @typescript-eslint/no-explicit-any
+  setCaptable: (captable: Captable) => void;
+  trackAnalytics: (eventName: string, eventProps: { [key: string]: any }) => void; // eslint-disable-line @typescript-eslint/no-explicit-any
 }
 
 export const pluginOptions: PluginOptions = {
@@ -62,19 +62,18 @@ export const pluginOptions: PluginOptions = {
   getSiteVars(): object {
     return {};
   },
-  trackAnalytics(): void {
-  },
+  trackAnalytics(): void {},
 };
-export var finalPluginOptions: PluginOptions;
+export let finalPluginOptions: PluginOptions;
 
 const plugin = function install(Vue: typeof _Vue, options?: CmsPluginOptions) {
   Object.assign(pluginOptions, options);
-  Vue.component('yield-to', YieldTo);
-  Vue.component('content-for', ContentFor);
-  Vue.component('cms-content', CmsContent);
-  Vue.component('cms-carousel', CmsCarousel);
-  Vue.component('cms-server-request', CmsServerRequest);
-  Vue.component('cms-zone', CmsZone);
+  Vue.component('YieldTo', YieldTo);
+  Vue.component('ContentFor', ContentFor);
+  Vue.component('CmsContent', CmsContent);
+  Vue.component('CmsCarousel', CmsCarousel);
+  Vue.component('CmsServerRequest', CmsServerRequest);
+  Vue.component('CmsZone', CmsZone);
 
   /**
    * Directive used to track impressions on a zone.
