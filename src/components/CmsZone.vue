@@ -11,7 +11,7 @@
       <cms-content
         v-if="zoneHeader"
         :html="zoneHeader"
-        :render-context="context"
+        :context="renderContext"
         :zone-id="zoneId"
       />
       <cms-carousel
@@ -22,25 +22,23 @@
       >
         <cms-content
           v-for="(content, index) in contents"
-          :key="index"
+          :key="`${nonce}-${content.delivery}`"
           :class="`cms-zone-content-${zoneId}-${index}`"
           class="cms-zone-carousel-content"
           tag="div"
           :html="content.html"
-          :extra="extra"
-          :render-context="context"
+          :context="renderContext"
           :zone-id="zoneId"
         />
       </cms-carousel>
       <div v-else class="zone-contents">
         <cms-content
           v-for="(content, index) in contents"
-          :key="index"
+          :key="`${nonce}-${content.delivery}`"
           :class="`cms-zone-content-${zoneId}-${index}`"
           tag="div"
           :html="content.html"
-          :extra="extra"
-          :render-context="context"
+          :context="renderContext"
           :zone-id="zoneId"
         />
       </div>
@@ -48,7 +46,7 @@
       <cms-content
         v-if="zoneFooter"
         :html="zoneFooter"
-        :render-context="context"
+        :context="renderContext"
         :zone-id="zoneId"
       />
     </div>
@@ -121,11 +119,19 @@ export default class CmsZone extends Vue {
   public scrollable: Element | null = null;
   public scrollableListeners: EventListener[] = [];
 
+  public nonce: number = 0;
   public cursorLoading: boolean = false;
   public next = debounce(() => this.getNextPage(), 400);
 
   private get isScrolling() {
     return this.zoneType === 'scrolling';
+  }
+
+  private get renderContext() {
+    return {
+      ...this.extra,
+      ...this.context,
+    };
   }
 
   private created(): void {
@@ -182,6 +188,9 @@ export default class CmsZone extends Vue {
     this.$el.classList.add('cms-zone-loading');
     this.$el.classList.remove('cms-zone-error');
     this.$el.classList.remove('cms-zone-offline');
+
+    // Increment nonce on every request to prevent vue from re-using cms-content components.
+    this.nonce++;
 
     let response;
     try {

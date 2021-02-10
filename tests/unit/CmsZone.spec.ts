@@ -6,6 +6,7 @@ import { compileToFunctions } from 'vue-template-compiler';
 import cmsClient from '@/cmsHttp';
 import CmsZone from '@/components/CmsZone.vue';
 import CmsPlugin from '@/plugins/cms';
+import { supressPromiseRejection } from './util';
 
 Vue.compile = compileToFunctions;
 const localVue = createLocalVue();
@@ -13,7 +14,6 @@ localVue.use(CmsPlugin);
 
 describe('CmsZone.vue', (): void => {
   let response: any; // eslint-disable-line @typescript-eslint/no-explicit-any
-  let requestOptions: any; // eslint-disable-line @typescript-eslint/no-explicit-any
   let resolvePromise: any; // eslint-disable-line @typescript-eslint/no-explicit-any
   let rejectPromise: any; // eslint-disable-line @typescript-eslint/no-explicit-any
 
@@ -30,8 +30,6 @@ describe('CmsZone.vue', (): void => {
   }
 
   beforeEach((): void => {
-    requestOptions = null;
-
     response = new Promise((resolve, reject): void => {
       resolvePromise = resolve;
       rejectPromise = reject;
@@ -42,11 +40,7 @@ describe('CmsZone.vue', (): void => {
     });
 
     cmsClient.trackZone = jest.fn();
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    cmsClient.fetchZone = jest.fn().mockImplementation((options: any) => {
-      requestOptions = options;
-      return response;
-    });
+    cmsClient.fetchZone = jest.fn().mockImplementation(() => response);
   });
 
   it('renders default content on error fetching zone', async (): Promise<void> => {
@@ -58,20 +52,14 @@ describe('CmsZone.vue', (): void => {
       propsData: { zoneId, extra },
     });
 
-    expect(cmsClient.fetchZone).toHaveBeenCalled();
-    expect(requestOptions.zoneId).toBe(zoneId);
-    expect(requestOptions.extra).toBe(extra);
+    expect(cmsClient.fetchZone).toHaveBeenCalledWith({ zoneId, extra });
     expect(wrapper.text()).toMatch('Default Content');
     expect(wrapper.classes()).toContain('cms-zone-loading');
-
-    try {
-      rejectPromise({});
-      await response;
-    } catch (e) {
-      await localVue.nextTick();
-      expect(wrapper.text()).toMatch('Default Content');
-      expect(wrapper.classes()).toContain('cms-zone-error');
-    }
+    rejectPromise({});
+    supressPromiseRejection(response);
+    await localVue.nextTick();
+    expect(wrapper.text()).toMatch('Default Content');
+    expect(wrapper.classes()).toContain('cms-zone-error');
   });
 
   ['default', 'carousel', 'scrolling'].forEach((zoneType): void => {
@@ -106,6 +94,7 @@ describe('CmsZone.vue', (): void => {
 
       resolvePromise(makeResponse(zoneType, [{
         html: '<div>Some Content {{ context.bar }}</div>',
+        delivery: 1,
         tracker: 'foo',
       }]));
 
@@ -136,7 +125,7 @@ describe('CmsZone.vue', (): void => {
         `,
       });
 
-      resolvePromise(makeResponse(zoneType, [{ html: '<div>Some Content</div>', tracker: 'foo' }]));
+      resolvePromise(makeResponse(zoneType, [{ html: '<div>Some Content</div>', delivery: 1, tracker: 'foo' }]));
       const wrapper = mount(component, { localVue });
       await response;
       await localVue.nextTick();
@@ -160,6 +149,7 @@ describe('CmsZone.vue', (): void => {
 
       resolvePromise(makeResponse(zoneType, [{
         html: '<div>Some Content</div>',
+        delivery: 1,
         tracker: 'foo',
         extra: { track_on: 'someroute' },
       }]));
@@ -187,6 +177,7 @@ describe('CmsZone.vue', (): void => {
 
       resolvePromise(makeResponse(zoneType, [{
         html: '<div>Some Content</div>',
+        delivery: 1,
         tracker: 'foo',
         extra: { track_on: 'click' },
       }]));
