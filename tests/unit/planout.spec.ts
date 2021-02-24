@@ -1,7 +1,7 @@
 import { createLocalVue } from '@vue/test-utils';
 import { PlanoutCode } from 'planout';
 
-import PlanoutVuePlugin, { PlanoutPlugin } from '@/plugins/planout';
+import PlanoutVuePlugin, { BaseNamespace, PlanoutPlugin } from '@/plugins/planout';
 
 const defaultScript: PlanoutCode = {
   op: 'seq',
@@ -31,6 +31,27 @@ describe('Vue plugin and vuex module tests', (): void => {
     axiosGetMock.mockReturnValueOnce({ namespaces: [], experiments: [] });
     localVue.use(PlanoutVuePlugin);
     expect(typeof localVue.prototype.$planout).toBe('object');
+  });
+});
+
+describe('BaseNamespace tests', (): void => {
+  it('Default numSegments to 1000', () => {
+    const ns = new BaseNamespace('test');
+    expect(ns.numSegments).toEqual(1000);
+
+    expect(ns.availableSegments[0]).toEqual(0);
+    expect(ns.availableSegments[999]).toEqual(999);
+    expect(ns.availableSegments).toEqual([...ns.availableSegments].sort((a, b) => a-b))
+    expect(ns.availableSegments.length).toEqual(1000);
+  });
+  it('can override numSegments', () => {
+    const ns = new BaseNamespace('test', 5);
+    expect(ns.numSegments).toEqual(5);
+
+    expect(ns.availableSegments[0]).toEqual(0);
+    expect(ns.availableSegments[4]).toEqual(4);
+    expect(ns.availableSegments).toEqual([...ns.availableSegments].sort((a, b) => a-b))
+    expect(ns.availableSegments.length).toEqual(5);
   });
 });
 
