@@ -1,5 +1,6 @@
 import Axios, { AxiosInstance } from 'axios';
 import isEqual from 'lodash/isEqual';
+import range  from 'lodash/range';
 import {
   Assignment,
   Experiment,
@@ -111,7 +112,7 @@ class InterpretedExperiment extends Experiment<Inputs, Params> {
   }
 }
 
-class BaseNamespace extends Namespace.SimpleNamespace<Inputs, Params> {
+export class BaseNamespace extends Namespace.SimpleNamespace<Inputs, Params> {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   stack!: { op: string; args: any[] }[];
 
@@ -119,13 +120,25 @@ class BaseNamespace extends Namespace.SimpleNamespace<Inputs, Params> {
 
   _defaultExperimentConfig!: PlanoutExperimentConfig;
 
-  constructor(namespace: string) {
+  availableSegments!: number[];
+
+  constructor(namespace: string, numSegments: number = 1000) {
     super({});
     this.setName(namespace);
+
+    // See parent class: https://github.com/rawls238/PlanOut.js/blob/22196f69a3f4964a420295b1de36fc7dd425ea26/es6/namespace.js#L76
+    // Overriding "numSegments" correctly is hard. The SimpleNamespace class allows you to override
+    // "numSegments" using the "setupDefaults" during the constructor call. It then uses that value
+    // to setup "availableSegments".
+    // Because you cannot set a value on "this" before calling the "super" method and the "super"
+    // method is what calls "setupDefaults", you cannot programmatically override "numSegments" in
+    // BaseNamespace using the above method.
+    // See below for the workaround.
+    this.numSegments = numSegments;
+    this.availableSegments = range(this.numSegments);
   }
 
   setupDefaults() {
-    this.numSegments = 1000;
     this.stack = [];
   }
 
@@ -189,9 +202,8 @@ class BaseNamespace extends Namespace.SimpleNamespace<Inputs, Params> {
   }
 
   clone() {
-    const ns = new BaseNamespace(this.getName());
+    const ns = new BaseNamespace(this.getName(), this.numSegments);
     ns._defaultExperimentConfig = this._defaultExperimentConfig;
-    ns.numSegments = this.numSegments;
     ns.setPrimaryUnit(this.getPrimaryUnit());
     this.stack.forEach((nsOp) => {
       ns[nsOp.op](...nsOp.args);
@@ -280,10 +292,9 @@ export class PlanoutPlugin {
 
   addNamespace(namespace: string, numSegments = 1000, primaryUnit = 'uid', compiled?: PlanoutCode) {
     if (!this.namespaces[namespace]) {
-      const ns = new BaseNamespace(namespace);
+      const ns = new BaseNamespace(namespace, numSegments);
       this.namespaces[namespace] = ns;
       ns.setName(namespace);
-      ns.numSegments = numSegments;
       ns.setPrimaryUnit(primaryUnit);
       ns.setDefaultExperimentConfig({
         namespace_name: namespace,
