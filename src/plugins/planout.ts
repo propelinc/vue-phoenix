@@ -1,5 +1,6 @@
 import Axios, { AxiosInstance } from 'axios';
-import { isEqual, range } from 'lodash';
+import isEqual from 'lodash/isEqual';
+import range  from 'lodash/range';
 import {
   Assignment, Experiment, ExperimentSetup,
   Inputs, Interpreter, PlanoutCode, Namespace,
@@ -120,9 +121,13 @@ export class BaseNamespace extends Namespace.SimpleNamespace<Inputs, Params> {
     this.setName(namespace);
 
     // See parent class: https://github.com/rawls238/PlanOut.js/blob/22196f69a3f4964a420295b1de36fc7dd425ea26/es6/namespace.js#L76
-    // Because availableSegments is set up in the constructor, simply overriding numSegments
-    // will break. Instead we setting up numSegments and availableSegments again after
-    // parent initialization.
+    // Overriding "numSegments" correctly is hard. The SimpleNamespace class allows you to override
+    // "numSegments" using the "setupDefaults" during the constructor call. It then uses that value
+    // to setup "availableSegments".
+    // Because you cannot set a value on "this" before calling the "super" method and the "super"
+    // method is what calls "setupDefaults", you cannot programmatically override "numSegments" in
+    // BaseNamespace using the above method.
+    // See below for the workaround.
     this.numSegments = numSegments;
     this.availableSegments = range(this.numSegments);
   }
