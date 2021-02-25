@@ -7,6 +7,7 @@
     <slot v-if="zoneStatus === 'error'" name="error" />
     <slot v-if="zoneStatus === 'offline'" name="offline" />
     <slot v-if="zoneStatus === 'loading'" name="loading" />
+    <slot v-if="!zoneStatus && !contents.length" name="empty" />
     <div v-if="contents.length">
       <cms-content
         v-if="zoneHeader"
