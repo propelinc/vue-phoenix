@@ -85,6 +85,25 @@ describe('CmsZone.vue', (): void => {
       expect(wrapper.text()).not.toMatch('Some footer');
     });
 
+    it(`renders empty slot for ${zoneType} zone`, async (): Promise<void> => {
+      const zoneId = '5';
+      const extra = { foo: 'bar' };
+      const wrapper = mount(CmsZone, {
+        localVue,
+        slots: { default: '<div>Default Content</div>', empty: '<div>Empty Content</div>' },
+        propsData: { zoneId, extra },
+      });
+
+      resolvePromise(makeResponse(zoneType, []));
+      await response;
+      await localVue.nextTick();
+      const expectedClasses = zoneType === 'scrolling' ? ['scrollable-content'] : [];
+      expect(wrapper.classes()).toEqual(expectedClasses);
+      expect(wrapper.text()).toBe('Empty Content');
+      expect(wrapper.text()).not.toMatch('Some header');
+      expect(wrapper.text()).not.toMatch('Some footer');
+    });
+
     it(`renders and tracks received content for '${zoneType}' zones`, async (): Promise<void> => {
       const zoneId = '5';
       const extra = { foo: 'bar' };
