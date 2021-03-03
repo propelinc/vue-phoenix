@@ -226,7 +226,7 @@ export default class CmsZone extends Vue {
     if (trackOn) {
       this.$root.$once(`cms.track.${this.zoneId}`, (): void => {
         cmsClient.trackZone({ content, zoneId: this.zoneId });
-        this.$root.$emit('cms.refresh', [this.zoneId]);
+        this.$root.$emit(`cms.refresh.${this.zoneId}`);
       });
 
       this.$root.$once('router.change', (hash: string): void => {
