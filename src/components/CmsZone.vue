@@ -124,6 +124,7 @@ export default class CmsZone extends Vue {
   private beforeDestroy(): void {
     this.$root.$off('cms.refresh', this.refresh);
     this.$root.$off(`cms.refresh.${this.zoneId}`, this.refresh);
+    this.$root.$off(`cms.track.${this.zoneId}`);
     this.removeScrollListeners();
   }
 
