@@ -202,12 +202,12 @@ export default class CmsZone extends Vue {
       return;
     }
 
-    this.removeScrollListeners();
-    this.scrollable = getClosest(this.$el, '.scrollable-content');
-    if (this.scrollable) {
-      this.trackScrollable(this.contents, this.scrollable);
-      return;
-    }
+    // this.removeScrollListeners();
+    // this.scrollable = getClosest(this.$el, '.scrollable-content');
+    // if (this.scrollable) {
+    //   this.trackScrollable(this.contents, this.scrollable);
+    //   return;
+    // }
 
     if (this.zoneType === 'carousel') {
       this.trackIndex(0);
