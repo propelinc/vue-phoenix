@@ -174,7 +174,7 @@ export default class CmsZone extends Vue {
     let response;
     try {
       response = await cmsClient.fetchZone({ zoneId: this.zoneId, extra: this.extra });
-      this.$el.classList.remove('cms-zone-loading');
+      // this.$el.classList.remove('cms-zone-loading');
       if (!response.data || !response.data.content) {
         throw new Error('No data');
       }
