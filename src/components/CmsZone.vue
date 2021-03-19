@@ -172,6 +172,7 @@ export default class CmsZone extends Vue {
     this.nonce++;
 
     if (this.zoneId === "84") {
+      this.zoneType = 'carousel';
       const choice = (new Date()).getMilliseconds() % 3
       if (choice === 0) {
         this.contents = [
