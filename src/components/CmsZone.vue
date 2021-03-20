@@ -16,6 +16,7 @@
         :zone-id="zoneId"
       />
       <cms-carousel
+        :key="`${nonce}-${zoneId}`"
         :center-padding="contents.length > 1 ? '20px' : '0'"
         :zone-id="zoneId"
         @change="trackIndex"
