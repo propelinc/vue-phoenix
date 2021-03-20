@@ -267,6 +267,7 @@ export default class CmsZone extends Vue {
           },
         ];
       }
+      this.nonce++;
       return;
     }
     let response;
