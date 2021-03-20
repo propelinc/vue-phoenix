@@ -16,7 +16,6 @@
         :zone-id="zoneId"
       />
       <cms-carousel
-        v-if="zoneType === 'carousel'"
         :center-padding="contents.length > 1 ? '20px' : '0'"
         :zone-id="zoneId"
         @change="trackIndex"
@@ -32,7 +31,9 @@
           :zone-id="zoneId"
         />
       </cms-carousel>
-      <div v-else class="zone-contents">
+
+      <strong>LETS DO BOTH </strong>
+      <div class="zone-contents">
         <cms-content
           v-for="(content, index) in contents"
           :key="`${nonce}-${content.delivery}`"
