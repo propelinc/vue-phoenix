@@ -17,6 +17,7 @@
       />
       <cms-carousel
         v-if="zoneType === 'carousel'"
+        :key="`${nonce}-${zoneId}`"
         :center-padding="contents.length > 1 ? '20px' : '0'"
         :zone-id="zoneId"
         @change="trackIndex"
@@ -197,6 +198,8 @@ export default class CmsZone extends Vue {
       ? `<div class="zone-footer">${data.zone_footer || ''}</div>`
       : '';
     this.zoneStatus = null;
+    // Circumvent issue where carousel breaks by forcing it to re-render
+    this.nonce++;
 
     if (!this.contents.length) {
       return;
