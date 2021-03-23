@@ -198,8 +198,7 @@ export default class CmsZone extends Vue {
       ? `<div class="zone-footer">${data.zone_footer || ''}</div>`
       : '';
     this.zoneStatus = null;
-    // Increment nonce after contents are set to ensure a new carousel is created.
-    // If not, the carousel component breaks when you change the existing contents.
+    // Circumvent issue where carousel breaks by forcing it to re-render
     this.nonce++;
 
     if (!this.contents.length) {
