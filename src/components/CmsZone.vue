@@ -42,8 +42,11 @@
         <cms-content
           v-for="(content, index) in contents"
           :key="`${nonce}-${content.delivery}`"
-          :class="`cms-zone-content-${zoneId}-${index}`"
-          class="cms-zone-carousel-content"
+          :class="{
+            [`cms-zone-content-${zoneId}-${index}`]: true,
+            'cms-zone-content--tracked': content.tracked,
+          }"
+          class="cms-zone-content cms-zone-carousel-content"
           tag="div"
           :html="content.html"
           :context="renderContext"
@@ -54,7 +57,11 @@
         <cms-content
           v-for="(content, index) in contents"
           :key="`${nonce}-${content.delivery}`"
-          :class="`cms-zone-content-${zoneId}-${index}`"
+          class="cms-zone-content"
+          :class="{
+            [`cms-zone-content-${zoneId}-${index}`]: true,
+            'cms-zone-content--tracked': content.tracked,
+          }"
           tag="div"
           :html="content.html"
           :context="renderContext"
@@ -244,7 +251,7 @@ export default class CmsZone extends Vue {
     if (!content || content.tracked) {
       return;
     }
-    content.tracked = true;
+    Vue.set(this.contents, index, { ...content, tracked: true });
 
     const trackOn = (content.extra || {}).track_on;
     if (trackOn) {
@@ -277,7 +284,6 @@ export default class CmsZone extends Vue {
           const contentElm = this.$el.querySelector('.slick-current');
           if (contentElm && this.isContentVisible(contentElm, scrollable, percentVisible)) {
             this.trackIndex(0);
-            contentElm.classList.add('content-viewable-tracked');
             scrollable.removeEventListener('scroll', listener);
           }
         }, durationVisibleToBeTrackedMs);
@@ -296,7 +302,6 @@ export default class CmsZone extends Vue {
           const contentElm = this.$el.querySelector(`.cms-zone-content-${this.zoneId}-${i}`);
           if (contentElm && this.isContentVisible(contentElm, scrollable, percentVisible)) {
             this.trackIndex(i);
-            contentElm.classList.add('content-viewable-tracked');
             scrollable.removeEventListener('scroll', listener);
           }
         }, durationVisibleToBeTrackedMs);
@@ -391,27 +396,31 @@ export default class CmsZone extends Vue {
 </style>
 
 <style lang="less" scoped>
-.cms-zone--inspect {
-  border: 2px solid #a3b0f9;
+.zone-inspect-overlay(@color-light, @color-dark) {
+  border: 1px solid @color-dark;
 
   .cms-zone__zone-label {
-    background: fade(#a3b0f9, 70%);
+    background: fade(@color-light, 70%);
   }
 
-  & & {
-    border: 2px solid #b3f6a2;
+  .cms-zone-content {
+    border: 1px dashed @color-light;
 
-    .cms-zone__zone-label {
-      background: fade(#b3f6a2, 70%);
+    &.cms-zone-content--tracked {
+      border-style: solid;
     }
+  }
+}
+
+.cms-zone--inspect {
+  .zone-inspect-overlay(#a3b0f9, #5560cb);
+
+  & & {
+    .zone-inspect-overlay(#b3f6a2, #51d156);
   }
 
   & & & {
-    border: 2px solid #fdcab7;
-
-    .cms-zone__zone-label {
-      background: fade(#fdcab7, 70%);
-    }
+    .zone-inspect-overlay(#fdcab7, #FC8247);
   }
 }
 
