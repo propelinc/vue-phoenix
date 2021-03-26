@@ -1,56 +1,64 @@
 <template>
-  <div
-    v-infinite-scroll="{ action: next, enabled: isScrolling }"
-    :class="{ 'scrollable-content': isScrolling }"
-  >
-    <slot v-if="!zoneType && !contents.length" />
-    <slot v-if="zoneStatus === 'error'" name="error" />
-    <slot v-if="zoneStatus === 'offline'" name="offline" />
-    <slot v-if="zoneStatus === 'loading'" name="loading" />
-    <slot v-if="!zoneStatus && !contents.length" name="empty" />
-    <div v-if="contents.length">
-      <cms-content
-        v-if="zoneHeader"
-        :html="zoneHeader"
-        :context="renderContext"
-        :zone-id="zoneId"
-      />
-      <cms-carousel
-        v-if="zoneType === 'carousel'"
-        :key="`${nonce}-${zoneId}`"
-        :center-padding="contents.length > 1 ? '20px' : '0'"
-        :zone-id="zoneId"
-        @change="trackIndex"
-      >
+  <div>
+    <div v-if="withSearch">
+      <cms-search />
+    </div>
+    <div v-if="withCategoryFilters">
+      <cms-filter :zone-id="zoneId" />
+    </div>
+    <div
+      v-infinite-scroll="{ action: next, enabled: isScrolling }"
+      :class="{ 'scrollable-content': isScrolling }"
+    >
+      <slot v-if="!zoneType && !contents.length" />
+      <slot v-if="zoneStatus === 'error'" name="error" />
+      <slot v-if="zoneStatus === 'offline'" name="offline" />
+      <slot v-if="zoneStatus === 'loading'" name="loading" />
+      <slot v-if="!zoneStatus && !contents.length" name="empty" />
+      <div v-if="contents.length">
         <cms-content
-          v-for="(content, index) in contents"
-          :key="`${nonce}-${content.delivery}`"
-          :class="`cms-zone-content-${zoneId}-${index}`"
-          class="cms-zone-carousel-content"
-          tag="div"
-          :html="content.html"
+          v-if="zoneHeader"
+          :html="zoneHeader"
           :context="renderContext"
           :zone-id="zoneId"
         />
-      </cms-carousel>
-      <div v-else class="zone-contents">
+        <cms-carousel
+          v-if="zoneType === 'carousel'"
+          :key="`${nonce}-${zoneId}`"
+          :center-padding="contents.length > 1 ? '20px' : '0'"
+          :zone-id="zoneId"
+          @change="trackIndex"
+        >
+          <cms-content
+            v-for="(content, index) in contents"
+            :key="`${nonce}-${content.delivery}`"
+            :class="`cms-zone-content-${zoneId}-${index}`"
+            class="cms-zone-carousel-content"
+            tag="div"
+            :html="content.html"
+            :context="renderContext"
+            :zone-id="zoneId"
+          />
+        </cms-carousel>
+        <div v-else class="zone-contents">
+          <cms-content
+            v-for="(content, index) in contents"
+            :key="`${nonce}-${content.delivery}`"
+            :class="`cms-zone-content-${zoneId}-${index}`"
+            tag="div"
+            :html="content.html"
+            :context="renderContext"
+            :zone-id="zoneId"
+          />
+        </div>
+        <slot v-if="cursorLoading" name="cursor" />
         <cms-content
-          v-for="(content, index) in contents"
-          :key="`${nonce}-${content.delivery}`"
-          :class="`cms-zone-content-${zoneId}-${index}`"
-          tag="div"
-          :html="content.html"
+          v-if="zoneFooter"
+          :html="zoneFooter"
           :context="renderContext"
           :zone-id="zoneId"
         />
       </div>
-      <slot v-if="cursorLoading" name="cursor" />
-      <cms-content
-        v-if="zoneFooter"
-        :html="zoneFooter"
-        :context="renderContext"
-        :zone-id="zoneId"
-      />
     </div>
   </div>
 </template>
@@ -88,6 +96,8 @@ export default class CmsZone extends Vue {
   @Prop(String) public zoneId!: string;
   @Prop(Object) public extra!: {};
   @Prop(Object) public context!: {};
+  @Prop(Boolean) public withSearch!: false;
+  @Prop(Boolean) public withCategoryFilters!: false;
 
   public zoneStatus: string | null = null;
   public zoneType: string = '';
