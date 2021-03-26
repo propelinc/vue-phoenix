@@ -1,45 +1,34 @@
 <template>
-  <div style="padding: 16px">
-    
+  <div class="search-filter-content">
     <!-- Search Bar -->
-    <div style="display: inline;">
+    <div class="search-bar">
       <v-text-field
         v-if="withSearch"
         v-model="typedQuery"
         filled
         rounded
         placeholder="Search..."
+        class="search-text"
         @keydown.enter="searchQuery = typedQuery"
-        style="display: inline-block; width: 85%"
-
       />
-      <div class="ml-1" style="display: inline-block; vertical-align: middle; padding-left: 12px;">
-        <close-icon 
+      <div class="search-icon ml-1">
+        <close-icon
           v-if="searchQuery && searchQuery === typedQuery"
+          fill-color="#027ac0"
           @click="updateSearchQuery()"
-          fillColor="#027ac0" 
         />
-        <magnify-icon 
-          v-else
-          @click="updateSearchQuery()"
-          fillColor="#027ac0" 
-        />
+        <magnify-icon v-else fill-color="#027ac0" @click="updateSearchQuery()" />
       </div>
     </div>
 
     <!-- Filters -->
-    <div
-      v-if="withCategoryFilters && filters.length > 0"
-      class="row"
-      style="font-weight: 600; margin-bottom: 10px; clear: both; text-align: center"
-    >
+    <div v-if="withCategoryFilters && filters.length > 0" class="filters-section row">
       <v-btn
         text
         large
         block
         color="success"
-        class="bold"
-        style="padding: 16px; height: 50px"
+        class="bold filter-dropdown"
         @click="toggleShowFilters()"
       >
         Filter
@@ -48,14 +37,19 @@
       </v-btn>
 
       <div v-if="showFilters" class="full-width container pb-1">
-        <div style="border-bottom: 2px solid #cccccc" />
-        <div v-for="category in filters" style="display: inline; overflow: hidden; overflow-x: scroll; width: 100%;">
-          <div 
+        <div class="border" />
+        <div v-for="category in filters" :key="category" class="categories">
+          <div
+            :style="
+              category === selectedCategory
+                ? 'color: #fff; font-weight: bold; background-color: #004976;'
+                : 'background-color: #EFEFEF;'
+            "
+            class="category-pill"
             @click="selectCategory(category)"
-            v-bind:style="category===selectedCategory ? 'color: #fff; font-weight: bold; background-color: #004976;' : 'background-color: #EFEFEF;'"
-            style="display: inline-block; float:left; background-color: #EFEFEF; border-radius: 28px; margin: 6px 12px 6px 0px">
-            <div style="padding:4px 4px; margin-right: 12px; margin-left: 12px; line-height: 2.2;">
-              {{category}}
+          >
+            <div class="category-pill-text">
+              {{ category }}
             </div>
           </div>
         </div>
@@ -79,7 +73,6 @@ import ChevronDownIcon from 'vue-material-design-icons/ChevronDown.vue';
 import ChevronUpIcon from 'vue-material-design-icons/ChevronUp.vue';
 import CloseIcon from 'vue-material-design-icons/Close.vue';
 import MagnifyIcon from 'vue-material-design-icons/Magnify.vue';
-
 import { Vue, Component, Prop } from 'vue-property-decorator';
 
 import cmsClient from '../cmsHttp';
@@ -139,3 +132,67 @@ export default class SearchFilterCmsZone extends Vue {
   }
 }
 </script>
+
+<style>
+.search-bar {
+  display: block;
+  position: relative;
+  height: 50px;
+  margin: 10px;
+}
+
+.search-text {
+  width: 100%;
+  height: 100%;
+  margin: 0;
+}
+
+.search-icon {
+  position: absolute;
+  height: 100%;
+  margin: 15px;
+  top: 0;
+  right: 0;
+}
+
+.search-filter-content {
+  padding: 16px;
+}
+
+.filters-section {
+  font-weight: 600;
+  margin-bottom: 10px;
+  clear: both;
+  text-align: center;
+}
+
+.filter-dropdown {
+  padding: 16px;
+  height: 50px;
+}
+
+.categories {
+  display: inline;
+  overflow: hidden;
+  overflow-x: scroll;
+  width: 100%;
+}
+
+.category-pill {
+  float: left;
+  background-color: #efefef;
+  border-radius: 28px;
+  margin: 6px 12px 6px 0px;
+}
+
+.category-pill-text {
+  padding: 4px 4px;
+  margin-right: 12px;
+  margin-left: 12px;
+  line-height: 2.2;
+}
+
+.border {
+  border-bottom: 2px solid #cccccc;
+}
+</style>
