@@ -1,10 +1,10 @@
 <template>
   <div>
     <div v-if="withSearch">
-      <cms-search />
+      <cms-search @searchEvent="handleSearch($event)" />
     </div>
     <div v-if="withCategoryFilters">
-      <cms-filter :zone-id="zoneId" />
+      <cms-filter :zone-id="zoneId" @filterEvent="handleFilter($event)" />
     </div>
     <div
       v-infinite-scroll="{ action: next, enabled: isScrolling }"
@@ -74,6 +74,8 @@ import { pluginOptions } from '../plugins/cms';
 
 import CmsCarousel from './CmsCarousel.vue';
 import CmsContent from './CmsContent';
+import CmsFilter from './CmsFilter.vue';
+import CmsSearch from './CmsSearch.vue';
 
 const durationVisibleToBeTrackedMs = 1000;
 const percentVisible = 50;
@@ -111,6 +113,18 @@ export default class CmsZone extends Vue {
   public nonce: number = 0;
   public cursorLoading: boolean = false;
   public next = debounce(() => this.getNextPage(), 400);
+
+  private handleSearch(searchQuery: string): void {
+    const hold = { ...this.extra };
+    hold.q = searchQuery;
+    this.extra = { ...hold };
+  }
+
+  private handleFilter(filterCategory: string): void {
+    const hold = { ...this.extra };
+    hold.category = filterCategory;
+    this.extra = { ...hold };
+  }
 
   private get isScrolling() {
     return this.zoneType === 'scrolling';

@@ -96,8 +96,8 @@ import CmsZone from './CmsZone.vue';
 })
 export default class SearchFilterCmsZone extends Vue {
   @Prop(String) public zoneId!: string;
-  @Prop(Boolean) public withSearch!: false;
-  @Prop(Boolean) public withCategoryFilters!: false;
+  @Prop({ type: Boolean, default: false }) public withSearch;
+  @Prop({ type: Boolean, default: false }) public withCategoryFilters;
   @Prop(Object) public extra!: {};
   @Prop(Object) public context!: {};
 
