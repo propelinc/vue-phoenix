@@ -119,7 +119,6 @@ class CmsClient {
   }
 
   async fetchFilterCategories(zoneId: string) {
-    return {"filters": ["category_1", "category_2", "category_3", "category_4", "category_5", "category_6", "category_7"]};
     return this.http({
       zoneId,
       url: `/cms/categories/${zoneId}`,

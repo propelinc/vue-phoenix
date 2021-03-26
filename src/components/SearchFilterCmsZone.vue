@@ -40,32 +40,15 @@
 
       <div v-if="showFilters" class="full-width container pb-1">
         <div style="border-bottom: 2px solid #cccccc" />
-        <div
-          v-for="category in filters"
-          style="display: inline; overflow: hidden; overflow-x: scroll; width: 100%"
-        >
-          <div
-            :style="
-              category === selectedCategory
-                ? 'color: #fff; font-weight: bold; background-color: #004976;'
-                : 'background-color: #EFEFEF;'
-            "
-            style="
-              display: inline-block;
-              float: left;
-              background-color: #efefef;
-              border-radius: 28px;
-              margin: 6px 12px 6px 0px;
-            "
+        <div v-for="category in filters" style="display: inline; overflow: hidden; overflow-x: scroll; width: 100%;">
+          <div 
             @click="selectCategory(category)"
-          >
-            <div style="padding: 4px 4px; margin-right: 12px; margin-left: 12px; line-height: 2.2">
-              {{ category }}
+            v-bind:style="category===selectedCategory ? 'color: #fff; font-weight: bold; background-color: #004976;' : 'background-color: #EFEFEF;'"
+            style="display: inline-block; float:left; background-color: #EFEFEF; border-radius: 28px; margin: 6px 12px 6px 0px">
+            <div style="padding:4px 4px; margin-right: 12px; margin-left: 12px; line-height: 2.2;">
+              {{category}}
             </div>
           </div>
-        </div>
-        <div @click="applyFilters">
-          <v-btn text block large class="bold" color="success"> Apply </v-btn>
         </div>
       </div>
     </div>
@@ -73,7 +56,8 @@
     <!-- Content -->
     <cms-zone
       :zone-id="zoneId"
-      :extra="{ q: searchQuery, category: selectedCategory, ...extra, ...context }"
+      :extra="{ q: searchQuery, category: selectedCategory, ...extra }"
+      :context="context"
     >
       <div class="cms-loading">Loading...</div>
       <div class="zone-empty" />
@@ -99,17 +83,13 @@ export default class SearchFilterCmsZone extends Vue {
   @Prop(Boolean) public withSearch!: false;
   @Prop(Boolean) public withCategoryFilters!: false;
   @Prop(Object) public extra!: {};
+  @Prop(Object) public context!: {};
 
   public searchQuery: string = '';
   public typedQuery: string = '';
   public showFilters: boolean = false;
   public filters: string[] = [];
   public selectedCategory: string | null = null;
-
-  public applyFilters() {
-    // TODO: Reload content with category filters
-    this.showFilters = false;
-  }
 
   public selectCategory(category: string) {
     if (this.selectedCategory === category) {
@@ -129,7 +109,7 @@ export default class SearchFilterCmsZone extends Vue {
     let response;
     try {
       response = await cmsClient.fetchFilterCategories(this.zoneId);
-      this.filters = response.filters;
+      this.filters = response.data;
     } catch (error) {}
   }
 
