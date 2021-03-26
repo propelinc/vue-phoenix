@@ -40,13 +40,27 @@
 
       <div v-if="showFilters" class="full-width container pb-1">
         <div style="border-bottom: 2px solid #cccccc" />
-        <div v-for="category in filters" style="display: inline; overflow: hidden; overflow-x: scroll; width: 100%;">
-          <div 
+        <div
+          v-for="category in filters"
+          style="display: inline; overflow: hidden; overflow-x: scroll; width: 100%"
+        >
+          <div
+            :style="
+              category === selectedCategory
+                ? 'color: #fff; font-weight: bold; background-color: #004976;'
+                : 'background-color: #EFEFEF;'
+            "
+            style="
+              display: inline-block;
+              float: left;
+              background-color: #efefef;
+              border-radius: 28px;
+              margin: 6px 12px 6px 0px;
+            "
             @click="selectCategory(category)"
-            v-bind:style="category===selectedCategory ? 'color: #fff; font-weight: bold; background-color: #004976;' : 'background-color: #EFEFEF;'"
-            style="display: inline-block; float:left; background-color: #EFEFEF; border-radius: 28px; margin: 6px 12px 6px 0px">
-            <div style="padding:4px 4px; margin-right: 12px; margin-left: 12px; line-height: 2.2;">
-              {{category}}
+          >
+            <div style="padding: 4px 4px; margin-right: 12px; margin-left: 12px; line-height: 2.2">
+              {{ category }}
             </div>
           </div>
         </div>
@@ -57,7 +71,10 @@
     </div>
 
     <!-- Content -->
-    <cms-zone :zone-id="zoneId" :extra="{ q: searchQuery, category: selectedCategory }">
+    <cms-zone
+      :zone-id="zoneId"
+      :extra="{ q: searchQuery, category: selectedCategory, ...extra, ...context }"
+    >
       <div class="cms-loading">Loading...</div>
       <div class="zone-empty" />
     </cms-zone>
@@ -81,6 +98,7 @@ export default class SearchFilterCmsZone extends Vue {
   @Prop(String) public zoneId!: string;
   @Prop(Boolean) public withSearch!: false;
   @Prop(Boolean) public withCategoryFilters!: false;
+  @Prop(Object) public extra!: {};
 
   public searchQuery: string = '';
   public typedQuery: string = '';
