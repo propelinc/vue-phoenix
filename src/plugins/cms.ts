@@ -7,6 +7,7 @@ import CmsCarousel from '../components/CmsCarousel.vue';
 import CmsContent from '../components/CmsContent';
 import CmsServerRequest from '../components/CmsServerRequest.vue';
 import CmsZone from '../components/CmsZone.vue';
+import SearchFilterCmsZone from '../components/SearchFilterCmsZone.vue'
 import { ContentFor, YieldTo } from '../components/capture';
 import { addDirectives } from '../directives';
 
@@ -74,6 +75,7 @@ const plugin = function install(Vue: typeof _Vue, options?: CmsPluginOptions) {
   Vue.component('CmsCarousel', CmsCarousel);
   Vue.component('CmsServerRequest', CmsServerRequest);
   Vue.component('CmsZone', CmsZone);
+  Vue.component('SearchFilterCmsZone', SearchFilterCmsZone)
 
   /**
    * Directive used to track impressions on a zone.
