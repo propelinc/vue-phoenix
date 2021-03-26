@@ -1,22 +1,31 @@
 <template>
   <div style="padding: 16px">
+    
     <!-- Search Bar -->
-    <v-text-field
-      v-if="withSearch"
-      v-model="typedQuery"
-      filled
-      rounded
-      placeholder="Search..."
-      :append-icon="
-        searchQuery && searchQuery === typedQuery ? 'chevron-down-icon' : 'chevron-up-icon'
-      "
-      @click:append="
-        (searchQuery === typedQuery
-          ? (searchQuery = typedQuery = '')
-          : (searchQuery = typedQuery)) || true
-      "
-      @keydown.enter="searchQuery = typedQuery"
-    />
+    <div style="display: inline;">
+      <v-text-field
+        v-if="withSearch"
+        v-model="typedQuery"
+        filled
+        rounded
+        placeholder="Search..."
+        @keydown.enter="searchQuery = typedQuery"
+        style="display: inline-block; width: 85%"
+
+      />
+      <div class="ml-1" style="display: inline-block; vertical-align: middle; padding-left: 12px;">
+        <close-icon 
+          v-if="searchQuery && searchQuery === typedQuery"
+          @click="updateSearchQuery()"
+          fillColor="#027ac0" 
+        />
+        <magnify-icon 
+          v-else
+          @click="updateSearchQuery()"
+          fillColor="#027ac0" 
+        />
+      </div>
+    </div>
 
     <!-- Filters -->
     <div
@@ -68,6 +77,9 @@
 <script lang="ts">
 import ChevronDownIcon from 'vue-material-design-icons/ChevronDown.vue';
 import ChevronUpIcon from 'vue-material-design-icons/ChevronUp.vue';
+import CloseIcon from 'vue-material-design-icons/Close.vue';
+import MagnifyIcon from 'vue-material-design-icons/Magnify.vue';
+
 import { Vue, Component, Prop } from 'vue-property-decorator';
 
 import cmsClient from '../cmsHttp';
@@ -76,7 +88,7 @@ import CmsZone from './CmsZone.vue';
 
 @Component({
   name: 'search-filter-cms-zone',
-  components: { CmsZone, ChevronUpIcon, ChevronDownIcon },
+  components: { CmsZone, ChevronUpIcon, ChevronDownIcon, CloseIcon, MagnifyIcon },
 })
 export default class SearchFilterCmsZone extends Vue {
   @Prop(String) public zoneId!: string;
@@ -90,6 +102,15 @@ export default class SearchFilterCmsZone extends Vue {
   public showFilters: boolean = false;
   public filters: string[] = [];
   public selectedCategory: string | null = null;
+
+  public updateSearchQuery() {
+    if (this.searchQuery === this.typedQuery) {
+      this.searchQuery = '';
+      this.typedQuery = '';
+    } else {
+      this.searchQuery = this.typedQuery;
+    }
+  }
 
   public selectCategory(category: string) {
     if (this.selectedCategory === category) {
