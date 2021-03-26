@@ -1,10 +1,13 @@
 <template>
   <div>
-    <div v-if="withSearch">
-      <cms-search @searchEvent="handleSearch($event)" />
-    </div>
-    <div v-if="withCategoryFilters">
-      <cms-filter :zone-id="zoneId" @filterEvent="handleFilter($event)" />
+    <div>
+      <div style="padding-top: 400px; margin-top: 400px">
+        Hit this
+        <cms-search @searchEvent="handleSearch($event)" />
+      </div>
+      <div>
+        <cms-filter :zone-id="zoneId" @filterEvent="handleFilter($event)" />
+      </div>
     </div>
     <div
       v-infinite-scroll="{ action: next, enabled: isScrolling }"
@@ -92,14 +95,14 @@ export function getClosest(elm: Element, selector: string): HTMLElement | null {
 
 @Component({
   name: 'cms-zone',
-  components: { CmsCarousel, CmsContent },
+  components: { CmsCarousel, CmsContent, CmsFilter, CmsSearch },
 })
 export default class CmsZone extends Vue {
   @Prop(String) public zoneId!: string;
   @Prop(Object) public extra!: {};
   @Prop(Object) public context!: {};
-  @Prop({ type: Boolean, default: false }) public withSearch!: boolean;
-  @Prop({ type: Boolean, default: false }) public withCategoryFilters!: boolean;
+  @Prop(Boolean) public withSearch!: false;
+  @Prop(Boolean) public withCategoryFilters!: false;
 
   public zoneStatus: string | null = null;
   public zoneType: string = '';
