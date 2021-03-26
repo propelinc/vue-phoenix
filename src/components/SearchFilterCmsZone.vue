@@ -1,29 +1,23 @@
 <template>
   <div style="padding: 16px">
-    
     <!-- Search Bar -->
-    <div style="display: inline;">
+    <div style="display: inline">
       <v-text-field
         v-if="withSearch"
         v-model="typedQuery"
         filled
         rounded
         placeholder="Search..."
-        @keydown.enter="searchQuery = typedQuery"
         style="display: inline-block; width: 85%"
-
+        @keydown.enter="searchQuery = typedQuery"
       />
-      <div class="ml-1" style="display: inline-block; vertical-align: middle; padding-left: 12px;">
-        <close-icon 
+      <div class="ml-1" style="display: inline-block; vertical-align: middle; padding-left: 12px">
+        <close-icon
           v-if="searchQuery && searchQuery === typedQuery"
+          fill-color="#027ac0"
           @click="updateSearchQuery()"
-          fillColor="#027ac0" 
         />
-        <magnify-icon 
-          v-else
-          @click="updateSearchQuery()"
-          fillColor="#027ac0" 
-        />
+        <magnify-icon v-else fill-color="#027ac0" @click="updateSearchQuery()" />
       </div>
     </div>
 
@@ -49,13 +43,27 @@
 
       <div v-if="showFilters" class="full-width container pb-1">
         <div style="border-bottom: 2px solid #cccccc" />
-        <div v-for="category in filters" style="display: inline; overflow: hidden; overflow-x: scroll; width: 100%;">
-          <div 
+        <div
+          v-for="category in filters"
+          style="display: inline; overflow: hidden; overflow-x: scroll; width: 100%"
+        >
+          <div
+            :style="
+              category === selectedCategory
+                ? 'color: #fff; font-weight: bold; background-color: #004976;'
+                : 'background-color: #EFEFEF;'
+            "
+            style="
+              display: inline-block;
+              float: left;
+              background-color: #efefef;
+              border-radius: 28px;
+              margin: 6px 12px 6px 0px;
+            "
             @click="selectCategory(category)"
-            v-bind:style="category===selectedCategory ? 'color: #fff; font-weight: bold; background-color: #004976;' : 'background-color: #EFEFEF;'"
-            style="display: inline-block; float:left; background-color: #EFEFEF; border-radius: 28px; margin: 6px 12px 6px 0px">
-            <div style="padding:4px 4px; margin-right: 12px; margin-left: 12px; line-height: 2.2;">
-              {{category}}
+          >
+            <div style="padding: 4px 4px; margin-right: 12px; margin-left: 12px; line-height: 2.2">
+              {{ category }}
             </div>
           </div>
         </div>
@@ -67,10 +75,7 @@
       :zone-id="zoneId"
       :extra="{ q: searchQuery, category: selectedCategory, ...extra }"
       :context="context"
-    >
-      <div class="cms-loading">Loading...</div>
-      <div class="zone-empty" />
-    </cms-zone>
+    />
   </div>
 </template>
 
@@ -79,7 +84,6 @@ import ChevronDownIcon from 'vue-material-design-icons/ChevronDown.vue';
 import ChevronUpIcon from 'vue-material-design-icons/ChevronUp.vue';
 import CloseIcon from 'vue-material-design-icons/Close.vue';
 import MagnifyIcon from 'vue-material-design-icons/Magnify.vue';
-
 import { Vue, Component, Prop } from 'vue-property-decorator';
 
 import cmsClient from '../cmsHttp';
