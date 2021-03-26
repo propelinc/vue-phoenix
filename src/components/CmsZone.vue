@@ -98,8 +98,8 @@ export default class CmsZone extends Vue {
   @Prop(String) public zoneId!: string;
   @Prop(Object) public extra!: {};
   @Prop(Object) public context!: {};
-  @Prop(Boolean) public withSearch!: false;
-  @Prop(Boolean) public withCategoryFilters!: false;
+  @Prop({ type: Boolean, default: false }) public withSearch!: boolean;
+  @Prop({ type: Boolean, default: false }) public withCategoryFilters!: boolean;
 
   public zoneStatus: string | null = null;
   public zoneType: string = '';
