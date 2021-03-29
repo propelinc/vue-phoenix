@@ -5,9 +5,10 @@ import { DirectiveBinding } from 'vue/types/options';
 import { Captable } from '../api';
 import CmsCarousel from '../components/CmsCarousel.vue';
 import CmsContent from '../components/CmsContent';
+import CmsSearch from '../components/CmsSearch.vue';
 import CmsServerRequest from '../components/CmsServerRequest.vue';
 import CmsZone from '../components/CmsZone.vue';
-import SearchFilterCmsZone from '../components/SearchFilterCmsZone.vue'
+import SearchFilterCmsZone from '../components/SearchFilterCmsZone.vue';
 import { ContentFor, YieldTo } from '../components/capture';
 import { addDirectives } from '../directives';
 import installService from '../services/cms';
@@ -76,9 +77,10 @@ const plugin = function install(Vue: typeof _Vue, options?: CmsPluginOptions) {
   Vue.component('ContentFor', ContentFor);
   Vue.component('CmsContent', CmsContent);
   Vue.component('CmsCarousel', CmsCarousel);
+  Vue.component('CmsSearch', CmsSearch);
   Vue.component('CmsServerRequest', CmsServerRequest);
   Vue.component('CmsZone', CmsZone);
-  Vue.component('SearchFilterCmsZone', SearchFilterCmsZone)
+  Vue.component('SearchFilterCmsZone', SearchFilterCmsZone);
 
   /**
    * Directive used to track impressions on a zone.
