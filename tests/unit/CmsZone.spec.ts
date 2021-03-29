@@ -253,7 +253,7 @@ describe('CmsZone.vue', (): void => {
       });
 
       expect(wrapper.find('.cms-zone--inspect').exists()).toBe(true);
-      expect(wrapper.find('.cms-zone__zone-label').text()).toBe('Zone 15');
+      expect(wrapper.find('.cms-zone__zone-label').text()).toBe('15');
     });
   });
 

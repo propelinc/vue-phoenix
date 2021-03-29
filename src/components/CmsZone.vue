@@ -8,7 +8,7 @@
       class="cms-zone__zone-label"
       @click.stop.prevent="shouldShowInspectModal = true"
     >
-      Zone <strong>{{ zoneId }}</strong>
+      {{ zoneId }}
     </button>
 
     <cms-inspect-sheet
@@ -429,5 +429,8 @@ export default class CmsZone extends Vue {
   white-space: nowrap;
   font-size: 12px;
   color: black;
+  font-weight: bold;
+  min-width: 40px;
+  backdrop-filter: blur(1px);
 }
 </style>

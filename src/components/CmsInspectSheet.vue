@@ -3,18 +3,18 @@
     <div class="cms-inspect-sheet-scrim" @click="$emit('input', false)" />
     <div class="cms-inspect-sheet">
       <div class="cms-inspect-sheet__header">
-        <h4 class="cms-inspect-sheet__header__title">Zone {{ zoneId || 'default' }}</h4>
+        <h4 class="cms-inspect-sheet__header__title">Zone {{ zoneId }}</h4>
       </div>
 
       <div class="cms-inspect-sheet__body">
         <div class="cms-inspect-sheet__section">
           <h4>Basics</h4>
           <div class="cms-inspect-sheet__row">
-            <div class="cms-inspect-sheet__row__label">Zone Type</div>
-            <div class="cms-inspect-sheet__row__value">{{ zoneType }}</div>
+            <div class="cms-inspect-sheet__row__label">Type</div>
+            <div class="cms-inspect-sheet__row__value">{{ zoneType || 'default'  }}</div>
           </div>
           <div class="cms-inspect-sheet__row">
-            <div class="cms-inspect-sheet__row__label">Zone Status</div>
+            <div class="cms-inspect-sheet__row__label">Status</div>
             <div class="cms-inspect-sheet__row__value">{{ zoneStatus || 'normal' }}</div>
           </div>
 
