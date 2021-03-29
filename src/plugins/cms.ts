@@ -9,6 +9,7 @@ import CmsServerRequest from '../components/CmsServerRequest.vue';
 import CmsZone from '../components/CmsZone.vue';
 import { ContentFor, YieldTo } from '../components/capture';
 import { addDirectives } from '../directives';
+import installService from '../services/cms';
 
 interface DestroyHTMLElement extends HTMLElement {
   $destroy: () => void;
@@ -67,6 +68,8 @@ export const pluginOptions: PluginOptions = {
 export let finalPluginOptions: PluginOptions;
 
 const plugin = function install(Vue: typeof _Vue, options?: CmsPluginOptions) {
+  installService(Vue);
+
   Object.assign(pluginOptions, options);
   Vue.component('YieldTo', YieldTo);
   Vue.component('ContentFor', ContentFor);

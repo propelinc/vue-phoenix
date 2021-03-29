@@ -1,8 +1,25 @@
 <template>
   <div
     v-infinite-scroll="{ action: next, enabled: isScrolling }"
-    :class="{ 'scrollable-content': isScrolling }"
+    :class="{ 'scrollable-content': isScrolling, 'cms-zone--inspect': isInspectOverlayEnabled }"
   >
+    <button
+      v-if="isInspectOverlayEnabled"
+      class="cms-zone__zone-label"
+      @click.stop.prevent="shouldShowInspectModal = true"
+    >
+      {{ zoneId }}
+    </button>
+
+    <cms-inspect-sheet
+      v-model="shouldShowInspectModal"
+      :zone-id="zoneId"
+      :render-context="renderContext"
+      :contents="contents"
+      :zone-status="zoneStatus"
+      :zone-type="zoneType"
+    />
+
     <slot v-if="!zoneType && !contents.length" />
     <slot v-if="zoneStatus === 'error'" name="error" />
     <slot v-if="zoneStatus === 'offline'" name="offline" />
@@ -25,8 +42,11 @@
         <cms-content
           v-for="(content, index) in contents"
           :key="`${nonce}-${content.delivery}`"
-          :class="`cms-zone-content-${zoneId}-${index}`"
-          class="cms-zone-carousel-content"
+          :class="{
+            [`cms-zone-content-${zoneId}-${index}`]: true,
+            'cms-zone-content--tracked': content.tracked,
+          }"
+          class="cms-zone-content cms-zone-carousel-content"
           tag="div"
           :html="content.html"
           :context="renderContext"
@@ -37,7 +57,11 @@
         <cms-content
           v-for="(content, index) in contents"
           :key="`${nonce}-${content.delivery}`"
-          :class="`cms-zone-content-${zoneId}-${index}`"
+          class="cms-zone-content"
+          :class="{
+            [`cms-zone-content-${zoneId}-${index}`]: true,
+            'cms-zone-content--tracked': content.tracked,
+          }"
           tag="div"
           :html="content.html"
           :context="renderContext"
@@ -66,6 +90,7 @@ import { pluginOptions } from '../plugins/cms';
 
 import CmsCarousel from './CmsCarousel.vue';
 import CmsContent from './CmsContent';
+import CmsInspectSheet from './CmsInspectSheet.vue';
 
 const durationVisibleToBeTrackedMs = 1000;
 const percentVisible = 50;
@@ -82,7 +107,7 @@ export function getClosest(elm: Element, selector: string): HTMLElement | null {
 
 @Component({
   name: 'cms-zone',
-  components: { CmsCarousel, CmsContent },
+  components: { CmsCarousel, CmsContent, CmsInspectSheet },
 })
 export default class CmsZone extends Vue {
   @Prop(String) public zoneId!: string;
@@ -101,6 +126,8 @@ export default class CmsZone extends Vue {
   public nonce: number = 0;
   public cursorLoading: boolean = false;
   public next = debounce(() => this.getNextPage(), 400);
+
+  shouldShowInspectModal = false;
 
   private get isScrolling() {
     return this.zoneType === 'scrolling';
@@ -224,7 +251,7 @@ export default class CmsZone extends Vue {
     if (!content || content.tracked) {
       return;
     }
-    content.tracked = true;
+    Vue.set(this.contents, index, { ...content, tracked: true });
 
     const trackOn = (content.extra || {}).track_on;
     if (trackOn) {
@@ -257,7 +284,6 @@ export default class CmsZone extends Vue {
           const contentElm = this.$el.querySelector('.slick-current');
           if (contentElm && this.isContentVisible(contentElm, scrollable, percentVisible)) {
             this.trackIndex(0);
-            contentElm.classList.add('content-viewable-tracked');
             scrollable.removeEventListener('scroll', listener);
           }
         }, durationVisibleToBeTrackedMs);
@@ -276,7 +302,6 @@ export default class CmsZone extends Vue {
           const contentElm = this.$el.querySelector(`.cms-zone-content-${this.zoneId}-${i}`);
           if (contentElm && this.isContentVisible(contentElm, scrollable, percentVisible)) {
             this.trackIndex(i);
-            contentElm.classList.add('content-viewable-tracked');
             scrollable.removeEventListener('scroll', listener);
           }
         }, durationVisibleToBeTrackedMs);
@@ -340,6 +365,10 @@ export default class CmsZone extends Vue {
     const visibleHeight = elHeight - invisibleHeight;
     return (visibleHeight / elHeight) * 100 >= minPercentVisible;
   }
+
+  get isInspectOverlayEnabled(): boolean {
+    return this.$cms.isInspectOverlayEnabled;
+  }
 }
 </script>
 
@@ -363,5 +392,45 @@ export default class CmsZone extends Vue {
   position: relative; /* need this to position inner content */
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
+}
+</style>
+
+<style lang="less" scoped>
+.zone-inspect-overlay(@color-light, @color-dark) {
+  border: 1px solid @color-dark;
+
+  .cms-zone__zone-label {
+    background: fade(@color-light, 70%);
+  }
+
+  .cms-zone-content {
+    border: 1px dashed @color-light;
+
+    &.cms-zone-content--tracked {
+      border-style: solid;
+    }
+  }
+}
+
+.cms-zone--inspect {
+  .zone-inspect-overlay(#a3b0f9, #5560cb);
+
+  & & {
+    .zone-inspect-overlay(#b3f6a2, #51d156);
+  }
+
+  & & & {
+    .zone-inspect-overlay(#fdcab7, #FC8247);
+  }
+}
+
+.cms-zone__zone-label {
+  padding: 4px 8px;
+  white-space: nowrap;
+  font-size: 12px;
+  color: black;
+  font-weight: bold;
+  min-width: 40px;
+  backdrop-filter: blur(1px);
 }
 </style>

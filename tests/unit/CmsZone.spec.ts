@@ -229,55 +229,82 @@ describe('CmsZone.vue', (): void => {
       expect(cmsClient.trackZone).toHaveBeenCalled();
     });
   });
-});
 
-describe('CmsZone.vue isContentVisible tests:', (): void => {
-  let cms: any; // eslint-disable-line @typescript-eslint/no-explicit-any
+  describe('inspector overlay', () => {
+    it('does not render inspect overlay by default', () => {
+      const wrapper = shallowMount(CmsZone, {
+        localVue,
+        propsData: { zoneId: '1' },
+      });
 
-  function getElementWithRect(height: number, top: number, bottom: number): Element {
-    const element = document.createElement('div');
-    (element as any).getBoundingClientRect = () => ({ height, top, bottom }); // eslint-disable-line @typescript-eslint/no-explicit-any
-    return element;
-  }
-
-  beforeEach((): void => {
-    const wrapper = shallowMount(CmsZone, {
-      localVue,
-      propsData: { zoneId: '5' },
+      expect(wrapper.find('.cms-zone--inspect').exists()).toBe(false);
+      expect(wrapper.find('.cms-zone__zone-label').exists()).toBe(false);
     });
-    cms = wrapper.vm;
+
+    it('can render the inspect overlay', () => {
+      const wrapper = shallowMount(CmsZone, {
+        localVue,
+        propsData: { zoneId: '15' },
+        mocks: {
+          $cms: {
+            isInspectOverlayEnabled: true,
+          },
+        },
+      });
+
+      expect(wrapper.find('.cms-zone--inspect').exists()).toBe(true);
+      expect(wrapper.find('.cms-zone__zone-label').text()).toBe('15');
+    });
   });
 
-  it('should only be visible when completely in view', (): void => {
-    let el = getElementWithRect(10, 20, 30);
-    let viewport = getElementWithRect(20, 0, 20);
-    expect(cms.isContentVisible(el, viewport, 100)).toBe(false);
+  describe('isContentVisible', (): void => {
+    let cms: any; // eslint-disable-line @typescript-eslint/no-explicit-any
 
-    el = getElementWithRect(10, 11, 21);
-    viewport = getElementWithRect(20, 0, 20);
-    expect(cms.isContentVisible(el, viewport, 100)).toBe(false);
+    function getElementWithRect(height: number, top: number, bottom: number): Element {
+      const element = document.createElement('div');
+      (element as any).getBoundingClientRect = () => ({ height, top, bottom }); // eslint-disable-line @typescript-eslint/no-explicit-any
+      return element;
+    }
 
-    el = getElementWithRect(10, 10, 20);
-    viewport = getElementWithRect(20, 0, 20);
-    expect(cms.isContentVisible(el, viewport, 100)).toBe(true);
+    beforeEach((): void => {
+      const wrapper = shallowMount(CmsZone, {
+        localVue,
+        propsData: { zoneId: '5' },
+      });
+      cms = wrapper.vm;
+    });
 
-    el = getElementWithRect(10, 0, 10);
-    viewport = getElementWithRect(20, 0, 20);
-    expect(cms.isContentVisible(el, viewport, 100)).toBe(true);
+    it('should only be visible when completely in view', (): void => {
+      let el = getElementWithRect(10, 20, 30);
+      let viewport = getElementWithRect(20, 0, 20);
+      expect(cms.isContentVisible(el, viewport, 100)).toBe(false);
 
-    el = getElementWithRect(10, -1, 9);
-    viewport = getElementWithRect(20, 0, 20);
-    expect(cms.isContentVisible(el, viewport, 100)).toBe(false);
+      el = getElementWithRect(10, 11, 21);
+      viewport = getElementWithRect(20, 0, 20);
+      expect(cms.isContentVisible(el, viewport, 100)).toBe(false);
 
-    el = getElementWithRect(10, -10, 0);
-    viewport = getElementWithRect(20, 0, 20);
-    expect(cms.isContentVisible(el, viewport, 100)).toBe(false);
-  });
+      el = getElementWithRect(10, 10, 20);
+      viewport = getElementWithRect(20, 0, 20);
+      expect(cms.isContentVisible(el, viewport, 100)).toBe(true);
 
-  it('should be visible when the minimum percentage is met', (): void => {
-    const el = getElementWithRect(10, 19, 29);
-    const viewport = getElementWithRect(20, 0, 20);
-    expect(cms.isContentVisible(el, viewport, 10)).toBe(true);
-    expect(cms.isContentVisible(el, viewport, 11)).toBe(false);
+      el = getElementWithRect(10, 0, 10);
+      viewport = getElementWithRect(20, 0, 20);
+      expect(cms.isContentVisible(el, viewport, 100)).toBe(true);
+
+      el = getElementWithRect(10, -1, 9);
+      viewport = getElementWithRect(20, 0, 20);
+      expect(cms.isContentVisible(el, viewport, 100)).toBe(false);
+
+      el = getElementWithRect(10, -10, 0);
+      viewport = getElementWithRect(20, 0, 20);
+      expect(cms.isContentVisible(el, viewport, 100)).toBe(false);
+    });
+
+    it('should be visible when the minimum percentage is met', (): void => {
+      const el = getElementWithRect(10, 19, 29);
+      const viewport = getElementWithRect(20, 0, 20);
+      expect(cms.isContentVisible(el, viewport, 10)).toBe(true);
+      expect(cms.isContentVisible(el, viewport, 11)).toBe(false);
+    });
   });
 });
