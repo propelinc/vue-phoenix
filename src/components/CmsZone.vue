@@ -1,56 +1,67 @@
 <template>
-  <div
-    v-infinite-scroll="{ action: next, enabled: isScrolling }"
-    :class="{ 'scrollable-content': isScrolling }"
-  >
-    <slot v-if="!zoneType && !contents.length" />
-    <slot v-if="zoneStatus === 'error'" name="error" />
-    <slot v-if="zoneStatus === 'offline'" name="offline" />
-    <slot v-if="zoneStatus === 'loading'" name="loading" />
-    <slot v-if="!zoneStatus && !contents.length" name="empty" />
-    <div v-if="contents.length">
-      <cms-content
-        v-if="zoneHeader"
-        :html="zoneHeader"
-        :context="renderContext"
-        :zone-id="zoneId"
-      />
-      <cms-carousel
-        v-if="zoneType === 'carousel'"
-        :key="`${nonce}-${zoneId}`"
-        :center-padding="contents.length > 1 ? '20px' : '0'"
-        :zone-id="zoneId"
-        @change="trackIndex"
-      >
+  <div>
+    <!-- Search Bar -->
+    <cms-search v-if="displaySearch()" @updateSearchQuery="updateSearchQuery($event)" />
+
+    <!-- Filters -->
+    <cms-filters
+      v-if="withCategoryFilters"
+      :zone-id="zoneId"
+      @updateSelectedCategory="updateSelectedCategory($event)"
+    />
+    <div
+      v-infinite-scroll="{ action: next, enabled: isScrolling }"
+      :class="{ 'scrollable-content': isScrolling }"
+    >
+      <slot v-if="!zoneType && !contents.length" />
+      <slot v-if="zoneStatus === 'error'" name="error" />
+      <slot v-if="zoneStatus === 'offline'" name="offline" />
+      <slot v-if="zoneStatus === 'loading'" name="loading" />
+      <slot v-if="!zoneStatus && !contents.length" name="empty" />
+      <div v-if="contents.length">
         <cms-content
-          v-for="(content, index) in contents"
-          :key="`${nonce}-${content.delivery}`"
-          :class="`cms-zone-content-${zoneId}-${index}`"
-          class="cms-zone-carousel-content"
-          tag="div"
-          :html="content.html"
+          v-if="zoneHeader"
+          :html="zoneHeader"
           :context="renderContext"
           :zone-id="zoneId"
         />
-      </cms-carousel>
-      <div v-else class="zone-contents">
+        <cms-carousel
+          v-if="zoneType === 'carousel'"
+          :key="`${nonce}-${zoneId}`"
+          :center-padding="contents.length > 1 ? '20px' : '0'"
+          :zone-id="zoneId"
+          @change="trackIndex"
+        >
+          <cms-content
+            v-for="(content, index) in contents"
+            :key="`${nonce}-${content.delivery}`"
+            :class="`cms-zone-content-${zoneId}-${index}`"
+            class="cms-zone-carousel-content"
+            tag="div"
+            :html="content.html"
+            :context="renderContext"
+            :zone-id="zoneId"
+          />
+        </cms-carousel>
+        <div v-else class="zone-contents">
+          <cms-content
+            v-for="(content, index) in contents"
+            :key="`${nonce}-${content.delivery}`"
+            :class="`cms-zone-content-${zoneId}-${index}`"
+            tag="div"
+            :html="content.html"
+            :context="renderContext"
+            :zone-id="zoneId"
+          />
+        </div>
+        <slot v-if="cursorLoading" name="cursor" />
         <cms-content
-          v-for="(content, index) in contents"
-          :key="`${nonce}-${content.delivery}`"
-          :class="`cms-zone-content-${zoneId}-${index}`"
-          tag="div"
-          :html="content.html"
+          v-if="zoneFooter"
+          :html="zoneFooter"
           :context="renderContext"
           :zone-id="zoneId"
         />
       </div>
-      <slot v-if="cursorLoading" name="cursor" />
-      <cms-content
-        v-if="zoneFooter"
-        :html="zoneFooter"
-        :context="renderContext"
-        :zone-id="zoneId"
-      />
     </div>
   </div>
 </template>
@@ -58,6 +69,8 @@
 <script lang="ts">
 import debounce from 'lodash/debounce';
 import isEqual from 'lodash/isEqual';
+import ChevronDownIcon from 'vue-material-design-icons/ChevronDown.vue';
+import ChevronUpIcon from 'vue-material-design-icons/ChevronUp.vue';
 import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
 
 import { Content } from '../api';
@@ -66,6 +79,8 @@ import { pluginOptions } from '../plugins/cms';
 
 import CmsCarousel from './CmsCarousel.vue';
 import CmsContent from './CmsContent';
+import CmsFilters from './CmsFilters.vue';
+import CmsSearch from './CmsSearch.vue';
 
 const durationVisibleToBeTrackedMs = 1000;
 const percentVisible = 50;
@@ -82,12 +97,14 @@ export function getClosest(elm: Element, selector: string): HTMLElement | null {
 
 @Component({
   name: 'cms-zone',
-  components: { CmsCarousel, CmsContent },
+  components: { CmsCarousel, CmsContent, CmsSearch, CmsFilters, ChevronUpIcon, ChevronDownIcon },
 })
 export default class CmsZone extends Vue {
   @Prop(String) public zoneId!: string;
   @Prop(Object) public extra!: {};
   @Prop(Object) public context!: {};
+  @Prop(Boolean) public withSearch!: false;
+  @Prop(Boolean) public withCategoryFilters!: false;
 
   public zoneStatus: string | null = null;
   public zoneType: string = '';
@@ -339,6 +356,19 @@ export default class CmsZone extends Vue {
     }
     const visibleHeight = elHeight - invisibleHeight;
     return (visibleHeight / elHeight) * 100 >= minPercentVisible;
+  }
+
+  private updateSearchQuery(query: string): void {
+    // Doing this rather than a straight property set so that the @Watch on extra fires
+    this.extra = { ...this.extra, q: query };
+  }
+
+  private updateSelectedCategory(category: string): void {
+    this.extra = { ...this.extra, category: category };
+  }
+
+  private displaySearch(): boolean {
+    return this.withSearch && (this.contents.length || this.extra.q !== undefined);
   }
 }
 </script>
