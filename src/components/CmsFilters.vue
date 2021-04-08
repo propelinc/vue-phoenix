@@ -18,11 +18,7 @@
       <div class="border" />
       <div v-for="category in filters" :key="category" class="categories">
         <div
-          :style="
-            category === selectedCategory
-              ? 'color: #fff; font-weight: bold; background-color: #004976;'
-              : 'background-color: #EFEFEF;'
-          "
+          :style="setCategoryStyle(category)"
           class="category-pill"
           @click="selectCategory(category)"
         >
@@ -71,12 +67,40 @@ export default class CmsFilters extends Vue {
     this.loadFilters();
   }
 
-  private async loadFilters() {
+  private async loadFilters(): Promise<void> {
     let response;
     try {
       response = await cmsClient.fetchFilterCategories(this.zoneId);
-      this.filters = response.data;
+      this.filters = ['All', ...this.shuffleArray<string>(response.data)];
     } catch (error) {}
+  }
+
+  private setCategoryStyle(category: string): string {
+    if (
+      category === this.selectedCategory ||
+      (this.selectedCategory === null && category === 'All')
+    ) {
+      return 'color: #fff; font-weight: bold; background-color: #004976;';
+    }
+    return 'background-color: #EFEFEF;';
+  }
+
+  private shuffleArray<T>(array: Array<T>): Array<T> {
+    // Randomization via Fisher-Yates Shuffle
+    const newArray = [...array];
+    let m = newArray.length;
+
+    // While there remain elements to shuffle…
+    while (m) {
+      // Pick a remaining element…
+      const i = Math.floor(Math.random() * m--);
+
+      // And swap it with the current element.
+      const t = newArray[m];
+      newArray[m] = newArray[i];
+      newArray[i] = t;
+    }
+    return newArray;
   }
 }
 </script>

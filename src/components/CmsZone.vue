@@ -363,8 +363,14 @@ export default class CmsZone extends Vue {
     this.extra = { ...this.extra, q: query };
   }
 
-  private updateSelectedCategory(category: string): void {
-    this.extra = { ...this.extra, category: category };
+  private updateSelectedCategory(filterCategory: string): void {
+    if (filterCategory !== 'All') {
+      this.extra = { ...this.extra, category: filterCategory };
+    } else {
+      // Destructuring assignment
+      const { category, ...extrasWithoutCategory } = this.extra;
+      this.extra = { ...extrasWithoutCategory };
+    }
   }
 
   private displaySearch(): boolean {
