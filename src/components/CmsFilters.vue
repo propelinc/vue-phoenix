@@ -16,14 +16,16 @@
 
     <div v-if="showFilters" class="full-width container pb-1">
       <div class="border" />
-      <div v-for="category in filters" :key="category" class="categories">
-        <div
-          :style="setCategoryStyle(category)"
-          class="category-pill"
-          @click="selectCategory(category)"
-        >
-          <div class="category-pill-text">
-            {{ category }}
+      <div class="categories-container">
+        <div v-for="category in filters" :key="category" class="categories">
+          <div
+            :style="setCategoryStyle(category)"
+            class="category-pill"
+            @click="selectCategory(category)"
+          >
+            <div class="category-pill-text">
+              {{ category }}
+            </div>
           </div>
         </div>
       </div>
@@ -117,7 +119,11 @@ export default class CmsFilters extends Vue {
   padding: 16px;
   height: 50px;
 }
-
+.categories-container {
+  white-space: nowrap;
+  overflow-x: auto;
+  overflow-y: hidden;
+}
 .categories {
   display: inline;
   overflow: hidden;
@@ -126,10 +132,10 @@ export default class CmsFilters extends Vue {
 }
 
 .category-pill {
-  float: left;
   background-color: #efefef;
   border-radius: 28px;
   margin: 6px 12px 6px 0px;
+  display: inline-block;
 }
 
 .category-pill-text {
