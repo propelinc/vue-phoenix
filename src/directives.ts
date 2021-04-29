@@ -40,7 +40,7 @@ function setupInfiniteScroll(el: DestroyHTMLElement, binding: DirectiveBinding) 
 
   const handler = (): void => {
     if (el.firstChild) {
-      const height = (el.firstChild as HTMLElement).clientHeight;
+      const height = (el.firstChild as HTMLElement).clientHeight || 0;
       if (el.scrollTop >= height - el.clientHeight - tolerance) {
         action();
       }
