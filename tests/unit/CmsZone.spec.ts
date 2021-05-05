@@ -4,6 +4,8 @@ import { compileToFunctions } from 'vue-template-compiler';
 
 import { Content } from '@/api.d.ts';
 import cmsClient from '@/cmsHttp';
+import CmsFilters from '@/components/CmsFilters.vue';
+import CmsSearch from '@/components/CmsSearch.vue';
 import CmsZone from '@/components/CmsZone.vue';
 import CmsPlugin from '@/plugins/cms';
 
@@ -17,6 +19,9 @@ describe('CmsZone.vue', (): void => {
   let response: any; // eslint-disable-line @typescript-eslint/no-explicit-any
   let resolvePromise: any; // eslint-disable-line @typescript-eslint/no-explicit-any
   let rejectPromise: any; // eslint-disable-line @typescript-eslint/no-explicit-any
+  let categoryResponse: any; // eslint-disable-line @typescript-eslint/no-explicit-any
+  let categoryResolvePromise: any; // eslint-disable-line @typescript-eslint/no-explicit-any
+  let categoryRejectPromise: any; // eslint-disable-line @typescript-eslint/no-explicit-any
 
   function makeResponse(zoneType: string, content: Content[]) {
     return {
@@ -29,13 +34,22 @@ describe('CmsZone.vue', (): void => {
       },
     };
   }
+  function makeFiltersResponse(categories: string[]) {
+    return {
+      status: 200,
+      data: categories,
+    };
+  }
 
   beforeEach((): void => {
     response = new Promise((resolve, reject): void => {
       resolvePromise = resolve;
       rejectPromise = reject;
     });
-
+    categoryResponse = new Promise((resolve, reject): void => {
+      categoryResolvePromise = resolve;
+      categoryRejectPromise = reject;
+    });
     Element.prototype.getBoundingClientRect = jest.fn(
       (): DOMRect => {
         return { width: 120, height: 120, top: 0, left: 0, bottom: 0, right: 0 } as DOMRect;
@@ -44,6 +58,7 @@ describe('CmsZone.vue', (): void => {
 
     cmsClient.trackZone = jest.fn();
     cmsClient.fetchZone = jest.fn().mockImplementation(() => response);
+    cmsClient.fetchFilterCategories = jest.fn().mockImplementation(() => categoryResponse);
   });
 
   it('renders default content on error fetching zone', async (): Promise<void> => {
@@ -79,7 +94,8 @@ describe('CmsZone.vue', (): void => {
       await response;
       await localVue.nextTick();
       const expectedClasses = zoneType === 'scrolling' ? ['scrollable-content'] : [];
-      expect(wrapper.classes()).toEqual(expectedClasses);
+      const zoneClasses = [...wrapper.element.children[0].classList];
+      expect(zoneClasses).toEqual(expectedClasses);
       expect(wrapper.text()).toBe('');
       expect(wrapper.text()).not.toMatch('Some header');
       expect(wrapper.text()).not.toMatch('Some footer');
@@ -98,7 +114,8 @@ describe('CmsZone.vue', (): void => {
       await response;
       await localVue.nextTick();
       const expectedClasses = zoneType === 'scrolling' ? ['scrollable-content'] : [];
-      expect(wrapper.classes()).toEqual(expectedClasses);
+      const zoneClasses = [...wrapper.element.children[0].classList];
+      expect(zoneClasses).toEqual(expectedClasses);
       expect(wrapper.text()).toBe('Empty Content');
       expect(wrapper.text()).not.toMatch('Some header');
       expect(wrapper.text()).not.toMatch('Some footer');
@@ -127,7 +144,8 @@ describe('CmsZone.vue', (): void => {
       await response;
       await localVue.nextTick();
       const expectedClasses = zoneType === 'scrolling' ? ['scrollable-content'] : [];
-      expect(wrapper.classes()).toEqual(expectedClasses);
+      const zoneClasses = [...wrapper.element.children[0].classList];
+      expect(zoneClasses).toEqual(expectedClasses);
       expect(cmsClient.trackZone).toHaveBeenCalled();
       expect(wrapper.find('.cms-zone-contents-5-0')).toBeTruthy();
       expect(wrapper.text()).toMatch('Some header');
@@ -227,6 +245,83 @@ describe('CmsZone.vue', (): void => {
       expect(wrapper.text()).toMatch('Some footer');
       wrapper.find('.tracker').trigger('click');
       expect(cmsClient.trackZone).toHaveBeenCalled();
+    });
+
+    it(`should display cmsSearch and cmsfilters for '${zoneType}' zones`, async (): Promise<void> => {
+      const wrapper = shallowMount(CmsZone, {
+        localVue,
+        stubs: {
+          CmsSearch,
+          CmsFilters,
+        },
+        propsData: { zoneId: '5', withSearch: true, withCategoryFilters: true, extra: {} },
+      });
+      resolvePromise(
+        makeResponse(zoneType, [
+          {
+            html: '<div>Some Content {{ context.bar }}</div>',
+            delivery: 1,
+            tracker: 'foo',
+          },
+        ])
+      );
+      await response;
+      await localVue.nextTick();
+      categoryResolvePromise(makeFiltersResponse(['foo']));
+      await categoryResponse;
+      await localVue.nextTick();
+      const componentChildren = [...wrapper.element.children];
+      expect(cmsClient.fetchFilterCategories).toHaveBeenCalled();
+      expect(componentChildren.some((x) => x.classList.contains('filters-section'))).toBeTruthy();
+      expect(componentChildren.some((x) => x.classList.contains('search-bar'))).toBeTruthy();
+    });
+
+    it(`should not display cmsSearch and cmsfilters for '${zoneType}' zones`, async (): Promise<void> => {
+      const wrapper = shallowMount(CmsZone, {
+        localVue,
+        stubs: {
+          CmsSearch,
+          CmsFilters,
+        },
+        propsData: { zoneId: '5', extra: {} },
+      });
+      resolvePromise(
+        makeResponse(zoneType, [
+          {
+            html: '<div>Some Content {{ context.bar }}</div>',
+            delivery: 1,
+            tracker: 'foo',
+          },
+        ])
+      );
+      await response;
+      await localVue.nextTick();
+      const componentChildren = [...wrapper.element.children];
+      expect(componentChildren.some((x) => x.classList.contains('filters-section'))).toBeFalsy();
+      expect(componentChildren.some((x) => x.classList.contains('search-bar'))).toBeFalsy();
+    });
+    it(`should not display cmsSearch if zone content is empty for '${zoneType}' zones`, async (): Promise<void> => {
+      const wrapper = mount(CmsZone, {
+        localVue,
+        propsData: { zoneId: '5', withSearch: true, extra: {} },
+      });
+      resolvePromise(makeResponse(zoneType, []));
+      await response;
+      await localVue.nextTick();
+      const componentChildren = [...wrapper.element.children];
+      expect(componentChildren.some((x) => x.classList.contains('search-bar'))).toBeFalsy();
+    });
+
+    it(`should display cmsSearch after search with no results for '${zoneType}' zones`, async (): Promise<void> => {
+      const wrapper = mount(CmsZone, {
+        localVue,
+        propsData: { zoneId: '5', withSearch: true, extra: { q: 'ash' } },
+      });
+      resolvePromise(makeResponse(zoneType, []));
+      await response;
+      await localVue.nextTick();
+      const componentChildren = [...wrapper.element.children];
+      expect(componentChildren.some((x) => x.classList.contains('search-bar'))).toBeTruthy();
     });
   });
 
