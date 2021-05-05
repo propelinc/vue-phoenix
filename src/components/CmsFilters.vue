@@ -46,7 +46,6 @@ import cmsClient from '../cmsHttp';
 })
 export default class CmsFilters extends Vue {
   @Prop(String) public zoneId!: string;
-  // @Prop(Array) public filters: string[] = [];
 
   public filters: string[] = [];
   public showFilters: boolean = false;
