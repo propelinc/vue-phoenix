@@ -20,15 +20,12 @@
 </template>
 
 <script lang="ts">
-import ChevronDownIcon from 'vue-material-design-icons/ChevronDown.vue';
-import ChevronUpIcon from 'vue-material-design-icons/ChevronUp.vue';
 import { Vue, Component, Prop } from 'vue-property-decorator';
 
 import cmsClient from '../cmsHttp';
 
 @Component({
   name: 'cms-filters',
-  components: { ChevronUpIcon, ChevronDownIcon },
 })
 export default class CmsFilters extends Vue {
   @Prop(String) public zoneId!: string;
