@@ -76,21 +76,8 @@
             :context="renderContext"
             :zone-id="zoneId"
           />
-          </cms-carousel>
-          <div v-else class="zone-contents">
-            <cms-content
-              v-for="(content, index) in contents"
-              :key="`${nonce}-${content.delivery}`"
-              :class="`cms-zone-content-${zoneId}-${index}`"
-              tag="div"
-              :html="content.html"
-              :context="renderContext"
-              :zone-id="zoneId"
-            />
-          </div>
-
-          <slot v-if="cursorLoading" name="cursor" />
-
+        </cms-carousel>
+        <div v-else class="zone-contents">
           <cms-content
             v-for="(content, index) in contents"
             :key="`${nonce}-${content.delivery}`"
@@ -104,7 +91,14 @@
             :context="renderContext"
             :zone-id="zoneId"
           />
-        </cms-carousel>
+        </div>
+        <slot v-if="cursorLoading" name="cursor" />
+        <cms-content
+          v-if="zoneFooter"
+          :html="zoneFooter"
+          :context="renderContext"
+          :zone-id="zoneId"
+        />
       </div>
     </div>
   </div>
