@@ -76,23 +76,6 @@
             :context="renderContext"
             :zone-id="zoneId"
           />
-          <cms-carousel
-            v-if="zoneType === 'carousel'"
-            :key="`${nonce}-${zoneId}`"
-            :center-padding="contents.length > 1 ? '20px' : '0'"
-            :zone-id="zoneId"
-            @change="trackIndex"
-          >
-            <cms-content
-              v-for="(content, index) in contents"
-              :key="`${nonce}-${content.delivery}`"
-              :class="`cms-zone-content-${zoneId}-${index}`"
-              class="cms-zone-carousel-content"
-              tag="div"
-              :html="content.html"
-              :context="renderContext"
-              :zone-id="zoneId"
-            />
           </cms-carousel>
           <div v-else class="zone-contents">
             <cms-content
