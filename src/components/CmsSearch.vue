@@ -1,9 +1,6 @@
 <template>
   <!-- Search Bar -->
   <div class="search-bar">
-    <!-- <div class="search-icon ml-1">
-      <slot name="magnify-icon" />
-    </div> -->
     <v-text-field
       v-model="typedQuery"
       filled
@@ -12,35 +9,29 @@
       class="search-text"
       @keydown.enter="updateSearchQuery()"
     >
-      <template v-slot:prepend-inner>
+      <template #prepend-inner>
         <slot name="magnify-icon" />
       </template>
-      <template v-slot:append>
+      <template #append>
         <div class="close-icon" @click="updateSearchQuery()">
           <slot v-if="displayCloseIcon()" name="close-icon" />
         </div>
       </template>
     </v-text-field>
-    <!-- <div class="close-icon" @click="updateSearchQuery()">
-      <slot v-if="displayCloseIcon()" name="close-icon" />
-    </div> -->
   </div>
 </template>
 
 <script lang="ts">
-import CloseIcon from 'vue-material-design-icons/Close.vue';
-import MagnifyIcon from 'vue-material-design-icons/Magnify.vue';
 import { Vue, Component } from 'vue-property-decorator';
 
 @Component({
   name: 'cms-search',
-  components: { CloseIcon, MagnifyIcon },
 })
 export default class CmsSearch extends Vue {
   public searchQuery: string = '';
   public typedQuery: string = '';
 
-  public displayCloseIcon(): boolean{
+  public displayCloseIcon(): boolean {
     return !!this.searchQuery && this.searchQuery === this.typedQuery;
   }
 
