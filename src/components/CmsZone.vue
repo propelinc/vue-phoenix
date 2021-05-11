@@ -1,14 +1,28 @@
 <template>
   <div>
     <!-- Search Bar -->
-    <cms-search v-if="displaySearch()" @updateSearchQuery="updateSearchQuery($event)" />
+    <cms-search v-if="displaySearch()" @updateSearchQuery="updateSearchQuery($event)">
+      <template #close-icon>
+        <slot name="close-icon" />
+      </template>
+      <template #magnify-icon>
+        <slot name="magnify-icon" />
+      </template>
+    </cms-search>
 
     <!-- Filters -->
     <cms-filters
       v-if="withCategoryFilters"
       :zone-id="zoneId"
       @updateSelectedCategory="updateSelectedCategory($event)"
-    />
+    >
+      <template #chevron-up>
+        <slot name="chevron-up" />
+      </template>
+      <template #chevron-down>
+        <slot name="chevron-down" />
+      </template>
+    </cms-filters>
     <div
       v-infinite-scroll="{ action: next, enabled: isScrolling }"
       :class="{ 'scrollable-content': isScrolling, 'cms-zone--inspect': isInspectOverlayEnabled }"
@@ -91,7 +105,9 @@
               :zone-id="zoneId"
             />
           </div>
+
           <slot v-if="cursorLoading" name="cursor" />
+
           <cms-content
             v-for="(content, index) in contents"
             :key="`${nonce}-${content.delivery}`"
@@ -114,8 +130,6 @@
 <script lang="ts">
 import debounce from 'lodash/debounce';
 import isEqual from 'lodash/isEqual';
-import ChevronDownIcon from 'vue-material-design-icons/ChevronDown.vue';
-import ChevronUpIcon from 'vue-material-design-icons/ChevronUp.vue';
 import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
 
 import { Content } from '../api';
@@ -149,8 +163,6 @@ export function getClosest(elm: Element, selector: string): HTMLElement | null {
     CmsInspectSheet,
     CmsSearch,
     CmsFilters,
-    ChevronUpIcon,
-    ChevronDownIcon,
   },
 })
 export default class CmsZone extends Vue {

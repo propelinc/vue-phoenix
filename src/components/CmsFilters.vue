@@ -1,21 +1,7 @@
 <template>
   <!-- Filters -->
   <div v-if="filters.length > 0" class="filters-section row">
-    <v-btn
-      text
-      large
-      block
-      color="success"
-      class="bold filter-dropdown"
-      @click="toggleShowFilters()"
-    >
-      Filter
-      <chevron-up-icon v-if="showFilters" color="#027ac0" class="ml-1" />
-      <chevron-down-icon v-else color="#027ac0" class="ml-1" />
-    </v-btn>
-
-    <div v-if="showFilters" class="full-width container pb-1">
-      <div class="border" />
+    <div class="full-width container pb-1">
       <div class="categories-container">
         <div v-for="category in filters" :key="category" class="categories">
           <div
@@ -58,10 +44,6 @@ export default class CmsFilters extends Vue {
       this.selectedCategory = category;
     }
     this.$emit('updateSelectedCategory', this.selectedCategory);
-  }
-
-  public toggleShowFilters() {
-    this.showFilters = !this.showFilters;
   }
 
   private created() {

@@ -1,6 +1,9 @@
 <template>
   <!-- Search Bar -->
   <div class="search-bar">
+    <!-- <div class="search-icon ml-1">
+      <slot name="magnify-icon" />
+    </div> -->
     <v-text-field
       v-model="typedQuery"
       filled
@@ -8,15 +11,19 @@
       placeholder="Search..."
       class="search-text"
       @keydown.enter="updateSearchQuery()"
-    />
-    <div class="search-icon ml-1">
-      <close-icon
-        v-if="searchQuery && searchQuery === typedQuery"
-        fill-color="#027ac0"
-        @click="updateSearchQuery()"
-      />
-      <magnify-icon v-else fill-color="#027ac0" @click="updateSearchQuery()" />
-    </div>
+    >
+      <template v-slot:prepend-inner>
+        <slot name="magnify-icon" />
+      </template>
+      <template v-slot:append>
+        <div class="close-icon" @click="updateSearchQuery()">
+          <slot v-if="displayCloseIcon()" name="close-icon" />
+        </div>
+      </template>
+    </v-text-field>
+    <!-- <div class="close-icon" @click="updateSearchQuery()">
+      <slot v-if="displayCloseIcon()" name="close-icon" />
+    </div> -->
   </div>
 </template>
 
@@ -32,6 +39,10 @@ import { Vue, Component } from 'vue-property-decorator';
 export default class CmsSearch extends Vue {
   public searchQuery: string = '';
   public typedQuery: string = '';
+
+  public displayCloseIcon(): boolean{
+    return !!this.searchQuery && this.searchQuery === this.typedQuery;
+  }
 
   public updateSearchQuery() {
     if (this.searchQuery === this.typedQuery) {
@@ -58,6 +69,9 @@ export default class CmsSearch extends Vue {
   width: 100%;
   height: 100%;
   margin: 0;
+  position: relative;
+  padding-inline-end: 44px;
+  padding-inline-start: 52px;
 }
 
 .search-icon {
@@ -65,6 +79,14 @@ export default class CmsSearch extends Vue {
   height: 100%;
   margin: 15px;
   top: 0;
-  right: 0;
+  left: 25px;
+}
+
+.close-icon {
+  position: absolute;
+  height: 100%;
+  margin: 15px;
+  top: 0;
+  right: 25px;
 }
 </style>
