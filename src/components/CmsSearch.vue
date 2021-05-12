@@ -10,7 +10,9 @@
       @keydown.enter="updateSearchQuery()"
     >
       <template #prepend-inner>
-        <slot name="magnify-icon" />
+        <div class="magnify-icon">
+          <slot name="magnify-icon" />
+        </div>
       </template>
       <template #append>
         <div class="close-icon" @click="updateSearchQuery()">
@@ -65,19 +67,11 @@ export default class CmsSearch extends Vue {
   padding-inline-start: 52px;
 }
 
-.search-icon {
-  position: absolute;
-  height: 100%;
-  margin: 15px;
-  top: 0;
-  left: 25px;
+.magnify-icon {
+  margin-right: 10px;
 }
 
 .close-icon {
-  position: absolute;
-  height: 100%;
-  margin: 15px;
-  top: 0;
-  right: 25px;
+  margin-left: 10px;
 }
 </style>

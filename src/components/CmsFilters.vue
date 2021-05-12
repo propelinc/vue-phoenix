@@ -60,7 +60,7 @@ export default class CmsFilters extends Vue {
       category === this.selectedCategory ||
       (this.selectedCategory === null && category === 'All')
     ) {
-      return 'color: #fff; font-weight: bold; background-color: #004976;';
+      return 'color: #fff; font-weight: bold; background-color: #1c7bbd;';
     }
     return 'background-color: #EFEFEF;';
   }

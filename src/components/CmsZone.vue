@@ -15,14 +15,7 @@
       v-if="withCategoryFilters"
       :zone-id="zoneId"
       @updateSelectedCategory="updateSelectedCategory($event)"
-    >
-      <template #chevron-up>
-        <slot name="chevron-up" />
-      </template>
-      <template #chevron-down>
-        <slot name="chevron-down" />
-      </template>
-    </cms-filters>
+    />
     <div
       v-infinite-scroll="{ action: next, enabled: isScrolling }"
       :class="{ 'scrollable-content': isScrolling, 'cms-zone--inspect': isInspectOverlayEnabled }"
@@ -408,6 +401,9 @@ export default class CmsZone extends Vue {
   private updateSearchQuery(query: string): void {
     // Doing this rather than a straight property set so that the @Watch on extra fires
     this.extra = { ...this.extra, q: query };
+    if (query) {
+      pluginOptions.trackAnalytics('search cms conent', { 'search query': query });
+    }
   }
 
   private updateSelectedCategory(filterCategory: string): void {

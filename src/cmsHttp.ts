@@ -121,7 +121,7 @@ class CmsClient {
   async fetchFilterCategories(zoneId: string) {
     return this.http({
       zoneId,
-      url: `/cms/${zoneId}/categories`,
+      url: `/cms/zone/${zoneId}/categories`,
     });
   }
 }
