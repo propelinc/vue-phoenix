@@ -55,7 +55,7 @@ export default class CmsSearch extends Vue {
   display: block;
   position: relative;
   height: 50px;
-  margin: 10px;
+  margin: 10px 0px 10px 0px;
 }
 
 .search-text {

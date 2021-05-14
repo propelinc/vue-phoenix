@@ -110,7 +110,7 @@ export default class CmsFilters extends Vue {
 }
 
 .category-pill {
-  background-color: #efefef;
+  background-color: #f3f5f6;
   border-radius: 28px;
   margin: 6px 12px 6px 0px;
   display: inline-block;

@@ -409,6 +409,7 @@ export default class CmsZone extends Vue {
   private updateSelectedCategory(filterCategory: string): void {
     if (filterCategory !== 'All') {
       this.extra = { ...this.extra, category: filterCategory };
+      pluginOptions.trackAnalytics('filter cms conent', { 'filter category': filterCategory });
     } else {
       // Destructuring assignment
       const { category, ...extrasWithoutCategory } = this.extra;
