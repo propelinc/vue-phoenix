@@ -1,21 +1,5 @@
 <template>
   <div>
-    <!-- Search Bar -->
-    <cms-search v-if="displaySearch()" @updateSearchQuery="updateSearchQuery($event)">
-      <template #close-icon>
-        <slot name="close-icon" />
-      </template>
-      <template #magnify-icon>
-        <slot name="magnify-icon" />
-      </template>
-    </cms-search>
-
-    <!-- Filters -->
-    <cms-filters
-      v-if="withCategoryFilters"
-      :zone-id="zoneId"
-      @updateSelectedCategory="updateSelectedCategory($event)"
-    />
     <div
       v-infinite-scroll="{ action: next, enabled: isScrolling }"
       :class="{ 'scrollable-content': isScrolling, 'cms-zone--inspect': isInspectOverlayEnabled }"
@@ -48,6 +32,22 @@
           :html="zoneHeader"
           :context="renderContext"
           :zone-id="zoneId"
+        />
+        <!-- Search Bar -->
+        <cms-search v-if="displaySearch()" @updateSearchQuery="updateSearchQuery($event)">
+          <template #close-icon>
+            <slot name="close-icon" />
+          </template>
+          <template #magnify-icon>
+            <slot name="magnify-icon" />
+          </template>
+        </cms-search>
+
+        <!-- Filters -->
+        <cms-filters
+          v-if="withCategoryFilters"
+          :zone-id="zoneId"
+          @updateSelectedCategory="updateSelectedCategory($event)"
         />
         <cms-carousel
           v-if="zoneType === 'carousel'"

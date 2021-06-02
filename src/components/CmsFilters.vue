@@ -5,8 +5,10 @@
       <div class="categories-container">
         <div v-for="category in filters" :key="category" class="categories">
           <div
-            :style="setCategoryStyle(category)"
-            class="category-pill"
+            :class="[
+              isActiveCategory(category) ? ['primary', 'active-category'] : 'inactive-category',
+              'category-pill',
+            ]"
             @click="selectCategory(category)"
           >
             <div class="category-pill-text">
@@ -55,14 +57,10 @@ export default class CmsFilters extends Vue {
     } catch (error) {}
   }
 
-  private setCategoryStyle(category: string): string {
-    if (
-      category === this.selectedCategory ||
-      (this.selectedCategory === null && category === 'All')
-    ) {
-      return 'color: #fff; font-weight: bold; background-color: #1c7bbd;';
-    }
-    return 'background-color: #EFEFEF;';
+  private isActiveCategory(category: string): boolean {
+    return (
+      category === this.selectedCategory || (this.selectedCategory === null && category === 'All')
+    );
   }
 
   private shuffleArray<T>(array: Array<T>): Array<T> {
@@ -110,13 +108,23 @@ export default class CmsFilters extends Vue {
 }
 
 .category-pill {
-  background-color: #f3f5f6;
   border-radius: 28px;
   margin: 6px 12px 6px 0px;
   display: inline-block;
 }
 
+.active-category {
+  color: #fff;
+  font-weight: bold;
+}
+
+.inactive-category {
+  background-color: #efefef;
+}
+
 .category-pill-text {
+  /* TODO: update this padding to 4px 4px 0px when we roll out providers */
+  /* font in providers makes it so that text is not centered */
   padding: 4px 4px;
   margin-right: 12px;
   margin-left: 12px;

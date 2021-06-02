@@ -51,6 +51,9 @@ export default class CmsSearch extends Vue {
 </script>
 
 <style>
+.theme--light.v-input.search-text input::placeholder {
+  color: #696969 !important;
+}
 .search-bar {
   display: block;
   position: relative;
