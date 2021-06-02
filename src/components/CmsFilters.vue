@@ -3,7 +3,7 @@
   <div v-if="filters.length > 0" class="filters-section row">
     <div class="full-width container pb-1">
       <div class="categories-container">
-        <div v-for="category in filters" :key="category" class="categories">
+        <div v-for="category in filters" :key="category" class="category">
           <div
             :class="[
               isActiveCategory(category) ? ['primary', 'active-category'] : 'inactive-category',
@@ -34,11 +34,11 @@ export default class CmsFilters extends Vue {
 
   public filters: string[] = [];
   public showFilters: boolean = false;
-  public selectedCategory: string | null = null;
+  public selectedCategory: string = 'All';
 
   public selectCategory(category: string) {
     if (this.selectedCategory === category) {
-      this.selectedCategory = null;
+      this.selectedCategory = 'All';
     } else {
       this.selectedCategory = category;
     }
@@ -91,16 +91,13 @@ export default class CmsFilters extends Vue {
   text-align: center;
 }
 
-.filter-dropdown {
-  padding: 16px;
-  height: 50px;
-}
 .categories-container {
   white-space: nowrap;
   overflow-x: auto;
   overflow-y: hidden;
 }
-.categories {
+
+.category {
   display: inline;
   overflow: hidden;
   overflow-x: scroll;
@@ -129,9 +126,5 @@ export default class CmsFilters extends Vue {
   margin-right: 12px;
   margin-left: 12px;
   line-height: 2.2;
-}
-
-.border {
-  border-bottom: 2px solid #cccccc;
 }
 </style>
