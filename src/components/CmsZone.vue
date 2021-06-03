@@ -26,7 +26,7 @@
       <slot v-if="zoneStatus === 'offline'" name="offline" />
       <slot v-if="zoneStatus === 'loading'" name="loading" />
       <slot v-if="!zoneStatus && !contents.length" name="empty" />
-      <div v-if="contents.length">
+      <div v-if="contents.length || displaySearch()">
         <cms-content
           v-if="zoneHeader"
           :html="zoneHeader"
@@ -246,9 +246,11 @@ export default class CmsZone extends Vue {
     this.zoneType = data.zone_type;
     this.contents = data.content as Content[];
     this.cursor = data.cursor;
-    this.zoneHeader = data.zone_header
-      ? `<div class="zone-header">${data.zone_header || ''}</div>`
-      : '';
+    if (data.zone_header) {
+      this.zoneHeader = `<div class="zone-header">${data.zone_header || ''}</div>`;
+    } else if (!data.zone_header && !this.displaySearch()) {
+      this.zoneHeader = '';
+    }
     this.zoneFooter = data.zone_footer
       ? `<div class="zone-footer">${data.zone_footer || ''}</div>`
       : '';
