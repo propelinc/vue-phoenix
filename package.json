@@ -40,7 +40,7 @@
     "eslint-plugin-vue": "^7.5.0",
     "jest": "25.1.0",
     "jquery": "3.5.1",
-    "lodash": "4.17.19",
+    "lodash": "4.17.21",
     "planout": "git://github.com/rawls238/Planout.js.git#97807c149d01031b972d9c3df7fb93558a166120",
     "prettier": "^2.2.1",
     "ts-jest": "25.2.1",
