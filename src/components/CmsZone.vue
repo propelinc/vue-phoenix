@@ -197,20 +197,12 @@ export default class CmsZone extends Vue {
 
     this.removeScrollListeners();
     this.scrollable = getClosest(this.$el, '.scrollable-content') || document.body;
-    await this.lazyLoadZone();
-  }
-
-  private async lazyLoadZone(): Promise<void> {
-    const listener = debounce(async (): Promise<void> => {
+    const unbind = this.addScrollListener((): void => {
       if (this.$el && !this.nonce && this.isAlmostVisible()) {
-        document.removeEventListener('scroll', listener, true);
-        await this.fetchZone();
+        unbind();
+        this.fetchZone();
       }
-    }, 200, { leading: true, trailing: true });
-
-    document.addEventListener('scroll', listener, true);
-    this.scrollableListeners.push(listener);
-    await listener();
+    });
   }
 
   private async fetchZone(): Promise<void> {
@@ -244,14 +236,9 @@ export default class CmsZone extends Vue {
       : '';
     this.zoneStatus = null;
 
-    // Increment nonce on every request to prevent vue from re-using cms-content components.
+    // Circumvent issue where carousel breaks by forcing it to re-render
     this.nonce++;
-
-    if (!this.contents.length) {
-      return;
-    }
-
-    this.trackScrollable(this.contents);
+    this.setupTracking(this.contents);
   }
 
   private isAlmostVisible() {
@@ -288,42 +275,48 @@ export default class CmsZone extends Vue {
     cmsClient.trackZone({ content, zoneId: this.zoneId });
   }
 
-  private trackScrollable(contents: Content[]): void {
-    if (this.zoneType === 'carousel') {
-      let timeout: number;
-      const listener = debounce((): void => {
-        window.clearTimeout(timeout);
-        timeout = window.setTimeout((): void => {
-          const contentElm = this.$el.querySelector('.slick-current');
-          if (contentElm && this.isContentVisible(contentElm, this.scrollable!, percentVisible)) {
-            this.trackIndex(0);
-            document.removeEventListener('scroll', listener, true);
-          }
-        }, durationVisibleToBeTrackedMs);
-      }, 200, { leading: true, trailing: true });
+  private addScrollListener(callback: () => void | Promise<void>, delay: number = 0): () => void {
+    if (delay) {
+      const rawCallback = callback;
+      let timer: number;
+      callback = (): void => {
+        window.clearTimeout(timer);
+        timer = window.setTimeout(rawCallback, delay);
+      };
+    }
 
-      document.addEventListener('scroll', listener, true);
-      this.scrollableListeners.push(listener);
-      Vue.nextTick(listener);
+    const listener = debounce(callback, 100, { leading: true, trailing: true });
+    const unbind = () => document.removeEventListener('scroll', listener, true);
+    document.addEventListener('scroll', listener, true);
+    this.scrollableListeners.push(listener);
+    Vue.nextTick(listener);
+    return unbind;
+  }
+
+  private setupTracking(contents: Content[]): void {
+    if (!contents.length) {
+      return;
+    }
+
+    if (this.zoneType === 'carousel') {
+      const unbind = this.addScrollListener((): void => {
+        const contentElm = this.$el.querySelector('.slick-current');
+        if (contentElm && this.isContentVisible(contentElm, this.scrollable!, percentVisible)) {
+          this.trackIndex(0);
+          unbind();
+        }
+      }, durationVisibleToBeTrackedMs);
       return;
     }
 
     contents.forEach((content, i): void => {
-      let timeout: number;
-      const listener = (): void => {
-        window.clearTimeout(timeout);
-        timeout = window.setTimeout((): void => {
-          const contentElm = this.$el.querySelector(`.cms-zone-content-${this.zoneId}-${i}`);
-          if (contentElm && this.isContentVisible(contentElm, this.scrollable!, percentVisible)) {
-            this.trackIndex(i);
-            document.removeEventListener('scroll', listener, true);
-          }
-        }, durationVisibleToBeTrackedMs);
-      };
-
-      document.addEventListener('scroll', listener, true);
-      this.scrollableListeners.push(listener);
-      Vue.nextTick(listener);
+      const unbind = this.addScrollListener((): void => {
+        const contentElm = this.$el.querySelector(`.cms-zone-content-${this.zoneId}-${i}`);
+        if (contentElm && this.isContentVisible(contentElm, this.scrollable!, percentVisible)) {
+          this.trackIndex(i);
+          unbind();
+        }
+      }, durationVisibleToBeTrackedMs);
     });
   }
 
@@ -351,7 +344,7 @@ export default class CmsZone extends Vue {
       this.cursor = response.data.cursor;
       const newContents = response.data.content as Content[];
       this.contents.push(...newContents);
-      this.trackScrollable(newContents);
+      this.setupTracking(newContents);
     } finally {
       this.cursorLoading = false;
     }
