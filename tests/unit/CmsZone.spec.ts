@@ -14,6 +14,9 @@ const localVue = createLocalVue();
 localVue.use(CmsPlugin);
 
 describe('CmsZone.vue', (): void => {
+  beforeEach(() => jest.useFakeTimers());
+  afterEach(() => jest.useRealTimers());
+
   let response: any; // eslint-disable-line @typescript-eslint/no-explicit-any
   let resolvePromise: any; // eslint-disable-line @typescript-eslint/no-explicit-any
   let rejectPromise: any; // eslint-disable-line @typescript-eslint/no-explicit-any
@@ -55,6 +58,7 @@ describe('CmsZone.vue', (): void => {
       propsData: { zoneId, extra },
     });
 
+    await localVue.nextTick();
     expect(cmsClient.fetchZone).toHaveBeenCalledWith({ zoneId, extra });
     expect(wrapper.text()).toMatch('Default Content');
     expect(wrapper.classes()).toContain('cms-zone-loading');
@@ -75,6 +79,7 @@ describe('CmsZone.vue', (): void => {
         propsData: { zoneId, extra },
       });
 
+      await localVue.nextTick();
       resolvePromise(makeResponse(zoneType, []));
       await response;
       await localVue.nextTick();
@@ -128,6 +133,7 @@ describe('CmsZone.vue', (): void => {
       await localVue.nextTick();
       const expectedClasses = zoneType === 'scrolling' ? ['scrollable-content'] : [];
       expect(wrapper.classes()).toEqual(expectedClasses);
+      jest.runOnlyPendingTimers();
       expect(cmsClient.trackZone).toHaveBeenCalled();
       expect(wrapper.find('.cms-zone-contents-5-0')).toBeTruthy();
       expect(wrapper.text()).toMatch('Some header');
@@ -162,7 +168,8 @@ describe('CmsZone.vue', (): void => {
       expect(wrapper.text()).toMatch('Some header');
       expect(wrapper.text()).toMatch('Some Content');
       expect(wrapper.text()).toMatch('Some footer');
-      await new Promise((resolve): number => setTimeout(resolve, 1050));
+
+      jest.runOnlyPendingTimers();
       expect(cmsClient.trackZone).toHaveBeenCalled();
     });
 
@@ -188,10 +195,13 @@ describe('CmsZone.vue', (): void => {
 
       await response;
       await localVue.nextTick();
+      jest.runOnlyPendingTimers();
+
       expect(cmsClient.trackZone).not.toHaveBeenCalled();
       expect(wrapper.text()).toMatch('Some header');
       expect(wrapper.text()).toMatch('Some Content');
       expect(wrapper.text()).toMatch('Some footer');
+
       wrapper.vm.$root.$emit('router.change', '#/someroute?foo=bar');
       expect(cmsClient.trackZone).toHaveBeenCalled();
     });
@@ -221,6 +231,7 @@ describe('CmsZone.vue', (): void => {
       const wrapper = mount(component, { localVue });
       await response;
       await localVue.nextTick();
+      jest.runOnlyPendingTimers();
       expect(cmsClient.trackZone).not.toHaveBeenCalled();
       expect(wrapper.text()).toMatch('Some header');
       expect(wrapper.text()).toMatch('Some Content');

@@ -1,6 +1,6 @@
 import Axios, { AxiosInstance } from 'axios';
 import isEqual from 'lodash/isEqual';
-import range  from 'lodash/range';
+import range from 'lodash/range';
 import {
   Assignment,
   Experiment,
