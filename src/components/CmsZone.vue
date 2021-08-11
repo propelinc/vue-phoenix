@@ -223,7 +223,7 @@ export default class CmsZone extends Vue {
     this.disconnectTrackObservers();
 
     this.fetchObserver = new IntersectionObserver(listener, {
-      rootMargin: '-50vh -50wh -50vh -50wh',
+      rootMargin: '-25%',
       threshold: 0.5,
     });
 
