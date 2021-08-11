@@ -12,9 +12,65 @@ import { supressPromiseRejection } from './util';
 Vue.compile = compileToFunctions;
 const localVue = createLocalVue();
 localVue.use(CmsPlugin);
+declare global {
+  interface Window {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    IntersectionObserver: any;
+  }
+}
+
+type IntersectionObserverCallback = (
+  entries?: Partial<IntersectionObserverEntry>[],
+  observer?: MockIntersectionObserver
+) => void;
+
+let gid = 0;
+
+class MockIntersectionObserver {
+  readonly root: Element | null;
+
+  readonly rootMargin: string;
+
+  readonly thresholds: ReadonlyArray<number>;
+
+  readonly callback: IntersectionObserverCallback;
+
+  el: Element | null = null;
+
+  id: number;
+
+  constructor(callback: IntersectionObserverCallback) {
+    this.root = null;
+    this.rootMargin = '';
+    this.thresholds = [];
+    this.callback = callback;
+    this.id = gid++;
+  }
+
+  disconnect() {
+    this.unobserve();
+  }
+
+  observe(el: Element) {
+    this.el = el;
+    this.callback([{ target: el, intersectionRatio: 1 }], this);
+  }
+
+  takeRecords(): Partial<IntersectionObserverEntry>[] {
+    return this.el ? [{ target: this.el, intersectionRatio: 1 }] : [];
+  }
+
+  unobserve() {
+    this.el = null;
+  }
+}
 
 describe('CmsZone.vue', (): void => {
-  beforeEach(() => jest.useFakeTimers());
+  beforeEach(() => {
+    jest.useFakeTimers();
+    window.IntersectionObserver = MockIntersectionObserver;
+  });
+
   afterEach(() => jest.useRealTimers());
 
   let response: any; // eslint-disable-line @typescript-eslint/no-explicit-any
@@ -38,12 +94,6 @@ describe('CmsZone.vue', (): void => {
       resolvePromise = resolve;
       rejectPromise = reject;
     });
-
-    Element.prototype.getBoundingClientRect = jest.fn(
-      (): DOMRect => {
-        return { width: 120, height: 120, top: 0, left: 0, bottom: 0, right: 0 } as DOMRect;
-      }
-    );
 
     cmsClient.trackZone = jest.fn();
     cmsClient.fetchZone = jest.fn().mockImplementation(() => response);
@@ -265,57 +315,6 @@ describe('CmsZone.vue', (): void => {
 
       expect(wrapper.find('.cms-zone--inspect').exists()).toBe(true);
       expect(wrapper.find('.cms-zone__zone-label').text()).toBe('15');
-    });
-  });
-
-  describe('isContentVisible', (): void => {
-    let cms: any; // eslint-disable-line @typescript-eslint/no-explicit-any
-
-    function getElementWithRect(height: number, top: number, bottom: number): Element {
-      const element = document.createElement('div');
-      (element as any).getBoundingClientRect = () => ({ height, top, bottom }); // eslint-disable-line @typescript-eslint/no-explicit-any
-      return element;
-    }
-
-    beforeEach((): void => {
-      const wrapper = shallowMount(CmsZone, {
-        localVue,
-        propsData: { zoneId: '5' },
-      });
-      cms = wrapper.vm;
-    });
-
-    it('should only be visible when completely in view', (): void => {
-      let el = getElementWithRect(10, 20, 30);
-      let viewport = getElementWithRect(20, 0, 20);
-      expect(cms.isContentVisible(el, viewport, 100)).toBe(false);
-
-      el = getElementWithRect(10, 11, 21);
-      viewport = getElementWithRect(20, 0, 20);
-      expect(cms.isContentVisible(el, viewport, 100)).toBe(false);
-
-      el = getElementWithRect(10, 10, 20);
-      viewport = getElementWithRect(20, 0, 20);
-      expect(cms.isContentVisible(el, viewport, 100)).toBe(true);
-
-      el = getElementWithRect(10, 0, 10);
-      viewport = getElementWithRect(20, 0, 20);
-      expect(cms.isContentVisible(el, viewport, 100)).toBe(true);
-
-      el = getElementWithRect(10, -1, 9);
-      viewport = getElementWithRect(20, 0, 20);
-      expect(cms.isContentVisible(el, viewport, 100)).toBe(false);
-
-      el = getElementWithRect(10, -10, 0);
-      viewport = getElementWithRect(20, 0, 20);
-      expect(cms.isContentVisible(el, viewport, 100)).toBe(false);
-    });
-
-    it('should be visible when the minimum percentage is met', (): void => {
-      const el = getElementWithRect(10, 19, 29);
-      const viewport = getElementWithRect(20, 0, 20);
-      expect(cms.isContentVisible(el, viewport, 10)).toBe(true);
-      expect(cms.isContentVisible(el, viewport, 11)).toBe(false);
     });
   });
 });
