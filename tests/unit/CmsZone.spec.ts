@@ -53,11 +53,7 @@ class MockIntersectionObserver {
 
   observe(el: Element) {
     this.el = el;
-    this.callback([{ target: el, intersectionRatio: 1 }], this);
-  }
-
-  takeRecords(): Partial<IntersectionObserverEntry>[] {
-    return this.el ? [{ target: this.el, intersectionRatio: 1 }] : [];
+    this.callback([{ target: el, intersectionRatio: 1, isIntersecting: true }], this);
   }
 
   unobserve() {

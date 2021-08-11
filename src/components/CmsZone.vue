@@ -126,8 +126,7 @@ export default class CmsZone extends Vue {
   public nonce: number = 0;
   public cursorLoading: boolean = false;
   public next = debounce(() => this.getNextPage(), 400);
-  public fetchObserver: IntersectionObserver | null = null;
-  public trackObservers: IntersectionObserver[] = [];
+  public observers: IntersectionObserver[] = [];
 
   shouldShowInspectModal = false;
 
@@ -156,8 +155,7 @@ export default class CmsZone extends Vue {
     this.$root.$off(`cms.refresh.${this.zoneId}`, this.refresh);
     this.$root.$off(`cms.track.${this.zoneId}`);
     this.removeScrollListeners();
-    this.disconnectFetchObserver();
-    this.disconnectTrackObservers();
+    this.disconnectObservers();
   }
 
   private removeScrollListeners(): void {
@@ -183,18 +181,11 @@ export default class CmsZone extends Vue {
     }
   }
 
-  private disconnectFetchObserver(): void {
-    if (this.fetchObserver) {
-      this.fetchObserver.disconnect();
-      this.fetchObserver = null;
-    }
-  }
-
-  private disconnectTrackObservers(): void {
-    for (const observer of this.trackObservers) {
+  private disconnectObservers(): void {
+    for (const observer of this.observers) {
       observer.disconnect();
     }
-    this.trackObservers = [];
+    this.observers = [];
   }
 
   private async refresh(): Promise<void> {
@@ -212,22 +203,19 @@ export default class CmsZone extends Vue {
     this.$el.classList.remove('cms-zone-error');
     this.$el.classList.remove('cms-zone-offline');
 
+    this.disconnectObservers();
     this.removeScrollListeners();
 
-    const listener = () => {
-      this.disconnectFetchObserver();
-      this.fetchZone();
+    const listener = (entries: IntersectionObserverEntry[]) => {
+      if (entries[0] && entries[0].isIntersecting) {
+        this.disconnectObservers();
+        this.fetchZone();
+      }
     };
 
-    this.disconnectFetchObserver();
-    this.disconnectTrackObservers();
-
-    this.fetchObserver = new IntersectionObserver(listener, {
-      rootMargin: '-25%',
-      threshold: 0.5,
-    });
-
-    this.fetchObserver.observe(this.$el);
+    const observer = new IntersectionObserver(listener, { rootMargin: '-25%' });
+    observer.observe(this.$el);
+    this.observers.push(observer);
   }
 
   private async fetchZone(): Promise<void> {
@@ -323,7 +311,7 @@ export default class CmsZone extends Vue {
       }
     }, options);
     observer.observe(el);
-    this.trackObservers.push(observer);
+    this.observers.push(observer);
   }
 
   private async getNextPage() {
