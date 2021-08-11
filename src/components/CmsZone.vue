@@ -121,7 +121,6 @@ export default class CmsZone extends Vue {
   public contents: Content[] = [];
   public cursor: string = '';
   public scrollable: Element | null = null;
-  public scrollableListeners: EventListener[] = [];
 
   public nonce: number = 0;
   public cursorLoading: boolean = false;
@@ -154,16 +153,7 @@ export default class CmsZone extends Vue {
     this.$root.$off('cms.refresh', this.refresh);
     this.$root.$off(`cms.refresh.${this.zoneId}`, this.refresh);
     this.$root.$off(`cms.track.${this.zoneId}`);
-    this.removeScrollListeners();
     this.disconnectObservers();
-  }
-
-  private removeScrollListeners(): void {
-    for (const h of this.scrollableListeners) {
-      document.removeEventListener('scroll', h, true);
-    }
-    this.scrollableListeners = [];
-    this.scrollable = null;
   }
 
   @Watch('zoneId')
@@ -204,7 +194,6 @@ export default class CmsZone extends Vue {
     this.$el.classList.remove('cms-zone-offline');
 
     this.disconnectObservers();
-    this.removeScrollListeners();
 
     const listener = (entries: IntersectionObserverEntry[]) => {
       if (entries[0] && entries[0].isIntersecting) {
