@@ -105,6 +105,7 @@ describe('CmsZone.vue', (): void => {
     });
 
     await localVue.nextTick();
+    await localVue.nextTick();
     expect(cmsClient.fetchZone).toHaveBeenCalledWith({ zoneId, extra });
     expect(wrapper.text()).toMatch('Default Content');
     expect(wrapper.classes()).toContain('cms-zone-loading');
@@ -129,6 +130,7 @@ describe('CmsZone.vue', (): void => {
       resolvePromise(makeResponse(zoneType, []));
       await response;
       await localVue.nextTick();
+      await localVue.nextTick();
       const expectedClasses = zoneType === 'scrolling' ? ['scrollable-content'] : [];
       expect(wrapper.classes()).toEqual(expectedClasses);
       expect(wrapper.text()).toBe('');
@@ -147,6 +149,7 @@ describe('CmsZone.vue', (): void => {
 
       resolvePromise(makeResponse(zoneType, []));
       await response;
+      await localVue.nextTick();
       await localVue.nextTick();
       const expectedClasses = zoneType === 'scrolling' ? ['scrollable-content'] : [];
       expect(wrapper.classes()).toEqual(expectedClasses);
@@ -176,6 +179,7 @@ describe('CmsZone.vue', (): void => {
       );
 
       await response;
+      await localVue.nextTick();
       await localVue.nextTick();
       const expectedClasses = zoneType === 'scrolling' ? ['scrollable-content'] : [];
       expect(wrapper.classes()).toEqual(expectedClasses);
@@ -209,6 +213,7 @@ describe('CmsZone.vue', (): void => {
       const wrapper = mount(component, { localVue });
       await response;
       await localVue.nextTick();
+      await localVue.nextTick();
       expect(cmsClient.trackZone).not.toHaveBeenCalled();
       expect(wrapper.find('.cms-zone-contents-5-0')).toBeTruthy();
       expect(wrapper.text()).toMatch('Some header');
@@ -240,6 +245,7 @@ describe('CmsZone.vue', (): void => {
       );
 
       await response;
+      await localVue.nextTick();
       await localVue.nextTick();
       jest.runOnlyPendingTimers();
 
@@ -276,6 +282,7 @@ describe('CmsZone.vue', (): void => {
 
       const wrapper = mount(component, { localVue });
       await response;
+      await localVue.nextTick();
       await localVue.nextTick();
       jest.runOnlyPendingTimers();
       expect(cmsClient.trackZone).not.toHaveBeenCalled();
