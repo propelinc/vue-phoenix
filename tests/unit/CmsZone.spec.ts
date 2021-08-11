@@ -8,6 +8,7 @@ import CmsZone from '@/components/CmsZone.vue';
 import CmsPlugin from '@/plugins/cms';
 
 import { supressPromiseRejection } from './util';
+import { times } from 'lodash';
 
 Vue.compile = compileToFunctions;
 const localVue = createLocalVue();
@@ -33,7 +34,7 @@ class MockIntersectionObserver {
 
   readonly callback: IntersectionObserverCallback;
 
-  el: Element | null = null;
+  observed: Element[] = [];
 
   constructor(callback: IntersectionObserverCallback) {
     this.root = null;
@@ -43,16 +44,19 @@ class MockIntersectionObserver {
   }
 
   disconnect() {
-    this.unobserve();
+    this.observed = [];
   }
 
   observe(el: Element) {
-    this.el = el;
+    this.observed.push(el);
     this.callback([{ target: el, intersectionRatio: 1, isIntersecting: true }], this);
   }
 
-  unobserve() {
-    this.el = null;
+  unobserve(el: Element) {
+    const index = this.observed.indexOf(el);
+    if (index > -1) {
+      this.observed.splice(index, 1);
+    }
   }
 }
 
