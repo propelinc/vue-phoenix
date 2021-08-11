@@ -24,8 +24,6 @@ type IntersectionObserverCallback = (
   observer?: MockIntersectionObserver
 ) => void;
 
-let gid = 0;
-
 class MockIntersectionObserver {
   readonly root: Element | null;
 
@@ -37,14 +35,11 @@ class MockIntersectionObserver {
 
   el: Element | null = null;
 
-  id: number;
-
   constructor(callback: IntersectionObserverCallback) {
     this.root = null;
     this.rootMargin = '';
     this.thresholds = [];
     this.callback = callback;
-    this.id = gid++;
   }
 
   disconnect() {
