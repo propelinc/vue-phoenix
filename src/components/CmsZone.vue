@@ -202,7 +202,7 @@ export default class CmsZone extends Vue {
       }
     };
 
-    const observer = new IntersectionObserver(listener, { rootMargin: '-25%' });
+    const observer = new IntersectionObserver(listener, { rootMargin: '25%' });
     await Vue.nextTick();
     this.observers.push(observer);
     observer.observe(this.$el);
