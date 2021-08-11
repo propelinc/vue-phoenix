@@ -298,20 +298,30 @@ export default class CmsZone extends Vue {
   }
 
   private setupIntersectionTracking(content: Content, el: Element) {
-    const observer = new IntersectionObserver(
-      (entries, observer) => {
-        setTimeout(() => {
-          const entries = observer.takeRecords();
-          const entry = entries[0];
-          if (entry && entry.intersectionRatio >= percentVisible) {
-            cmsClient.trackZone({ content, zoneId: this.zoneId });
-          }
-          observer.disconnect();
-        }, durationVisibleToBeTrackedMs);
-      },
-      { threshold: percentVisible }
-    );
+    let tracked = false;
+    const options = { threshold: percentVisible };
 
+    const isVisible = (entries: IntersectionObserverEntry[]) => {
+      return entries[0] && entries[0].intersectionRatio >= percentVisible;
+    };
+
+    const trackIfVisible = () => {
+      const checkObserver = new IntersectionObserver((entries) => {
+        checkObserver.disconnect();
+        if (!tracked && isVisible(entries)) {
+          tracked = true;
+          observer.disconnect();
+          cmsClient.trackZone({ content, zoneId: this.zoneId });
+        }
+      }, options);
+      checkObserver.observe(el);
+    };
+
+    const observer = new IntersectionObserver((entries) => {
+      if (!tracked && isVisible(entries)) {
+        setTimeout(trackIfVisible, durationVisibleToBeTrackedMs);
+      }
+    }, options);
     observer.observe(el);
     this.trackObservers.push(observer);
   }
