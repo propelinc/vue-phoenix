@@ -8,7 +8,6 @@ import CmsZone from '@/components/CmsZone.vue';
 import CmsPlugin from '@/plugins/cms';
 
 import { supressPromiseRejection } from './util';
-import { times } from 'lodash';
 
 Vue.compile = compileToFunctions;
 const localVue = createLocalVue();
