@@ -42,10 +42,10 @@
       >
         <cms-content
           v-for="(content, index) in contents"
-          :id="`cms-zone-content-${zoneId}-${index}`"
+          :id="contentId(index)"
           :key="`${nonce}-${content.delivery}`"
           :class="{
-            [`cms-zone-content-${zoneId}-${index}`]: true,
+            [contentId(index)]: true,
             'cms-zone-content--tracked': content.tracked,
           }"
           class="cms-zone-content cms-zone-carousel-content"
@@ -58,11 +58,11 @@
       <div v-else class="zone-contents">
         <cms-content
           v-for="(content, index) in contents"
-          :id="`cms-zone-content-${zoneId}-${index}`"
+          :id="contentId(index)"
           :key="`${nonce}-${content.delivery}`"
           class="cms-zone-content"
           :class="{
-            [`cms-zone-content-${zoneId}-${index}`]: true,
+            [contentId(index)]: true,
             'cms-zone-content--tracked': content.tracked,
           }"
           tag="div"
@@ -108,7 +108,7 @@ class ZoneObserverManager {
   private fetchObserver: IntersectionObserver;
   // Initiates impression tracking when a content's visibility ratio exceeds `minVisibleRatio`.
   private trackObserver: IntersectionObserver;
-  // Tracks an impression `durationVisibleToBeTrackedMs` initiation.
+  // Tracks an impression `durationVisibleToBeTrackedMs` after initiation.
   private checkObserver: IntersectionObserver;
 
   private constructor() {
@@ -213,6 +213,10 @@ export default class CmsZone extends Vue {
 
   get id() {
     return `cms-zone-${this.zoneId}`;
+  }
+
+  get contentId() {
+    return (index: number) => `cms-zone-content-${this.zoneId}-${index}`;
   }
 
   get isScrolling() {
@@ -327,7 +331,7 @@ export default class CmsZone extends Vue {
       if (trackOn) {
         this.setupDeferredTracking(content, trackOn);
       } else {
-        const el = this.$el.querySelector(`.cms-zone-content-${this.zoneId}-${i}`)!;
+        const el = this.$el.querySelector(`#${this.contentId(i)}`)!;
         this.zoneObserverManager.setupTracking(this, content, el);
       }
     });
