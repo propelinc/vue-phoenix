@@ -31,6 +31,7 @@ export interface CmsPluginOptions {
 
   trackAnalytics?: (eventName: string, eventProps: { [key: string]: any }) => void; // eslint-disable-line @typescript-eslint/no-explicit-any
   extensions?: { [key: string]: (this: never, ...args: any[]) => any }; // eslint-disable-line @typescript-eslint/no-explicit-any
+  lazyLoadRootMargin?: string;
 }
 
 export interface PluginOptions extends CmsPluginOptions {
@@ -41,6 +42,7 @@ export interface PluginOptions extends CmsPluginOptions {
   globalCssCacheMs: number;
   setCaptable: (captable: Captable) => void;
   trackAnalytics: (eventName: string, eventProps: { [key: string]: any }) => void; // eslint-disable-line @typescript-eslint/no-explicit-any
+  lazyLoadRootMargin: string;
 }
 
 export const pluginOptions: PluginOptions = {
@@ -64,6 +66,7 @@ export const pluginOptions: PluginOptions = {
     return {};
   },
   trackAnalytics(): void {},
+  lazyLoadRootMargin: '25%',
 };
 export let finalPluginOptions: PluginOptions;
 

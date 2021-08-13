@@ -1,5 +1,6 @@
 <template>
   <div
+    :id="id"
     v-infinite-scroll="{ action: next, enabled: isScrolling }"
     :class="{ 'scrollable-content': isScrolling, 'cms-zone--inspect': isInspectOverlayEnabled }"
   >
@@ -12,6 +13,7 @@
     </button>
 
     <cms-inspect-sheet
+      v-if="shouldShowInspectModal"
       v-model="shouldShowInspectModal"
       :zone-id="zoneId"
       :render-context="renderContext"
@@ -37,10 +39,10 @@
         :key="`${nonce}-${zoneId}`"
         :center-padding="contents.length > 1 ? '20px' : '0'"
         :zone-id="zoneId"
-        @change="trackIndex"
       >
         <cms-content
           v-for="(content, index) in contents"
+          ref="contents"
           :key="`${nonce}-${content.delivery}`"
           :class="{
             [`cms-zone-content-${zoneId}-${index}`]: true,
@@ -57,6 +59,7 @@
         <cms-content
           v-for="(content, index) in contents"
           :key="`${nonce}-${content.delivery}`"
+          ref="contents"
           class="cms-zone-content"
           :class="{
             [`cms-zone-content-${zoneId}-${index}`]: true,
@@ -92,17 +95,96 @@ import CmsCarousel from './CmsCarousel.vue';
 import CmsContent from './CmsContent';
 import CmsInspectSheet from './CmsInspectSheet.vue';
 
-const durationVisibleToBeTrackedMs = 1000;
-const percentVisible = 50;
+class ZoneObserverManager {
+  static instance: ZoneObserverManager;
 
-export function getClosest(elm: Element, selector: string): HTMLElement | null {
-  while (elm && elm.parentNode !== document) {
-    if (elm.matches(selector)) {
-      return elm as HTMLElement;
-    }
-    elm = elm.parentNode as HTMLElement;
+  private durationVisibleToBeTrackedMs = 1000;
+  private minVisibleRatio = 0.5;
+
+  private pendingZones: { [key: string]: CmsZone } = {};
+  private pendingTrackers: { [key: string]: { zone: CmsZone; content: Content } } = {};
+
+  // Fetch zones when they are within the `lazyLoadRootMargin`.
+  private fetchObserver: IntersectionObserver;
+  // Initiates impression tracking when a content's visibility ratio exceeds `minVisibleRatio`.
+  private trackObserver: IntersectionObserver;
+  // Tracks an impression `durationVisibleToBeTrackedMs` after initiation.
+  private checkObserver: IntersectionObserver;
+
+  private constructor() {
+    this.fetchObserver = new IntersectionObserver(
+      (entries, observer) => {
+        entries.forEach((e) => {
+          if (e.isIntersecting && this.pendingZones[e.target.id]) {
+            observer.unobserve(e.target);
+            this.pendingZones[e.target.id].fetchZone();
+            delete this.pendingZones[e.target.id];
+          }
+        });
+      },
+      { rootMargin: pluginOptions.lazyLoadRootMargin }
+    );
+
+    this.trackObserver = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((e) => {
+          if (e.intersectionRatio >= this.minVisibleRatio && this.pendingTrackers[e.target.id]) {
+            setTimeout(
+              () => this.checkObserver.observe(e.target),
+              this.durationVisibleToBeTrackedMs
+            );
+          }
+        });
+      },
+      { threshold: this.minVisibleRatio }
+    );
+
+    this.checkObserver = new IntersectionObserver(
+      (entries, observer) => {
+        entries.forEach((e) => {
+          if (e.intersectionRatio >= this.minVisibleRatio && this.pendingTrackers[e.target.id]) {
+            observer.unobserve(e.target);
+            const { zone, content } = this.pendingTrackers[e.target.id];
+            zone.trackContent(content);
+            this.trackObserver.unobserve(e.target);
+            delete this.pendingTrackers[e.target.id];
+          }
+        });
+      },
+      { threshold: this.minVisibleRatio }
+    );
   }
-  return null;
+
+  static getInstance(): ZoneObserverManager {
+    if (!ZoneObserverManager.instance) {
+      ZoneObserverManager.instance = new ZoneObserverManager();
+    }
+
+    return ZoneObserverManager.instance;
+  }
+
+  setupFetching(zone: CmsZone) {
+    this.pendingZones[zone.id] = zone;
+    this.fetchObserver.observe(zone.$el);
+  }
+
+  setupTracking(zone: CmsZone, content: Content, el: Element) {
+    this.pendingTrackers[el.id] = { zone, content };
+    this.trackObserver.observe(el);
+    zone.observed.push(el);
+  }
+
+  disconnect(zone: CmsZone) {
+    delete this.pendingZones[zone.id];
+    this.fetchObserver.unobserve(zone.$el);
+
+    for (const el of zone.observed) {
+      delete this.pendingTrackers[el.id];
+      this.checkObserver.unobserve(el);
+      this.trackObserver.unobserve(el);
+    }
+    zone.observed = [];
+  }
 }
 
 @Component({
@@ -110,69 +192,67 @@ export function getClosest(elm: Element, selector: string): HTMLElement | null {
   components: { CmsCarousel, CmsContent, CmsInspectSheet },
 })
 export default class CmsZone extends Vue {
-  @Prop(String) public zoneId!: string;
-  @Prop(Object) public extra!: {};
-  @Prop(Object) public context!: {};
+  @Prop(String) zoneId!: string;
+  @Prop(Object) extra!: {};
+  @Prop(Object) context!: {};
 
-  public zoneStatus: string | null = null;
-  public zoneType: string = '';
-  public zoneHeader: string = '';
-  public zoneFooter: string = '';
-  public contents: Content[] = [];
-  public cursor: string = '';
-  public scrollable: Element | null = null;
-  public scrollableListeners: EventListener[] = [];
+  zoneStatus: string | null = null;
+  zoneType: string = '';
+  zoneHeader: string = '';
+  zoneFooter: string = '';
+  contents: Content[] = [];
+  cursor: string = '';
+  scrollable: Element | null = null;
 
-  public nonce: number = 0;
-  public cursorLoading: boolean = false;
-  public next = debounce(() => this.getNextPage(), 400);
+  nonce: number = 0;
+  cursorLoading: boolean = false;
+  next = debounce(() => this.getNextPage(), 400);
+  observed: Element[] = [];
 
   shouldShowInspectModal = false;
 
-  private get isScrolling() {
+  get id() {
+    return `cms-zone-${this.zoneId}`;
+  }
+
+  get isScrolling() {
     return this.zoneType === 'scrolling';
   }
 
-  private get renderContext() {
+  get renderContext() {
     return {
       ...this.extra,
       ...this.context,
     };
   }
 
-  private created(): void {
+  get zoneObserverManager() {
+    return ZoneObserverManager.getInstance();
+  }
+
+  created(): void {
     this.$root.$on('cms.refresh', this.refresh);
     this.$root.$on(`cms.refresh.${this.zoneId}`, this.refresh);
   }
 
-  private mounted(): void {
+  mounted(): void {
     this.refresh();
   }
 
-  private beforeDestroy(): void {
+  beforeDestroy(): void {
     this.$root.$off('cms.refresh', this.refresh);
     this.$root.$off(`cms.refresh.${this.zoneId}`, this.refresh);
     this.$root.$off(`cms.track.${this.zoneId}`);
-    this.removeScrollListeners();
-  }
-
-  private removeScrollListeners(): void {
-    if (this.scrollable) {
-      for (const h of this.scrollableListeners) {
-        this.scrollable.removeEventListener('scroll', h);
-      }
-      this.scrollableListeners = [];
-      this.scrollable = null;
-    }
+    this.zoneObserverManager.disconnect(this);
   }
 
   @Watch('zoneId')
-  private onZoneIdChanged(): void {
+  onZoneIdChanged(): void {
     this.refresh();
   }
 
   @Watch('extra', { deep: true, immediate: true })
-  private async onExtraChanged(value?: object, oldValue?: object): Promise<void> {
+  async onExtraChanged(value?: object, oldValue?: object): Promise<void> {
     // Prevent deep watcher for extra from firing too often.
     // See: https://github.com/vuejs/vue/issues/5776
     if (oldValue !== undefined && !isEqual(value, oldValue)) {
@@ -181,7 +261,7 @@ export default class CmsZone extends Vue {
     }
   }
 
-  private async refresh(): Promise<void> {
+  async refresh(): Promise<void> {
     if (!pluginOptions.checkConnection()) {
       this.zoneStatus = 'offline';
       this.$el.classList.add('cms-zone-offline');
@@ -196,6 +276,12 @@ export default class CmsZone extends Vue {
     this.$el.classList.remove('cms-zone-error');
     this.$el.classList.remove('cms-zone-offline');
 
+    this.zoneObserverManager.disconnect(this);
+    await Vue.nextTick();
+    this.zoneObserverManager.setupFetching(this);
+  }
+
+  async fetchZone(): Promise<void> {
     // Increment nonce on every request to prevent vue from re-using cms-content components.
     this.nonce++;
 
@@ -225,94 +311,53 @@ export default class CmsZone extends Vue {
       ? `<div class="zone-footer">${data.zone_footer || ''}</div>`
       : '';
     this.zoneStatus = null;
+
     // Circumvent issue where carousel breaks by forcing it to re-render
     this.nonce++;
 
-    if (!this.contents.length) {
-      return;
-    }
+    await Vue.nextTick();
 
-    this.removeScrollListeners();
-    this.scrollable = getClosest(this.$el, '.scrollable-content');
-    if (this.scrollable) {
-      this.trackScrollable(this.contents, this.scrollable);
-      return;
-    }
-
-    if (this.zoneType === 'carousel') {
-      this.trackIndex(0);
-    } else {
-      this.contents.forEach((c, i): void => this.trackIndex(i));
-    }
+    this.zoneObserverManager.disconnect(this);
+    this.setupTracking(this.contents);
   }
 
-  private trackIndex(index: number): void {
-    const content = this.contents[index];
-    if (!content || content.tracked) {
-      return;
-    }
-    Vue.set(this.contents, index, { ...content, tracked: true });
-
-    const trackOn = (content.extra || {}).track_on;
-    if (trackOn) {
-      this.$root.$once(
-        `cms.track.${this.zoneId}`,
-        async (): Promise<void> => {
-          await cmsClient.trackZone({ content, zoneId: this.zoneId });
-          this.$root.$emit(`cms.refresh.${this.zoneId}`);
-        }
-      );
-
-      this.$root.$once('router.change', (hash: string): void => {
-        const regex = new RegExp(trackOn);
-        if (regex.test(hash)) {
-          this.$root.$emit(`cms.track.${this.zoneId}`);
-        }
-      });
-      return;
-    }
-
-    cmsClient.trackZone({ content, zoneId: this.zoneId });
-  }
-
-  private trackScrollable(contents: Content[], scrollable: Element): void {
-    if (this.zoneType === 'carousel') {
-      let timeout: number;
-      const listener = (): void => {
-        window.clearTimeout(timeout);
-        timeout = window.setTimeout((): void => {
-          const contentElm = this.$el.querySelector('.slick-current');
-          if (contentElm && this.isContentVisible(contentElm, scrollable, percentVisible)) {
-            this.trackIndex(0);
-            scrollable.removeEventListener('scroll', listener);
-          }
-        }, durationVisibleToBeTrackedMs);
-      };
-      scrollable.addEventListener('scroll', listener);
-      this.scrollableListeners.push(listener);
-      Vue.nextTick(listener);
-      return;
-    }
-
-    contents.forEach((content, i): void => {
-      let timeout: number;
-      const listener = (): void => {
-        window.clearTimeout(timeout);
-        timeout = window.setTimeout((): void => {
-          const contentElm = this.$el.querySelector(`.cms-zone-content-${this.zoneId}-${i}`);
-          if (contentElm && this.isContentVisible(contentElm, scrollable, percentVisible)) {
-            this.trackIndex(i);
-            scrollable.removeEventListener('scroll', listener);
-          }
-        }, durationVisibleToBeTrackedMs);
-      };
-      scrollable.addEventListener('scroll', listener);
-      this.scrollableListeners.push(listener);
-      Vue.nextTick(listener);
+  setupTracking(contents: Content[]): void {
+    contents.forEach((content, i) => {
+      const trackOn = (content.extra || {}).track_on;
+      if (trackOn) {
+        this.setupDeferredTracking(content, trackOn);
+      } else {
+        const el = (this.$refs.contents[i] as Vue).$el as Element;
+        this.zoneObserverManager.setupTracking(this, content, el);
+      }
     });
   }
 
-  private async getNextPage() {
+  setupDeferredTracking(content: Content, trackOn: string) {
+    this.$root.$once(
+      `cms.track.${this.zoneId}`,
+      async (): Promise<void> => {
+        await this.trackContent(content);
+        this.$root.$emit(`cms.refresh.${this.zoneId}`);
+      }
+    );
+
+    this.$root.$once('router.change', (hash: string): void => {
+      const regex = new RegExp(trackOn);
+      if (regex.test(hash)) {
+        this.$root.$emit(`cms.track.${this.zoneId}`);
+      }
+    });
+  }
+
+  async trackContent(content: Content) {
+    if (!content.tracked) {
+      Vue.set(content, 'tracked', true);
+      await cmsClient.trackZone({ content, zoneId: this.zoneId });
+    }
+  }
+
+  async getNextPage() {
     if (!pluginOptions.checkConnection()) {
       return;
     }
@@ -336,34 +381,10 @@ export default class CmsZone extends Vue {
       this.cursor = response.data.cursor;
       const newContents = response.data.content as Content[];
       this.contents.push(...newContents);
-      if (this.scrollable) {
-        this.trackScrollable(newContents, this.scrollable);
-      }
+      this.setupTracking(newContents);
     } finally {
       this.cursorLoading = false;
     }
-  }
-
-  private isContentVisible(el: Element, viewport: Element, minPercentVisible: number): boolean {
-    const elRect = el.getBoundingClientRect();
-    const elTop = elRect.top;
-    const elBottom = elRect.bottom;
-    const elHeight = elRect.height;
-
-    const vRect = viewport.getBoundingClientRect();
-    const vBottom = vRect.bottom;
-
-    const offset = 0;
-    const vTop = vRect.top + offset;
-
-    let invisibleHeight = 0;
-    if (elTop > vTop) {
-      invisibleHeight = elBottom - vBottom;
-    } else if (elTop < vTop) {
-      invisibleHeight = vTop - elTop;
-    }
-    const visibleHeight = elHeight - invisibleHeight;
-    return (visibleHeight / elHeight) * 100 >= minPercentVisible;
   }
 
   get isInspectOverlayEnabled(): boolean {

@@ -11,7 +11,7 @@
           <h4>Basics</h4>
           <div class="cms-inspect-sheet__row">
             <div class="cms-inspect-sheet__row__label">Type</div>
-            <div class="cms-inspect-sheet__row__value">{{ zoneType || 'default'  }}</div>
+            <div class="cms-inspect-sheet__row__value">{{ zoneType || 'default' }}</div>
           </div>
           <div class="cms-inspect-sheet__row">
             <div class="cms-inspect-sheet__row__label">Status</div>

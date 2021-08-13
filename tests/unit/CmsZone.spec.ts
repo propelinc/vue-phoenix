@@ -7,13 +7,22 @@ import cmsClient from '@/cmsHttp';
 import CmsZone from '@/components/CmsZone.vue';
 import CmsPlugin from '@/plugins/cms';
 
+import MockIntersectionObserver from './mockIntersectionObserver';
 import { supressPromiseRejection } from './util';
 
 Vue.compile = compileToFunctions;
 const localVue = createLocalVue();
 localVue.use(CmsPlugin);
 
+
 describe('CmsZone.vue', (): void => {
+  beforeEach(() => {
+    jest.useFakeTimers();
+    window.IntersectionObserver = MockIntersectionObserver;
+  });
+
+  afterEach(() => jest.useRealTimers());
+
   let response: any; // eslint-disable-line @typescript-eslint/no-explicit-any
   let resolvePromise: any; // eslint-disable-line @typescript-eslint/no-explicit-any
   let rejectPromise: any; // eslint-disable-line @typescript-eslint/no-explicit-any
@@ -36,12 +45,6 @@ describe('CmsZone.vue', (): void => {
       rejectPromise = reject;
     });
 
-    Element.prototype.getBoundingClientRect = jest.fn(
-      (): DOMRect => {
-        return { width: 120, height: 120, top: 0, left: 0, bottom: 0, right: 0 } as DOMRect;
-      }
-    );
-
     cmsClient.trackZone = jest.fn();
     cmsClient.fetchZone = jest.fn().mockImplementation(() => response);
   });
@@ -55,6 +58,8 @@ describe('CmsZone.vue', (): void => {
       propsData: { zoneId, extra },
     });
 
+    await localVue.nextTick();
+    await localVue.nextTick();
     expect(cmsClient.fetchZone).toHaveBeenCalledWith({ zoneId, extra });
     expect(wrapper.text()).toMatch('Default Content');
     expect(wrapper.classes()).toContain('cms-zone-loading');
@@ -75,8 +80,10 @@ describe('CmsZone.vue', (): void => {
         propsData: { zoneId, extra },
       });
 
+      await localVue.nextTick();
       resolvePromise(makeResponse(zoneType, []));
       await response;
+      await localVue.nextTick();
       await localVue.nextTick();
       const expectedClasses = zoneType === 'scrolling' ? ['scrollable-content'] : [];
       expect(wrapper.classes()).toEqual(expectedClasses);
@@ -96,6 +103,7 @@ describe('CmsZone.vue', (): void => {
 
       resolvePromise(makeResponse(zoneType, []));
       await response;
+      await localVue.nextTick();
       await localVue.nextTick();
       const expectedClasses = zoneType === 'scrolling' ? ['scrollable-content'] : [];
       expect(wrapper.classes()).toEqual(expectedClasses);
@@ -126,8 +134,10 @@ describe('CmsZone.vue', (): void => {
 
       await response;
       await localVue.nextTick();
+      await localVue.nextTick();
       const expectedClasses = zoneType === 'scrolling' ? ['scrollable-content'] : [];
       expect(wrapper.classes()).toEqual(expectedClasses);
+      jest.runOnlyPendingTimers();
       expect(cmsClient.trackZone).toHaveBeenCalled();
       expect(wrapper.find('.cms-zone-contents-5-0')).toBeTruthy();
       expect(wrapper.text()).toMatch('Some header');
@@ -157,12 +167,14 @@ describe('CmsZone.vue', (): void => {
       const wrapper = mount(component, { localVue });
       await response;
       await localVue.nextTick();
+      await localVue.nextTick();
       expect(cmsClient.trackZone).not.toHaveBeenCalled();
       expect(wrapper.find('.cms-zone-contents-5-0')).toBeTruthy();
       expect(wrapper.text()).toMatch('Some header');
       expect(wrapper.text()).toMatch('Some Content');
       expect(wrapper.text()).toMatch('Some footer');
-      await new Promise((resolve): number => setTimeout(resolve, 1050));
+
+      jest.runOnlyPendingTimers();
       expect(cmsClient.trackZone).toHaveBeenCalled();
     });
 
@@ -188,10 +200,14 @@ describe('CmsZone.vue', (): void => {
 
       await response;
       await localVue.nextTick();
+      await localVue.nextTick();
+      jest.runOnlyPendingTimers();
+
       expect(cmsClient.trackZone).not.toHaveBeenCalled();
       expect(wrapper.text()).toMatch('Some header');
       expect(wrapper.text()).toMatch('Some Content');
       expect(wrapper.text()).toMatch('Some footer');
+
       wrapper.vm.$root.$emit('router.change', '#/someroute?foo=bar');
       expect(cmsClient.trackZone).toHaveBeenCalled();
     });
@@ -221,6 +237,8 @@ describe('CmsZone.vue', (): void => {
       const wrapper = mount(component, { localVue });
       await response;
       await localVue.nextTick();
+      await localVue.nextTick();
+      jest.runOnlyPendingTimers();
       expect(cmsClient.trackZone).not.toHaveBeenCalled();
       expect(wrapper.text()).toMatch('Some header');
       expect(wrapper.text()).toMatch('Some Content');
@@ -254,57 +272,6 @@ describe('CmsZone.vue', (): void => {
 
       expect(wrapper.find('.cms-zone--inspect').exists()).toBe(true);
       expect(wrapper.find('.cms-zone__zone-label').text()).toBe('15');
-    });
-  });
-
-  describe('isContentVisible', (): void => {
-    let cms: any; // eslint-disable-line @typescript-eslint/no-explicit-any
-
-    function getElementWithRect(height: number, top: number, bottom: number): Element {
-      const element = document.createElement('div');
-      (element as any).getBoundingClientRect = () => ({ height, top, bottom }); // eslint-disable-line @typescript-eslint/no-explicit-any
-      return element;
-    }
-
-    beforeEach((): void => {
-      const wrapper = shallowMount(CmsZone, {
-        localVue,
-        propsData: { zoneId: '5' },
-      });
-      cms = wrapper.vm;
-    });
-
-    it('should only be visible when completely in view', (): void => {
-      let el = getElementWithRect(10, 20, 30);
-      let viewport = getElementWithRect(20, 0, 20);
-      expect(cms.isContentVisible(el, viewport, 100)).toBe(false);
-
-      el = getElementWithRect(10, 11, 21);
-      viewport = getElementWithRect(20, 0, 20);
-      expect(cms.isContentVisible(el, viewport, 100)).toBe(false);
-
-      el = getElementWithRect(10, 10, 20);
-      viewport = getElementWithRect(20, 0, 20);
-      expect(cms.isContentVisible(el, viewport, 100)).toBe(true);
-
-      el = getElementWithRect(10, 0, 10);
-      viewport = getElementWithRect(20, 0, 20);
-      expect(cms.isContentVisible(el, viewport, 100)).toBe(true);
-
-      el = getElementWithRect(10, -1, 9);
-      viewport = getElementWithRect(20, 0, 20);
-      expect(cms.isContentVisible(el, viewport, 100)).toBe(false);
-
-      el = getElementWithRect(10, -10, 0);
-      viewport = getElementWithRect(20, 0, 20);
-      expect(cms.isContentVisible(el, viewport, 100)).toBe(false);
-    });
-
-    it('should be visible when the minimum percentage is met', (): void => {
-      const el = getElementWithRect(10, 19, 29);
-      const viewport = getElementWithRect(20, 0, 20);
-      expect(cms.isContentVisible(el, viewport, 10)).toBe(true);
-      expect(cms.isContentVisible(el, viewport, 11)).toBe(false);
     });
   });
 });
