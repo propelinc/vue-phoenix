@@ -42,10 +42,10 @@
       >
         <cms-content
           v-for="(content, index) in contents"
-          :id="contentId(index)"
+          ref="contents"
           :key="`${nonce}-${content.delivery}`"
           :class="{
-            [contentId(index)]: true,
+            [`cms-zone-content-${zoneId}-${index}`]: true,
             'cms-zone-content--tracked': content.tracked,
           }"
           class="cms-zone-content cms-zone-carousel-content"
@@ -58,11 +58,11 @@
       <div v-else class="zone-contents">
         <cms-content
           v-for="(content, index) in contents"
-          :id="contentId(index)"
           :key="`${nonce}-${content.delivery}`"
+          ref="contents"
           class="cms-zone-content"
           :class="{
-            [contentId(index)]: true,
+            [`cms-zone-content-${zoneId}-${index}`]: true,
             'cms-zone-content--tracked': content.tracked,
           }"
           tag="div"
@@ -215,10 +215,6 @@ export default class CmsZone extends Vue {
     return `cms-zone-${this.zoneId}`;
   }
 
-  get contentId() {
-    return (index: number) => `cms-zone-content-${this.zoneId}-${index}`;
-  }
-
   get isScrolling() {
     return this.zoneType === 'scrolling';
   }
@@ -331,7 +327,7 @@ export default class CmsZone extends Vue {
       if (trackOn) {
         this.setupDeferredTracking(content, trackOn);
       } else {
-        const el = this.$el.querySelector(`#${this.contentId(i)}`)!;
+        const el = (this.$refs.contents[i] as Vue).$el as Element;
         this.zoneObserverManager.setupTracking(this, content, el);
       }
     });
