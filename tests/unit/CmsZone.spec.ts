@@ -139,7 +139,8 @@ describe('CmsZone.vue', (): void => {
       expect(wrapper.classes()).toEqual(expectedClasses);
       jest.runOnlyPendingTimers();
       expect(cmsClient.trackZone).toHaveBeenCalled();
-      expect(wrapper.find('.cms-zone-contents-5-0')).toBeTruthy();
+      expect((wrapper.vm.$refs.contents as Vue[]).length).toEqual(1);
+      expect(wrapper.vm.$refs.contents[0].$el.id).toEqual('cms-zone-content-5-0');
       expect(wrapper.text()).toMatch('Some header');
       expect(wrapper.text()).toMatch('Some Content car');
       expect(wrapper.text()).toMatch('Some footer');

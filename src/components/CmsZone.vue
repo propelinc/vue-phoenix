@@ -42,10 +42,11 @@
       >
         <cms-content
           v-for="(content, index) in contents"
+          :id="contentId(index)"
           ref="contents"
           :key="`${nonce}-${content.delivery}`"
           :class="{
-            [`cms-zone-content-${zoneId}-${index}`]: true,
+            [contentId(index)]: true,
             'cms-zone-content--tracked': content.tracked,
           }"
           class="cms-zone-content cms-zone-carousel-content"
@@ -58,11 +59,12 @@
       <div v-else class="zone-contents">
         <cms-content
           v-for="(content, index) in contents"
+          :id="contentId(index)"
           :key="`${nonce}-${content.delivery}`"
           ref="contents"
           class="cms-zone-content"
           :class="{
-            [`cms-zone-content-${zoneId}-${index}`]: true,
+            [contentId(index)]: true,
             'cms-zone-content--tracked': content.tracked,
           }"
           tag="div"
@@ -213,6 +215,10 @@ export default class CmsZone extends Vue {
 
   get id() {
     return `cms-zone-${this.zoneId}`;
+  }
+
+  get contentId() {
+    return (index: number) => `cms-zone-content-${this.zoneId}-${index}`;
   }
 
   get isScrolling() {
