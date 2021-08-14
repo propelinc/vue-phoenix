@@ -36,13 +36,13 @@
       />
       <cms-carousel
         v-if="zoneType === 'carousel'"
-        :id="contentId(index)"
         :key="`${nonce}-${zoneId}`"
         :center-padding="contents.length > 1 ? '20px' : '0'"
         :zone-id="zoneId"
       >
         <cms-content
           v-for="(content, index) in contents"
+          :id="contentId(index)"
           ref="contents"
           :key="`${nonce}-${content.delivery}`"
           :class="{
