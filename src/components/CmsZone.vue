@@ -27,6 +27,7 @@
     <slot v-if="zoneStatus === 'offline'" name="offline" />
     <slot v-if="zoneStatus === 'loading'" name="loading" />
     <slot v-if="!zoneStatus && !contents.length" name="empty" />
+    <slot name="search-header" />
     <div v-if="contents.length">
       <cms-content
         v-if="zoneHeader"

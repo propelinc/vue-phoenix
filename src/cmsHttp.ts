@@ -117,6 +117,13 @@ class CmsClient {
 
     await this.http({ zoneId, url: content.tracker });
   }
+
+  async fetchFilterCategories(zoneId: string) {
+    return this.http({
+      zoneId,
+      url: `/cms/zone/${zoneId}/categories`,
+    });
+  }
 }
 
 export default new CmsClient();
