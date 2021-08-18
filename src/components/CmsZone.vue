@@ -328,13 +328,12 @@ export default class CmsZone extends Vue {
   }
 
   setupTracking(contents: Content[]): void {
-    contents.forEach(async (content, i) => {
+    contents.forEach((content, i) => {
       const trackOn = (content.extra || {}).track_on;
       if (trackOn) {
         this.setupDeferredTracking(content, trackOn);
       } else {
-        await Vue.nextTick();
-        const el = (this.$refs.contents[i] as Vue).$el as Element;
+        const el = document.getElementById(this.contentId(i)) as Element;
         this.zoneObserverManager.setupTracking(this, content, el);
       }
     });
