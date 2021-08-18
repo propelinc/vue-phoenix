@@ -387,6 +387,7 @@ export default class CmsZone extends Vue {
       this.cursor = response.data.cursor;
       const newContents = response.data.content as Content[];
       this.contents.push(...newContents);
+      await Vue.nextTick();
       this.setupTracking(newContents);
     } finally {
       this.cursorLoading = false;
