@@ -27,7 +27,7 @@
     <slot v-if="zoneStatus === 'offline'" name="offline" />
     <slot v-if="zoneStatus === 'loading'" name="loading" />
     <slot v-if="!zoneStatus && !contents.length" name="empty" />
-    <slot name="search-header" />
+    <slot v-if="displaySearchHeader" name="search-header" />
     <div v-if="contents.length">
       <cms-content
         v-if="zoneHeader"
@@ -396,6 +396,10 @@ export default class CmsZone extends Vue {
 
   get isInspectOverlayEnabled(): boolean {
     return this.$cms.isInspectOverlayEnabled;
+  }
+
+  get displaySearchHeader(): boolean {
+    return !!(this.contents.length || 'q' in this.extra || 'category' in this.extra);
   }
 }
 </script>
