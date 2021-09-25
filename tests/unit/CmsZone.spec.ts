@@ -253,7 +253,7 @@ describe('CmsZone.vue', (): void => {
     it('does not render inspect overlay by default', () => {
       const wrapper = shallowMount(CmsZone, {
         localVue,
-        propsData: { zoneId: '1' },
+        propsData: { zoneId: '1', extra: {} },
       });
 
       expect(wrapper.find('.cms-zone--inspect').exists()).toBe(false);
@@ -263,7 +263,7 @@ describe('CmsZone.vue', (): void => {
     it('can render the inspect overlay', () => {
       const wrapper = shallowMount(CmsZone, {
         localVue,
-        propsData: { zoneId: '15' },
+        propsData: { zoneId: '15', extra: {} },
         mocks: {
           $cms: {
             isInspectOverlayEnabled: true,
