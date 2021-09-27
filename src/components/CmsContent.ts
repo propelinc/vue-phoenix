@@ -20,15 +20,11 @@ export default class CmsContent extends Vue {
 
   private created(): void {
     this.mutableContext = { ...this.context };
-    this.cssManager = new CmsCssManager();
-
-    if (this.css) {
-      this.cssManager.addStyles(this.css);
-    }
+    this.cssManager = new CmsCssManager(this.css);
   }
 
   private beforeDestroy(): void {
-    this.cssManager.removeStyles();
+    this.cssManager.destroy();
   }
 
   private track(event: string, props: object): void {
@@ -89,10 +85,6 @@ export default class CmsContent extends Vue {
 
   @Watch('css')
   private updateCss() {
-    if (this.css) {
-      this.cssManager.updateStyles(this.css);
-    } else {
-      this.cssManager.removeStyles();
-    }
+    this.cssManager.update(this.css);
   }
 }

@@ -1,7 +1,13 @@
 import CmsCssManager from '@/CmsCssManager';
+
+function getCssRules(element: HTMLStyleElement): string[] {
+  const cssRules = Array.from(element!.sheet!.cssRules);
+  return cssRules.map((ruleList: CSSStyleRule) => ruleList.cssText);
+}
+
 describe('CmsCssManager.ts', (): void => {
   afterEach(() => {
-    document.querySelectorAll('style').forEach(styleTag => {
+    document.querySelectorAll('style').forEach((styleTag) => {
       styleTag.remove();
     });
   });
@@ -18,51 +24,70 @@ describe('CmsCssManager.ts', (): void => {
     expect(new CmsCssManager().scopeId).not.toBe(new CmsCssManager().scopeId);
   });
 
-  it('can add styles', async (): Promise<void> => {
-    const cssManager = new CmsCssManager();
-
-    cssManager.addStyles('h1 {color: blue;}');
+  it('can properly add scoped styles', () => {
+    const cssManager = new CmsCssManager(
+      'h1 {color: blue;} .center {transition: transform(-50%, -50%);}'
+    );
 
     const styleTags = document.querySelectorAll('style');
     expect(styleTags.length).toBe(1);
-    const styleTag = styleTags[0];
-    expect(styleTag.getAttribute('data-cms-css-for')).toEqual(`${cssManager.scopeId}`);
-    // In reality, the styles should have been scoped.
-    // However, it doesn't seem like jsdom links the style tag text and the js representation of the rules together.
-    expect(styleTag.innerHTML).toBe('h1 {color: blue;}');
-  });
 
-  it('can properly scopes styles', () => {
-    const cssManager = new CmsCssManager();
-
-    cssManager.addStyles('h1 {color: blue;} .center {transition: transform(-50%, -50%);}');
-
-    // Similarly to above, the text of the style tag doesn't seem to get updated properly, so we have to get the actual css rules.
-    const styleTag = document.querySelector('style');
-    const cssRules = (styleTag!.sheet as CSSStyleSheet).cssRules;
-    expect(cssRules[0].cssText).toBe(`[data-cms-css=${cssManager.scopeId}] h1,h1[data-cms-css=${cssManager.scopeId}] {color: blue;}`);
-    expect(cssRules[1].cssText).toBe(`[data-cms-css=${cssManager.scopeId}] .center,.center[data-cms-css=${cssManager.scopeId}] {transition: transform(-50%, -50%);}`);
+    const cssRules = getCssRules(styleTags[0]);
+    expect(cssRules).toEqual([
+      `[data-cms-css=${cssManager.scopeId}] h1,h1[data-cms-css=${cssManager.scopeId}] {color: blue;}`,
+      `[data-cms-css=${cssManager.scopeId}] .center,.center[data-cms-css=${cssManager.scopeId}] {transition: transform(-50%, -50%);}`,
+    ]);
   });
 
   it('can update styles', async (): Promise<void> => {
-    const cssManager = new CmsCssManager();
-
-    cssManager.addStyles('h1 {color: blue;} .center {transition: transform(-50%, -50%);}');
+    const cssManager = new CmsCssManager(
+      'h1 {color: blue;} .center {transition: transform(-50%, -50%);}'
+    );
 
     const styleTag = document.querySelector('style');
-    expect(styleTag!.innerHTML).toBe('h1 {color: blue;} .center {transition: transform(-50%, -50%);}');
+    expect(getCssRules(styleTag!)[0]).toBe(
+      `[data-cms-css=${cssManager.scopeId}] h1,h1[data-cms-css=${cssManager.scopeId}] {color: blue;}`
+    );
 
-    cssManager.updateStyles('h2 {color: green;}');
-    expect(styleTag!.innerHTML).toBe('h2 {color: green;}');
+    cssManager.update('h2 {color: green;}');
+    expect(getCssRules(styleTag!)[0]).toBe(
+      `[data-cms-css=${cssManager.scopeId}] h2,h2[data-cms-css=${cssManager.scopeId}] {color: green;}`
+    );
+  });
+
+  it('remove styles when update is called with nothing', async (): Promise<void> => {
+    const cssManager = new CmsCssManager(
+      'h1 {color: blue;} .center {transition: transform(-50%, -50%);}'
+    );
+    expect(document.querySelectorAll('style').length).toBe(1);
+
+    cssManager.update();
+    expect(document.querySelectorAll('style').length).toBe(0);
+
+    cssManager.update('h2 {color: green;}');
+    expect(document.querySelectorAll('style').length).toBe(1);
+  });
+
+  it('keeps css scoped to each instance', async (): Promise<void> => {
+    const firstManager = new CmsCssManager('h1 {color: blue;}');
+    const secondManager = new CmsCssManager('p {color: blue;}');
+
+    const styleTags = document.querySelectorAll('style');
+    expect(styleTags.length).toBe(2);
+
+    expect(getCssRules(styleTags[0])).toEqual([
+      `[data-cms-css=${firstManager.scopeId}] h1,h1[data-cms-css=${firstManager.scopeId}] {color: blue;}`,
+    ]);
+    expect(getCssRules(styleTags[1])).toEqual([
+      `[data-cms-css=${secondManager.scopeId}] p,p[data-cms-css=${secondManager.scopeId}] {color: blue;}`,
+    ]);
   });
 
   it('can remove styles', () => {
-    const cssManager = new CmsCssManager();
-
-    cssManager.addStyles('h2 {color: green;}');
+    const cssManager = new CmsCssManager('h2 {color: green;}');
     expect(document.querySelectorAll('style').length).toBe(1);
 
-    cssManager.removeStyles();
+    cssManager.destroy();
     expect(document.querySelectorAll('style').length).toBe(0);
   });
 });

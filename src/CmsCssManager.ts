@@ -1,4 +1,4 @@
-// This is heavily inspired (read: stolen) from the http-vue-loader library.
+// This is heavily inspired by the http-vue-loader library.
 // See: https://github.com/FranckFreiburger/http-vue-loader/blob/master/src/httpVueLoader.js.
 
 let scopeIdCounter = 0;
@@ -9,8 +9,12 @@ export default class CmsCssManager {
   scopeId: number;
   private styleElement: HTMLStyleElement | null = null;
 
-  constructor() {
+  constructor(css?: string) {
     this.scopeId = scopeIdCounter++;
+
+    if (css) {
+      this.add(css);
+    }
   }
 
   get scopeAttrs(): { [key: string]: number } {
@@ -21,7 +25,7 @@ export default class CmsCssManager {
     return `[${CMS_CONTENT_ATTRIBUTE_NAME}=${this.scopeId}]`;
   }
 
-  addStyles(css: string) {
+  private add(css: string) {
     const base = this.createTemporaryBaseElement();
 
     this.styleElement = document.createElement('style');
@@ -33,27 +37,31 @@ export default class CmsCssManager {
     document.head.removeChild(base);
   }
 
-  updateStyles(css: string) {
-    if (this.styleElement) {
-      const base = this.createTemporaryBaseElement();
+  update(css?: string) {
+    if (css) {
+      if (this.styleElement) {
+        const base = this.createTemporaryBaseElement();
 
-      this.styleElement.textContent = css;
-      this.scopeStyles();
+        this.styleElement.textContent = css;
+        this.scopeStyles();
 
-      document.head.removeChild(base);
+        document.head.removeChild(base);
+      } else {
+        this.add(css);
+      }
     } else {
-      this.addStyles(css);
+      this.destroy();
     }
   }
 
-  removeStyles() {
+  destroy() {
     if (this.styleElement) {
       this.styleElement.remove();
       this.styleElement = null;
     }
   }
 
-  // firefox and chrome need the <base> to be set while inserting or modifying <style> in a document.
+  // Firefox and chrome need the <base> to be set while inserting or modifying <style> in a document.
   private createTemporaryBaseElement(): HTMLBaseElement {
     const temporaryBaseElement = document.createElement('base');
     temporaryBaseElement.href = window.location.href;
@@ -89,7 +97,7 @@ export default class CmsCssManager {
       rule.selectorText.split(/\s*,\s*/).forEach((selector: string) => {
         scopedSelectors.push(`${this.scopeSelector} ${selector}`);
         const segments = selector.match(/([^ :]+)(.+)?/) || [];
-        scopedSelectors.push(`${segments[1]}${this.scopeSelector}${(segments[2]) || ''}`);
+        scopedSelectors.push(`${segments[1]}${this.scopeSelector}${segments[2] || ''}`);
       });
 
       const ruleBody = rule.cssText.substr(rule.selectorText.length);

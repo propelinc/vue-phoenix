@@ -13,7 +13,7 @@ const mockedCmsCssManager = mocked(CmsCssManager, true);
 Vue.compile = compileToFunctions;
 const localVue = createLocalVue();
 
-describe('CmsContent.vue', (): void => {
+describe('CmsContent.ts', (): void => {
   beforeEach(() => {
     jest.resetAllMocks();
   });
@@ -79,45 +79,18 @@ describe('CmsContent.vue', (): void => {
     expect(pluginOptions.trackAnalytics).toHaveBeenCalled();
   });
 
-  it('creates adds correctly scoped styles when rendered', () => {
-    mount(CmsContent, {
-      localVue,
-      propsData: { css: 'h1 {color: blue;}', html: '<div></div>' },
-    });
-
-    expect(mockedCmsCssManager.mock.instances[0].addStyles).toBeCalledWith('h1 {color: blue;}');
-  });
-
-  it('updates scoped styles tag when css is changed', async () => {
+  it('correctly passes css to the css manager', async () => {
     const wrapper = mount(CmsContent, {
       localVue,
       propsData: { css: 'h1 {color: blue;}', html: '<div></div>' },
     });
+    const cssManager = mockedCmsCssManager.mock.instances[0];
+    expect(cssManager.constructor).toBeCalledWith('h1 {color: blue;}');
 
     await wrapper.setProps({ css: 'h1 {color: pink;}' });
-
-    expect(mockedCmsCssManager.mock.instances[0].updateStyles).toBeCalledWith('h1 {color: pink;}');
-  });
-
-  it('updates scoped styles tag when css is removed', async () => {
-    const wrapper = mount(CmsContent, {
-      localVue,
-      propsData: { css: 'h1 {color: blue;}', html: '<div></div>' },
-    });
-
-    await wrapper.setProps({ css: null });
-
-    expect(mockedCmsCssManager.mock.instances[0].removeStyles).toHaveBeenCalled();
-  });
-
-  it('removes scoped styles when component is destroyed', () => {
-    const wrapper = mount(CmsContent, {
-      localVue,
-      propsData: { css: 'h1 {color: blue;}' },
-    });
+    expect(cssManager.update).toBeCalledWith('h1 {color: pink;}');
 
     wrapper.destroy();
-
-    expect(mockedCmsCssManager.mock.instances[0].removeStyles).toHaveBeenCalled();
+    expect(cssManager.destroy).toHaveBeenCalled();
   });
 });
