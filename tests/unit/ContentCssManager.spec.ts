@@ -1,11 +1,11 @@
-import CmsCssManager from '@/CmsCssManager';
+import ContentCssManager from '@/ContentCssManager';
 
 function getCssRules(element: HTMLStyleElement): string[] {
   const cssRules = Array.from(element!.sheet!.cssRules);
   return cssRules.map((ruleList: CSSStyleRule) => ruleList.cssText);
 }
 
-describe('CmsCssManager.ts', (): void => {
+describe('ContentCssManager.ts', (): void => {
   afterEach(() => {
     document.querySelectorAll('style').forEach((styleTag) => {
       styleTag.remove();
@@ -13,7 +13,7 @@ describe('CmsCssManager.ts', (): void => {
   });
 
   it('calculates scope-related variables correctly', () => {
-    const cssManager = new CmsCssManager();
+    const cssManager = new ContentCssManager();
 
     const scopeId = cssManager.scopeId;
     expect(cssManager.scopeSelector).toBe(`[data-cms-css=${scopeId}]`);
@@ -21,11 +21,11 @@ describe('CmsCssManager.ts', (): void => {
   });
 
   it('updates the scope id for every new css manager', () => {
-    expect(new CmsCssManager().scopeId).not.toBe(new CmsCssManager().scopeId);
+    expect(new ContentCssManager().scopeId).not.toBe(new ContentCssManager().scopeId);
   });
 
   it('can properly add scoped styles', () => {
-    const cssManager = new CmsCssManager(
+    const cssManager = new ContentCssManager(
       'h1 {color: blue;} .center {transition: transform(-50%, -50%);}'
     );
 
@@ -40,7 +40,7 @@ describe('CmsCssManager.ts', (): void => {
   });
 
   it('can update styles', async (): Promise<void> => {
-    const cssManager = new CmsCssManager(
+    const cssManager = new ContentCssManager(
       'h1 {color: blue;} .center {transition: transform(-50%, -50%);}'
     );
 
@@ -56,7 +56,7 @@ describe('CmsCssManager.ts', (): void => {
   });
 
   it('remove styles when update is called with nothing', async (): Promise<void> => {
-    const cssManager = new CmsCssManager(
+    const cssManager = new ContentCssManager(
       'h1 {color: blue;} .center {transition: transform(-50%, -50%);}'
     );
     expect(document.querySelectorAll('style').length).toBe(1);
@@ -69,8 +69,8 @@ describe('CmsCssManager.ts', (): void => {
   });
 
   it('keeps css scoped to each instance', async (): Promise<void> => {
-    const firstManager = new CmsCssManager('h1 {color: blue;}');
-    const secondManager = new CmsCssManager('p {color: blue;}');
+    const firstManager = new ContentCssManager('h1 {color: blue;}');
+    const secondManager = new ContentCssManager('p {color: blue;}');
 
     const styleTags = document.querySelectorAll('style');
     expect(styleTags.length).toBe(2);
@@ -84,7 +84,7 @@ describe('CmsCssManager.ts', (): void => {
   });
 
   it('can remove styles', () => {
-    const cssManager = new CmsCssManager('h2 {color: green;}');
+    const cssManager = new ContentCssManager('h2 {color: green;}');
     expect(document.querySelectorAll('style').length).toBe(1);
 
     cssManager.destroy();

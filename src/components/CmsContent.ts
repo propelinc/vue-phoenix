@@ -2,7 +2,7 @@ import isEqual from 'lodash/isEqual';
 import { CreateElement, Component as ComponentType, VNode } from 'vue';
 import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
 
-import CmsCssManager from '@/CmsCssManager';
+import ContentCssManager from '@/ContentCssManager';
 
 import { pluginOptions } from '../plugins/cms';
 
@@ -16,11 +16,11 @@ export default class CmsContent extends Vue {
 
   public mutableContext: object = {};
   public setupComplete: boolean = false;
-  private cssManager!: CmsCssManager;
+  private cssManager!: ContentCssManager;
 
   private created(): void {
     this.mutableContext = { ...this.context };
-    this.cssManager = new CmsCssManager(this.css);
+    this.cssManager = new ContentCssManager(this.css);
   }
 
   private beforeDestroy(): void {

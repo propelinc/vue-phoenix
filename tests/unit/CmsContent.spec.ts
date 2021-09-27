@@ -3,12 +3,12 @@ import { mocked } from 'ts-jest';
 import Vue from 'vue';
 import { compileToFunctions } from 'vue-template-compiler';
 
-import CmsCssManager from '@/CmsCssManager';
+import ContentCssManager from '@/ContentCssManager';
 import CmsContent from '@/components/CmsContent';
 import { pluginOptions } from '@/plugins/cms';
 
-jest.mock('@/CmsCssManager');
-const mockedCmsCssManager = mocked(CmsCssManager, true);
+jest.mock('@/ContentCssManager');
+const mockedContentCssManager = mocked(ContentCssManager, true);
 
 Vue.compile = compileToFunctions;
 const localVue = createLocalVue();
@@ -84,7 +84,7 @@ describe('CmsContent.ts', (): void => {
       localVue,
       propsData: { css: 'h1 {color: blue;}', html: '<div></div>' },
     });
-    const cssManager = mockedCmsCssManager.mock.instances[0];
+    const cssManager = mockedContentCssManager.mock.instances[0];
     expect(cssManager.constructor).toBeCalledWith('h1 {color: blue;}');
 
     await wrapper.setProps({ css: 'h1 {color: pink;}' });

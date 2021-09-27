@@ -5,7 +5,7 @@ let scopeIdCounter = 0;
 
 const CMS_CONTENT_ATTRIBUTE_NAME = 'data-cms-css';
 
-export default class CmsCssManager {
+export default class ContentCssManager {
   scopeId: number;
   private styleElement: HTMLStyleElement | null = null;
 
