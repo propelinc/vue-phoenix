@@ -99,7 +99,7 @@ export default class CmsInspectSheet extends Vue {
   }
 
   get zoneAdminLink(): string {
-    return `${pluginOptions.baseUrl}/admin/zone/edit/?id=64`;
+    return `${pluginOptions.baseUrl}/admin/zone/edit/?id=${this.zoneId}`;
   }
 
   get siteVarEntries() {
