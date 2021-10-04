@@ -118,11 +118,16 @@ class CmsClient {
     await this.http({ zoneId, url: content.tracker });
   }
 
-  async fetchFilterCategories(zoneId: string) {
-    return this.http({
+  async fetchFilterCategories({ zoneId, q }: { zoneId: string; q: string | null }) {
+    const requestParams = {
       zoneId,
       url: `/cms/zone/${zoneId}/categories`,
-    });
+      params: {},
+    };
+    if (q) {
+      requestParams.params.q = q;
+    }
+    return this.http(requestParams);
   }
 }
 

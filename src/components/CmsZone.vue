@@ -399,7 +399,7 @@ export default class CmsZone extends Vue {
   }
 
   get displayContent(): boolean {
-    return !!(this.contents.length || 'q' in this.extra || 'category' in this.extra);
+    return !!(this.contents.length || this.extra?.q || this.extra?.category);
   }
 }
 </script>
