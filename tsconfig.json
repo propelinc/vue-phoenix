@@ -12,7 +12,6 @@
     "allowSyntheticDefaultImports": true,
     "suppressImplicitAnyIndexErrors": true,
     "resolveJsonModule": true,
-    "downlevelIteration": true,
     "sourceMap": true,
     "baseUrl": ".",
     "types": [
