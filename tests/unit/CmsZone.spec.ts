@@ -2,7 +2,7 @@ import { shallowMount, mount, createLocalVue } from '@vue/test-utils';
 import Vue from 'vue';
 import { compileToFunctions } from 'vue-template-compiler';
 
-import { Content } from '@/api';
+import { Content } from '@/api.d.ts';
 import cmsClient from '@/cmsHttp';
 import CmsZone from '@/components/CmsZone.vue';
 import CmsPlugin from '@/plugins/cms';
@@ -234,7 +234,7 @@ describe('CmsZone.vue', (): void => {
         ])
       );
 
-      const wrapper = mount(component, { localVue, propsData: { extra: {} } });
+      const wrapper = mount(component, { localVue });
       await response;
       await localVue.nextTick();
       await localVue.nextTick();
@@ -252,7 +252,7 @@ describe('CmsZone.vue', (): void => {
     it('does not render inspect overlay by default', () => {
       const wrapper = shallowMount(CmsZone, {
         localVue,
-        propsData: { zoneId: '1', extra: {} },
+        propsData: { zoneId: '1' },
       });
 
       expect(wrapper.find('.cms-zone--inspect').exists()).toBe(false);
