@@ -2,8 +2,7 @@ import isEqual from 'lodash/isEqual';
 import { CreateElement, Component as ComponentType, VNode } from 'vue';
 import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
 
-import ContentCssManager from '@/ContentCssManager';
-
+import ContentCssManager from '../ContentCssManager';
 import { pluginOptions } from '../plugins/cms';
 
 @Component({ name: 'cms-content' })
