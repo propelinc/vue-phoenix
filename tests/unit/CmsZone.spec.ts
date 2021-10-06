@@ -2,7 +2,7 @@ import { shallowMount, mount, createLocalVue } from '@vue/test-utils';
 import Vue from 'vue';
 import { compileToFunctions } from 'vue-template-compiler';
 
-import { Content } from '@/api.d.ts';
+import { Content } from '@/api';
 import cmsClient from '@/cmsHttp';
 import CmsZone from '@/components/CmsZone.vue';
 import CmsPlugin from '@/plugins/cms';
@@ -13,7 +13,6 @@ import { supressPromiseRejection } from './util';
 Vue.compile = compileToFunctions;
 const localVue = createLocalVue();
 localVue.use(CmsPlugin);
-
 
 describe('CmsZone.vue', (): void => {
   beforeEach(() => {
@@ -165,7 +164,7 @@ describe('CmsZone.vue', (): void => {
       resolvePromise(
         makeResponse(zoneType, [{ html: '<div>Some Content</div>', delivery: 1, tracker: 'foo' }])
       );
-      const wrapper = mount(component, { localVue });
+      const wrapper = mount(component, { localVue, propsData: { extra: {} } });
       await response;
       await localVue.nextTick();
       await localVue.nextTick();
@@ -235,7 +234,7 @@ describe('CmsZone.vue', (): void => {
         ])
       );
 
-      const wrapper = mount(component, { localVue });
+      const wrapper = mount(component, { localVue, propsData: { extra: {} } });
       await response;
       await localVue.nextTick();
       await localVue.nextTick();
