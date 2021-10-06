@@ -164,7 +164,7 @@ describe('CmsZone.vue', (): void => {
       resolvePromise(
         makeResponse(zoneType, [{ html: '<div>Some Content</div>', delivery: 1, tracker: 'foo' }])
       );
-      const wrapper = mount(component, { localVue, propsData: { extra: {} } });
+      const wrapper = mount(component, { localVue });
       await response;
       await localVue.nextTick();
       await localVue.nextTick();
@@ -262,7 +262,7 @@ describe('CmsZone.vue', (): void => {
     it('can render the inspect overlay', () => {
       const wrapper = shallowMount(CmsZone, {
         localVue,
-        propsData: { zoneId: '15', extra: {} },
+        propsData: { zoneId: '15' },
         mocks: {
           $cms: {
             isInspectOverlayEnabled: true,
