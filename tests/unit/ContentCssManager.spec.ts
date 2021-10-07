@@ -1,11 +1,11 @@
-import ContentCssManager from '@/ContentCssManager';
+import ContentCssManager from '@/services/contentCssManager';
 
 function getCssRules(element: HTMLStyleElement): string[] {
-  const cssRules = Array.from(element!.sheet!.cssRules);
+  const cssRules = Array.from((element.sheet! as CSSStyleSheet).cssRules);
   return cssRules.map((ruleList: CSSStyleRule) => ruleList.cssText);
 }
 
-describe('ContentCssManager.ts', (): void => {
+describe('contentCssManager.ts', (): void => {
   afterEach(() => {
     document.querySelectorAll('style').forEach((styleTag) => {
       styleTag.remove();
@@ -16,7 +16,7 @@ describe('ContentCssManager.ts', (): void => {
     const cssManager = new ContentCssManager();
 
     const scopeId = cssManager.scopeId;
-    expect(cssManager.scopeSelector).toBe(`[data-cms-css=${scopeId}]`);
+    expect(cssManager.scopeSelector).toBe(`[data-cms-css="${scopeId}"]`);
     expect(cssManager.scopeAttrs).toEqual({ 'data-cms-css': scopeId });
   });
 
@@ -34,8 +34,8 @@ describe('ContentCssManager.ts', (): void => {
 
     const cssRules = getCssRules(styleTags[0]);
     expect(cssRules).toEqual([
-      `[data-cms-css=${cssManager.scopeId}] h1,h1[data-cms-css=${cssManager.scopeId}] {color: blue;}`,
-      `[data-cms-css=${cssManager.scopeId}] .center,.center[data-cms-css=${cssManager.scopeId}] {transition: transform(-50%, -50%);}`,
+      `[data-cms-css="${cssManager.scopeId}"] h1,h1[data-cms-css="${cssManager.scopeId}"] {color: blue;}`,
+      `[data-cms-css="${cssManager.scopeId}"] .center,.center[data-cms-css="${cssManager.scopeId}"] {transition: transform(-50%, -50%);}`,
     ]);
   });
 
@@ -46,12 +46,12 @@ describe('ContentCssManager.ts', (): void => {
 
     const styleTag = document.querySelector('style');
     expect(getCssRules(styleTag!)[0]).toBe(
-      `[data-cms-css=${cssManager.scopeId}] h1,h1[data-cms-css=${cssManager.scopeId}] {color: blue;}`
+      `[data-cms-css="${cssManager.scopeId}"] h1,h1[data-cms-css="${cssManager.scopeId}"] {color: blue;}`
     );
 
     cssManager.update('h2 {color: green;}');
     expect(getCssRules(styleTag!)[0]).toBe(
-      `[data-cms-css=${cssManager.scopeId}] h2,h2[data-cms-css=${cssManager.scopeId}] {color: green;}`
+      `[data-cms-css="${cssManager.scopeId}"] h2,h2[data-cms-css="${cssManager.scopeId}"] {color: green;}`
     );
   });
 
@@ -76,10 +76,10 @@ describe('ContentCssManager.ts', (): void => {
     expect(styleTags.length).toBe(2);
 
     expect(getCssRules(styleTags[0])).toEqual([
-      `[data-cms-css=${firstManager.scopeId}] h1,h1[data-cms-css=${firstManager.scopeId}] {color: blue;}`,
+      `[data-cms-css="${firstManager.scopeId}"] h1,h1[data-cms-css="${firstManager.scopeId}"] {color: blue;}`,
     ]);
     expect(getCssRules(styleTags[1])).toEqual([
-      `[data-cms-css=${secondManager.scopeId}] p,p[data-cms-css=${secondManager.scopeId}] {color: blue;}`,
+      `[data-cms-css="${secondManager.scopeId}"] p,p[data-cms-css="${secondManager.scopeId}"] {color: blue;}`,
     ]);
   });
 

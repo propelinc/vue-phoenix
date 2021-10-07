@@ -1,13 +1,13 @@
 import { mount, createLocalVue } from '@vue/test-utils';
-import { mocked } from 'ts-jest';
+import { mocked } from 'ts-jest/utils';
 import Vue from 'vue';
 import { compileToFunctions } from 'vue-template-compiler';
 
-import ContentCssManager from '@/ContentCssManager';
 import CmsContent from '@/components/CmsContent';
 import { pluginOptions } from '@/plugins/cms';
+import ContentCssManager from '@/services/contentCssManager';
 
-jest.mock('@/ContentCssManager');
+jest.mock('@/services/contentCssManager');
 const mockedContentCssManager = mocked(ContentCssManager, true);
 
 Vue.compile = compileToFunctions;

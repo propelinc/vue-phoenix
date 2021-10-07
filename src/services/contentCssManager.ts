@@ -22,7 +22,7 @@ export default class ContentCssManager {
   }
 
   get scopeSelector(): string {
-    return `[${CMS_CONTENT_ATTRIBUTE_NAME}=${this.scopeId}]`;
+    return `[${CMS_CONTENT_ATTRIBUTE_NAME}="${this.scopeId}"]`;
   }
 
   private add(css: string) {
