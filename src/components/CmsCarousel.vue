@@ -37,7 +37,7 @@ export default class CmsCarousel extends Vue {
   }
 
   public next(delay: number): void {
-    setTimeout((): void => (this.$refs.slick as _Slick).next(), delay);
+    window.setTimeout((): void => (this.$refs.slick as _Slick).next(), delay);
   }
 
   public onIndexChanged(event: object, slick: _Slick, currentSlide: number): void {
