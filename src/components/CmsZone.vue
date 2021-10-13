@@ -399,11 +399,12 @@ export default class CmsZone extends Vue {
   }
 
   get displayContent(): boolean {
-    return !!(
-      this.contents.length ||
-      (this.extra && this.extra.q) ||
-      (this.extra && this.extra.category)
-    );
+    return !!(this.contents.length || this.isSearchable);
+  }
+
+  get isSearchable(): boolean {
+    // eslint-disable-next-line dot-notation
+    return (this.extra && this.extra['q']) || (this.extra && this.extra['category']);
   }
 }
 </script>
