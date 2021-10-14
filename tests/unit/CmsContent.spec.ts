@@ -1,14 +1,23 @@
 import { mount, createLocalVue } from '@vue/test-utils';
+import { mocked } from 'ts-jest/utils';
 import Vue from 'vue';
 import { compileToFunctions } from 'vue-template-compiler';
 
 import CmsContent from '@/components/CmsContent';
 import { pluginOptions } from '@/plugins/cms';
+import ContentCssManager from '@/services/contentCssManager';
+
+jest.mock('@/services/contentCssManager');
+const mockedContentCssManager = mocked(ContentCssManager, true);
 
 Vue.compile = compileToFunctions;
 const localVue = createLocalVue();
 
-describe('CmsContent.vue', (): void => {
+describe('CmsContent.ts', (): void => {
+  beforeEach(() => {
+    jest.resetAllMocks();
+  });
+
   it('creates a dynamic component that allows templating variables', async (): Promise<void> => {
     const context = { foo: 'bar' };
     const html = '<div>Content {{ context.foo }}</div>';
@@ -37,7 +46,7 @@ describe('CmsContent.vue', (): void => {
     expect(wrapper.text()).toMatch('Content bar');
   });
 
-  it('shows the default slot when html is empty', async (): Promise<void> => {
+  it('shows the default slot when html is empty', () => {
     const wrapper = mount(CmsContent, {
       localVue,
       slots: { default: '<div>Default Content</div>' },
@@ -68,5 +77,20 @@ describe('CmsContent.vue', (): void => {
     await Vue.nextTick();
     expect(wrapper.text()).toMatch('Foo');
     expect(pluginOptions.trackAnalytics).toHaveBeenCalled();
+  });
+
+  it('correctly passes css to the css manager', async () => {
+    const wrapper = mount(CmsContent, {
+      localVue,
+      propsData: { css: 'h1 {color: blue;}', html: '<div></div>' },
+    });
+    const cssManager = mockedContentCssManager.mock.instances[0];
+    expect(cssManager.constructor).toBeCalledWith('h1 {color: blue;}');
+
+    await wrapper.setProps({ css: 'h1 {color: pink;}' });
+    expect(cssManager.update).toBeCalledWith('h1 {color: pink;}');
+
+    wrapper.destroy();
+    expect(cssManager.destroy).toHaveBeenCalled();
   });
 });

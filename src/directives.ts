@@ -102,7 +102,7 @@ const scrollOnFocus: DirectiveOptions = {
       const scrollableContent = getClosest(el, '.scrollable-content');
       if (scrollable && scrollableContent) {
         const height = scrollableContent.offsetHeight;
-        setTimeout((): void => {
+        window.setTimeout((): void => {
           // If scrollableContent height is reduced in half second
           // since an input got focus we assume soft keyboard is showing.
           if (height > scrollableContent.offsetHeight) {
@@ -152,7 +152,7 @@ const trackClick: DirectiveOptions = {
     // being removed before it can fire.
 
     // The setTimeout allows the click handler to execute before it is removed.
-    setTimeout((): void => destroy(el), 0);
+    window.setTimeout((): void => destroy(el), 0);
   },
 };
 

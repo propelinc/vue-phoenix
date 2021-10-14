@@ -52,6 +52,7 @@
           class="cms-zone-content cms-zone-carousel-content"
           tag="div"
           :html="content.html"
+          :css="content.css"
           :context="renderContext"
           :zone-id="zoneId"
         />
@@ -69,6 +70,7 @@
           }"
           tag="div"
           :html="content.html"
+          :css="content.css"
           :context="renderContext"
           :zone-id="zoneId"
         />
@@ -131,7 +133,7 @@ class ZoneObserverManager {
       (entries) => {
         entries.forEach((e) => {
           if (e.intersectionRatio >= this.minVisibleRatio && this.pendingTrackers[e.target.id]) {
-            setTimeout(
+            window.setTimeout(
               () => this.checkObserver.observe(e.target),
               this.durationVisibleToBeTrackedMs
             );

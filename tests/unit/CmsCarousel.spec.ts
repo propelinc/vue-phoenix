@@ -19,9 +19,9 @@ describe('CmsCarousel.vue', (): void => {
     expect(wrapper.find('.slick-current').text()).toMatch('Slide 1');
 
     component.next(0);
-    await new Promise((resolve): number => setTimeout(resolve, 550));
+    await new Promise((resolve): number => window.setTimeout(resolve, 550));
     expect(wrapper.find('.slick-current').text()).toMatch('Slide 2');
-    await new Promise((resolve): number => setTimeout(resolve, 550));
+    await new Promise((resolve): number => window.setTimeout(resolve, 550));
     expect(component.index).toBe(1);
   });
 });
