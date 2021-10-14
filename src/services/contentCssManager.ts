@@ -4,6 +4,7 @@
 let scopeIdCounter = 0;
 
 const CMS_CONTENT_ATTRIBUTE_NAME = 'data-cms-css';
+const STYLE_TAG_ATTRIBUTE_NAME = 'data-cms-css-for';
 
 export default class ContentCssManager {
   scopeId: number;
@@ -30,7 +31,7 @@ export default class ContentCssManager {
 
     this.styleElement = document.createElement('style');
     this.styleElement.appendChild(document.createTextNode(css));
-    this.styleElement.setAttribute('data-cms-css-for', this.scopeId.toString());
+    this.styleElement.setAttribute(STYLE_TAG_ATTRIBUTE_NAME, this.scopeId.toString());
     document.head.appendChild(this.styleElement);
     this.scopeStyles();
 
