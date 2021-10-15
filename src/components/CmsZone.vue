@@ -27,13 +27,14 @@
     <slot v-if="zoneStatus === 'offline'" name="offline" />
     <slot v-if="zoneStatus === 'loading'" name="loading" />
     <slot v-if="!zoneStatus && !contents.length" name="empty" />
-    <div v-if="contents.length">
+    <div v-if="displayContent">
       <cms-content
         v-if="zoneHeader"
         :html="zoneHeader"
         :context="renderContext"
         :zone-id="zoneId"
       />
+      <slot name="search-header" />
       <cms-carousel
         v-if="zoneType === 'carousel'"
         :key="`${nonce}-${zoneId}`"
@@ -397,6 +398,15 @@ export default class CmsZone extends Vue {
 
   get isInspectOverlayEnabled(): boolean {
     return this.$cms.isInspectOverlayEnabled;
+  }
+
+  get displayContent(): boolean {
+    return !!(this.contents.length || this.forceMargins);
+  }
+
+  get forceMargins(): boolean {
+    // eslint-disable-next-line dot-notation
+    return this.extra && this.extra['force_margins'];
   }
 }
 </script>
