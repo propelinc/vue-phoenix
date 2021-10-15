@@ -399,10 +399,10 @@ export default class CmsZone extends Vue {
   }
 
   get displayContent(): boolean {
-    return !!(this.contents.length || this.shouldShowContent);
+    return !!(this.contents.length || this.forceMargins);
   }
 
-  get shouldShowContent(): boolean {
+  get forceMargins(): boolean {
     // eslint-disable-next-line dot-notation
     return this.extra && this.extra['force_margins'];
   }
