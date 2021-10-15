@@ -91,6 +91,26 @@ describe('CmsZone.vue', (): void => {
       expect(wrapper.text()).not.toMatch('Some footer');
     });
 
+    it(`renders headers and footers when force_margins present for ${zoneType} zone`, async (): Promise<void> => {
+      const zoneId = '5';
+      const extra = { foo: 'bar', force_margins: true };
+      const wrapper = mount(CmsZone, {
+        localVue,
+        slots: { default: '<div>Default Content</div>' },
+        propsData: { zoneId, extra },
+      });
+
+      await localVue.nextTick();
+      resolvePromise(makeResponse(zoneType, []));
+      await response;
+      await localVue.nextTick();
+      await localVue.nextTick();
+      const expectedClasses = zoneType === 'scrolling' ? ['scrollable-content'] : [];
+      expect(wrapper.classes()).toEqual(expectedClasses);
+      expect(wrapper.text()).toMatch('Some header');
+      expect(wrapper.text()).toMatch('Some footer');
+    });
+
     it(`renders empty slot for ${zoneType} zone`, async (): Promise<void> => {
       const zoneId = '5';
       const extra = { foo: 'bar' };
