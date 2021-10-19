@@ -70,6 +70,17 @@ describe('CmsContent.ts', (): void => {
     expect(wrapper.text()).toMatch('Content 5');
   });
 
+  it('re-initialize is allowed when the html updates', async (): Promise<void> => {
+    const html = '<div :run="setup({k: 5})">Content {{ context.k }}</div>';
+    const wrapper = mount(CmsContent, { localVue, propsData: { html } });
+    await Vue.nextTick();
+    expect(wrapper.text()).toMatch('Content 5');
+
+    wrapper.vm.html = '<div :run="setup({k: 2})">Content {{ context.k }}</div>';
+    await Vue.nextTick();
+    expect(wrapper.text()).toMatch('Content 2');
+  });
+
   it('tracks analytics events', async (): Promise<void> => {
     pluginOptions.trackAnalytics = jest.fn();
     const html = `<div :run="setup({k: 5})"><div :run="track('foo', context)">Foo</div></div>`;

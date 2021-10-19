@@ -48,6 +48,11 @@ export default class CmsContent extends Vue {
     }
   }
 
+  @Watch('html')
+  private resetSetup(): void {
+    this.setupComplete = false;
+  }
+
   private render(h: CreateElement): VNode {
     if (!this.html) {
       return h('div', this.$slots.default);
