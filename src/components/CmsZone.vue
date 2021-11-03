@@ -1,5 +1,8 @@
 <template>
-  <div :id="id" :class="{ 'cms-zone--inspect': isInspectOverlayEnabled }">
+  <div
+    :id="id"
+    :class="{ 'scrollable-content': isScrolling, 'cms-zone--inspect': isInspectOverlayEnabled }"
+  >
     <button
       v-if="isInspectOverlayEnabled"
       class="cms-zone__zone-label"
