@@ -1,0 +1,32 @@
+<template>
+  <div class="observer"/>
+</template>
+
+<script lang="ts">
+import { Vue, Component, Prop } from 'vue-property-decorator';
+
+@Component({ name: 'cms-server-request' })
+export default class CmsServerRequest extends Vue {
+
+  @Prop({ type: Object, default: () => {} }) options!: object;
+
+  observer: IntersectionObserver | null = null;
+
+  mounted() {
+    const options = this.options || {};
+    this.observer = new IntersectionObserver(([entry]) => {
+      if (entry && entry.isIntersecting) {
+        this.$emit('intersect');
+      }
+    }, options);
+
+    this.observer.observe(this.$el);
+  }
+
+  destroyed() {
+    if (this.observer) {
+      this.observer.disconnect();
+    }
+  }
+}
+</script>

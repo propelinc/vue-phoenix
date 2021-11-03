@@ -1,9 +1,5 @@
 <template>
-  <div
-    :id="id"
-    v-infinite-scroll="{ action: next, enabled: isScrolling }"
-    :class="{ 'scrollable-content': isScrolling, 'cms-zone--inspect': isInspectOverlayEnabled }"
-  >
+  <div :id="id" :class="{ 'cms-zone--inspect': isInspectOverlayEnabled }">
     <button
       v-if="isInspectOverlayEnabled"
       class="cms-zone__zone-label"
@@ -76,6 +72,7 @@
           :zone-id="zoneId"
         />
       </div>
+      <cms-observer v-if="isScrolling" @intersect="next" />
       <slot v-if="cursorLoading" name="cursor" />
       <cms-content
         v-if="zoneFooter"
