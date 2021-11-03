@@ -141,7 +141,6 @@ const init: DirectiveOptions = {
 };
 
 export function addDirectives(Vue: VueConstructor): void {
-  Vue.directive('infinite-scroll', infiniteScroll);
   Vue.directive('scroll-on-focus', scrollOnFocus);
   Vue.directive('track-click', trackClick);
   Vue.directive('track-render', trackRender);
