@@ -99,6 +99,7 @@ import { pluginOptions } from '../plugins/cms';
 import CmsCarousel from './CmsCarousel.vue';
 import CmsContent from './CmsContent';
 import CmsInspectSheet from './CmsInspectSheet.vue';
+import CmsObserver from './CmsObserver.vue';
 
 class ZoneObserverManager {
   static instance: ZoneObserverManager;
@@ -194,7 +195,7 @@ class ZoneObserverManager {
 
 @Component({
   name: 'cms-zone',
-  components: { CmsCarousel, CmsContent, CmsInspectSheet },
+  components: { CmsCarousel, CmsContent, CmsInspectSheet, CmsObserver },
 })
 export default class CmsZone extends Vue {
   @Prop(String) zoneId!: string;
