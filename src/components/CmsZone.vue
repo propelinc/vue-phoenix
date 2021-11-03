@@ -72,7 +72,7 @@
           :zone-id="zoneId"
         />
       </div>
-      <cms-observer v-if="isScrolling" @intersect="next" />
+      <cms-observer v-if="isScrolling" :options="{ rootMargin: '25%' }" @intersect="next" />
       <slot v-if="cursorLoading" name="cursor" />
       <cms-content
         v-if="zoneFooter"
@@ -85,8 +85,8 @@
 </template>
 
 <script lang="ts">
-import debounce from 'lodash/debounce';
 import isEqual from 'lodash/isEqual';
+import throttle from 'lodash/throttle';
 import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
 
 import { Content } from '../api';
@@ -205,15 +205,36 @@ export default class CmsZone extends Vue {
   zoneFooter: string = '';
   contents: Content[] = [];
   cursor: string = '';
-  scrollable: Element | null = null;
+  observed: Element[] = [];
+  shouldShowInspectModal = false;
 
   nonce: number = 0;
   cursorLoading: boolean = false;
   allContentLoaded: boolean = false;
-  next = debounce(() => this.getNextPage(), 400);
-  observed: Element[] = [];
 
-  shouldShowInspectModal = false;
+  next = throttle(async (observer: IntersectionObserver) => {
+    if (this.cursorLoading) {
+      return [];
+    }
+
+    if (this.allContentLoaded) {
+      return [];
+    }
+
+    this.cursorLoading = true;
+    try {
+      const results = await this.getNextPage();
+
+      await Vue.nextTick();
+      if (!results.length) {
+        this.allContentLoaded = true;
+      } else if (!observer.takeRecords().length) {
+        this.next(observer);
+      }
+    } finally {
+      this.cursorLoading = false;
+    }
+  }, 400);
 
   get id() {
     return `cms-zone-${this.zoneId}`;
@@ -366,44 +387,25 @@ export default class CmsZone extends Vue {
     }
   }
 
-  async getNextPage() {
+  async getNextPage(): Promise<Content[]> {
     if (!pluginOptions.checkConnection()) {
-      return;
+      return [];
     }
 
-    if (this.cursorLoading) {
-      return;
+    const response = await cmsClient.fetchZone({
+      zoneId: this.zoneId,
+      extra: this.extra,
+      cursor: this.cursor,
+    });
+    if (!response.data || !response.data.content) {
+      throw new Error('No data');
     }
 
-    if (this.allContentLoaded) {
-      return;
-    }
-
-    this.cursorLoading = true;
-
-    let response;
-    try {
-      response = await cmsClient.fetchZone({
-        zoneId: this.zoneId,
-        extra: this.extra,
-        cursor: this.cursor,
-      });
-      if (!response.data || !response.data.content) {
-        throw new Error('No data');
-      }
-
-      this.cursor = response.data.cursor;
-      const newContents = response.data.content as Content[];
-
-      if (!newContents.length) {
-        this.allContentLoaded = true;
-      } else {
-        this.contents.push(...newContents);
-        this.setupTracking(newContents);
-      }
-    } finally {
-      this.cursorLoading = false;
-    }
+    this.cursor = response.data.cursor;
+    const newContents = response.data.content as Content[];
+    this.contents.push(...newContents);
+    this.setupTracking(newContents);
+    return newContents;
   }
 
   get isInspectOverlayEnabled(): boolean {

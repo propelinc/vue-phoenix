@@ -15,7 +15,7 @@ export default class CmsServerRequest extends Vue {
     const options = this.options || {};
     this.observer = new IntersectionObserver(([entry]) => {
       if (entry && entry.isIntersecting) {
-        this.$emit('intersect');
+        this.$emit('intersect', this.observer);
       }
     }, options);
 
