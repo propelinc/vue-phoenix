@@ -1,8 +1,5 @@
 <template>
-  <div
-    :id="id"
-    :class="{ 'scrollable-content': isScrolling, 'cms-zone--inspect': isInspectOverlayEnabled }"
-  >
+  <div :id="id" :class="{ 'cms-zone--inspect': isInspectOverlayEnabled }">
     <button
       v-if="isInspectOverlayEnabled"
       class="cms-zone__zone-label"
@@ -423,29 +420,6 @@ export default class CmsZone extends Vue {
   }
 }
 </script>
-
-<style>
-.scrollable {
-  display: flex;
-  flex-direction: column;
-  position: relative;
-  height: 100%;
-}
-
-.scrollable-header {
-  flex: 0 0 auto;
-  position: static;
-}
-
-.scrollable-content {
-  height: 100%;
-  width: 100%;
-  flex: 1 1 auto;
-  position: relative; /* need this to position inner content */
-  overflow-y: auto;
-  -webkit-overflow-scrolling: touch;
-}
-</style>
 
 <style lang="less" scoped>
 .zone-inspect-overlay(@color-light, @color-dark) {

@@ -20,57 +20,6 @@ function destroy(el: DestroyHTMLElement): void {
   }
 }
 
-function setupInfiniteScroll(el: DestroyHTMLElement, binding: DirectiveBinding) {
-  const params =
-    typeof binding.value === 'object' ? binding.value : { action: binding.value, enabled: true };
-
-  if (!params.enabled) {
-    if (el.bound) {
-      destroy(el);
-    }
-    return;
-  }
-
-  if (el.bound) {
-    return;
-  }
-
-  const tolerance = parseInt(binding.arg || '100', 10);
-  const action = params.action;
-
-  const handler = (): void => {
-    if (el.firstChild) {
-      const height = (el.firstChild as HTMLElement).clientHeight || 0;
-      if (el.scrollTop >= height - el.clientHeight - tolerance) {
-        action();
-      }
-    } else {
-      if (el.scrollTop >= el.clientHeight - tolerance) {
-        action();
-      }
-    }
-  };
-
-  el.bound = true;
-  el.addEventListener('scroll', handler);
-  el.$destroy = (): void => {
-    el.removeEventListener('scroll', handler);
-    el.bound = false;
-  };
-}
-
-/**
- * Triggers action when scroll gets close to the bottom.
- *
- * Example usage:
- * <div v-infinite-scroll="action()">Scroll me</div>
- */
-const infiniteScroll: DirectiveOptions = {
-  bind: setupInfiniteScroll,
-  update: setupInfiniteScroll,
-  unbind: destroy,
-};
-
 /**
  * Scroll input into view when focused.
  *
