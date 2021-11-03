@@ -342,6 +342,7 @@ export default class CmsZone extends Vue {
     try {
       await this.getNextPage();
       this.$el.classList.remove('cms-zone-loading');
+      this.zoneStatus = null;
     } catch (error) {
       this.zoneStatus = 'error';
       this.$el.classList.add('cms-zone-error');
@@ -349,15 +350,10 @@ export default class CmsZone extends Vue {
       return;
     } finally {
       this.$el.classList.remove('cms-zone-loading');
+      // Circumvent issue where carousel breaks by forcing it to re-render
+      this.nonce++;
+      this.zoneObserverManager.disconnect(this);
     }
-
-    this.zoneStatus = null;
-
-    // Circumvent issue where carousel breaks by forcing it to re-render
-    this.nonce++;
-
-    await Vue.nextTick();
-    this.zoneObserverManager.disconnect(this);
   }
 
   setupTracking(contents: Content[]): void {
