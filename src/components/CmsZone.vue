@@ -89,7 +89,7 @@ import isEqual from 'lodash/isEqual';
 import throttle from 'lodash/throttle';
 import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
 
-import { Content } from '../api';
+import { CMSZoneResponse, Content } from '../api';
 import cmsClient from '../cmsHttp';
 import { pluginOptions } from '../plugins/cms';
 
@@ -200,11 +200,8 @@ export default class CmsZone extends Vue {
   @Prop(Object) context!: {};
 
   zoneStatus: string | null = null;
-  zoneType: string = '';
-  zoneHeader: string = '';
-  zoneFooter: string = '';
+  lastResponse: CMSZoneResponse | null = null;
   contents: Content[] = [];
-  cursor: string = '';
   observed: Element[] = [];
   shouldShowInspectModal = false;
 
@@ -244,6 +241,29 @@ export default class CmsZone extends Vue {
     return (index: number) => `cms-zone-content-${this.zoneId}-${index}`;
   }
 
+  get zoneType(): string {
+    if (!this.lastResponse || this.zoneStatus === 'error') {
+      return '';
+    }
+    return this.lastResponse.zone_type;
+  }
+
+  get zoneHeader(): string {
+    return this.lastResponse && this.lastResponse.zone_header
+      ? `<div class="zone-header">${this.lastResponse.zone_header}</div>`
+      : '';
+  }
+
+  get zoneFooter(): string {
+    return this.lastResponse && this.lastResponse.zone_footer
+      ? `<div class="zone-footer">${this.lastResponse.zone_footer}</div>`
+      : '';
+  }
+
+  get cursor(): string {
+    return this.lastResponse && this.lastResponse.cursor ? this.lastResponse.cursor : '';
+  }
+
   get isScrolling() {
     return this.zoneType === 'scrolling';
   }
@@ -277,6 +297,7 @@ export default class CmsZone extends Vue {
 
   @Watch('zoneId')
   onZoneIdChanged(): void {
+    this.lastResponse = null;
     this.refresh();
   }
 
@@ -292,6 +313,9 @@ export default class CmsZone extends Vue {
 
   async refresh(): Promise<void> {
     this.allContentLoaded = false;
+    this.cursorLoading = false;
+    // This.next.cancel();
+
     if (!pluginOptions.checkConnection()) {
       this.zoneStatus = 'offline';
       this.$el.classList.add('cms-zone-offline');
@@ -315,40 +339,25 @@ export default class CmsZone extends Vue {
     // Increment nonce on every request to prevent vue from re-using cms-content components.
     this.nonce++;
 
-    let response;
     try {
-      response = await cmsClient.fetchZone({ zoneId: this.zoneId, extra: this.extra });
+      await this.getNextPage();
       this.$el.classList.remove('cms-zone-loading');
-      if (!response.data || !response.data.content) {
-        throw new Error('No data');
-      }
     } catch (error) {
       this.zoneStatus = 'error';
-      this.$el.classList.remove('cms-zone-loading');
       this.$el.classList.add('cms-zone-error');
-      this.zoneType = '';
       this.contents = [];
       return;
+    } finally {
+      this.$el.classList.remove('cms-zone-loading');
     }
-    const data = response.data;
-    this.zoneType = data.zone_type;
-    this.contents = data.content as Content[];
-    this.cursor = data.cursor;
-    this.zoneHeader = data.zone_header
-      ? `<div class="zone-header">${data.zone_header || ''}</div>`
-      : '';
-    this.zoneFooter = data.zone_footer
-      ? `<div class="zone-footer">${data.zone_footer || ''}</div>`
-      : '';
+
     this.zoneStatus = null;
 
     // Circumvent issue where carousel breaks by forcing it to re-render
     this.nonce++;
 
     await Vue.nextTick();
-
     this.zoneObserverManager.disconnect(this);
-    this.setupTracking(this.contents);
   }
 
   setupTracking(contents: Content[]): void {
@@ -392,20 +401,27 @@ export default class CmsZone extends Vue {
       return [];
     }
 
+    const zoneId = this.zoneId;
     const response = await cmsClient.fetchZone({
-      zoneId: this.zoneId,
+      zoneId: zoneId,
       extra: this.extra,
       cursor: this.cursor,
     });
+
     if (!response.data || !response.data.content) {
       throw new Error('No data');
     }
 
-    this.cursor = response.data.cursor;
-    const newContents = response.data.content as Content[];
-    this.contents.push(...newContents);
-    this.setupTracking(newContents);
-    return newContents;
+    if (zoneId !== this.zoneId) {
+      return [];
+    }
+
+    this.lastResponse = response.data;
+    this.contents.push(...this.lastResponse.content);
+
+    await Vue.nextTick();
+    this.setupTracking(this.lastResponse.content);
+    return this.lastResponse.content;
   }
 
   get isInspectOverlayEnabled(): boolean {
