@@ -84,8 +84,7 @@ describe('CmsZone.vue', (): void => {
       await response;
       await localVue.nextTick();
       await localVue.nextTick();
-      const expectedClasses = zoneType === 'scrolling' ? ['scrollable-content'] : [];
-      expect(wrapper.classes()).toEqual(expectedClasses);
+
       expect(wrapper.text()).toBe('');
       expect(wrapper.text()).not.toMatch('Some header');
       expect(wrapper.text()).not.toMatch('Some footer');
@@ -105,8 +104,7 @@ describe('CmsZone.vue', (): void => {
       await response;
       await localVue.nextTick();
       await localVue.nextTick();
-      const expectedClasses = zoneType === 'scrolling' ? ['scrollable-content'] : [];
-      expect(wrapper.classes()).toEqual(expectedClasses);
+
       expect(wrapper.text()).toMatch('Some header');
       expect(wrapper.text()).toMatch('Some footer');
     });
@@ -124,8 +122,7 @@ describe('CmsZone.vue', (): void => {
       await response;
       await localVue.nextTick();
       await localVue.nextTick();
-      const expectedClasses = zoneType === 'scrolling' ? ['scrollable-content'] : [];
-      expect(wrapper.classes()).toEqual(expectedClasses);
+
       expect(wrapper.text()).toBe('Empty Content');
       expect(wrapper.text()).not.toMatch('Some header');
       expect(wrapper.text()).not.toMatch('Some footer');
@@ -154,8 +151,7 @@ describe('CmsZone.vue', (): void => {
       await response;
       await localVue.nextTick();
       await localVue.nextTick();
-      const expectedClasses = zoneType === 'scrolling' ? ['scrollable-content'] : [];
-      expect(wrapper.classes()).toEqual(expectedClasses);
+
       jest.runOnlyPendingTimers();
       expect(cmsClient.trackZone).toHaveBeenCalled();
       expect((wrapper.vm.$refs.contents as Vue[]).length).toEqual(1);
