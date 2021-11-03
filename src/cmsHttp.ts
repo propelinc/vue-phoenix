@@ -1,6 +1,6 @@
 import Axios, { AxiosInstance, AxiosResponse } from 'axios';
 
-import { Content, CmsStyleSheet } from './api';
+import { Content, CmsStyleSheet, CMSZoneResponse } from './api';
 import { pluginOptions } from './plugins/cms';
 
 class CmsClient {
@@ -26,7 +26,7 @@ class CmsClient {
     const captable = pluginOptions.getCaptable();
     const zoneCaptable = captable[zoneId];
     const headers = zoneCaptable ? { Captable: zoneCaptable } : {};
-    const response = await this.axios.get(url, { params, headers });
+    const response = await this.axios.get<CMSZoneResponse>(url, { params, headers });
     if (response.data && response.data.captable) {
       pluginOptions.setCaptable({ zoneId, captable: response.data.captable });
     }

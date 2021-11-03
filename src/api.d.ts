@@ -27,6 +27,7 @@ export interface CMSZoneResponse {
   zone_type: string;
   zone_header: string | null;
   zone_footer: string | null;
+  cursor: string | null;
 }
 
 export interface ContentTracker {
