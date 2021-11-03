@@ -211,6 +211,7 @@ export default class CmsZone extends Vue {
 
   nonce: number = 0;
   cursorLoading: boolean = false;
+  allContentLoaded: boolean = false;
   next = debounce(() => this.getNextPage(), 400);
   observed: Element[] = [];
 
@@ -271,6 +272,7 @@ export default class CmsZone extends Vue {
   }
 
   async refresh(): Promise<void> {
+    this.allContentLoaded = false;
     if (!pluginOptions.checkConnection()) {
       this.zoneStatus = 'offline';
       this.$el.classList.add('cms-zone-offline');
@@ -375,6 +377,10 @@ export default class CmsZone extends Vue {
       return;
     }
 
+    if (this.allContentLoaded) {
+      return;
+    }
+
     this.cursorLoading = true;
 
     let response;
@@ -387,10 +393,16 @@ export default class CmsZone extends Vue {
       if (!response.data || !response.data.content) {
         throw new Error('No data');
       }
+
       this.cursor = response.data.cursor;
       const newContents = response.data.content as Content[];
-      this.contents.push(...newContents);
-      this.setupTracking(newContents);
+
+      if (!newContents.length) {
+        this.allContentLoaded = true;
+      } else {
+        this.contents.push(...newContents);
+        this.setupTracking(newContents);
+      }
     } finally {
       this.cursorLoading = false;
     }
