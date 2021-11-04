@@ -12,13 +12,11 @@ export default class CmsIntersectionObserver extends Vue {
   observer: IntersectionObserver | null = null;
 
   mounted() {
-    const options = this.options || {};
     this.observer = new IntersectionObserver(([entry]) => {
-      if (entry && entry.isIntersecting) {
-        this.$emit('intersect', this.observer);
+      if (entry) {
+        this.$emit(entry.isIntersecting ? 'enter' : 'leave');
       }
-    }, options);
-
+    }, this.options);
     this.observer.observe(this.$el);
   }
 
@@ -29,3 +27,10 @@ export default class CmsIntersectionObserver extends Vue {
   }
 }
 </script>
+
+<style lang="less" scoped>
+.observer {
+  height: 1px;
+  width: 1px;
+}
+</style>

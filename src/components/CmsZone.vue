@@ -72,11 +72,7 @@
           :zone-id="zoneId"
         />
       </div>
-      <cms-intersection-observer
-        v-if="isScrolling"
-        :options="{ rootMargin: '5%' }"
-        @intersect="next"
-      />
+      <cms-intersection-observer v-if="isScrolling" @enter="startPaging" @leave="stopPaging" />
       <slot v-if="cursorLoading" name="cursor" />
       <cms-content
         v-if="zoneFooter"
@@ -90,7 +86,6 @@
 
 <script lang="ts">
 import isEqual from 'lodash/isEqual';
-import throttle from 'lodash/throttle';
 import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
 
 import { CMSZoneResponse, Content } from '../api';
@@ -211,31 +206,33 @@ export default class CmsZone extends Vue {
 
   nonce: number = 0;
   cursorLoading: boolean = false;
-  allContentLoaded: boolean = false;
+  donePaging = false;
 
-  next = throttle(async (observer: IntersectionObserver) => {
-    if (this.cursorLoading) {
-      return [];
+  async startPaging() {
+    if (this.donePaging) {
+      this.donePaging = false;
+      return;
     }
 
-    if (this.allContentLoaded) {
-      return [];
+    if (this.cursorLoading) {
+      return;
     }
 
     this.cursorLoading = true;
     try {
-      const results = await this.getNextPage();
-
-      await Vue.nextTick();
-      if (!results.length) {
-        this.allContentLoaded = true;
-      } else if (!observer.takeRecords().length) {
-        this.next(observer);
-      }
+      await this.getNextPage();
     } finally {
       this.cursorLoading = false;
     }
-  }, 400);
+
+    if (!this.allContentLoaded) {
+      this.startPaging();
+    }
+  }
+
+  stopPaging() {
+    this.donePaging = true;
+  }
 
   get id() {
     return `cms-zone-${this.zoneId}`;
@@ -243,6 +240,10 @@ export default class CmsZone extends Vue {
 
   get contentId() {
     return (index: number) => `cms-zone-content-${this.zoneId}-${index}`;
+  }
+
+  get allContentLoaded(): boolean {
+    return this.lastResponse?.content?.length === 0;
   }
 
   get zoneType(): string {
@@ -315,9 +316,10 @@ export default class CmsZone extends Vue {
   }
 
   async refresh(): Promise<void> {
-    this.allContentLoaded = false;
+    this.donePaging = false;
     this.cursorLoading = false;
     this.lastResponse = null;
+    this.contents = [];
 
     if (!pluginOptions.checkConnection()) {
       this.zoneStatus = 'offline';
@@ -395,9 +397,13 @@ export default class CmsZone extends Vue {
     }
   }
 
-  async getNextPage(): Promise<Content[]> {
+  async getNextPage(): Promise<void> {
     if (!pluginOptions.checkConnection()) {
-      return [];
+      return;
+    }
+
+    if (this.allContentLoaded) {
+      return;
     }
 
     const zoneId = this.zoneId;
@@ -412,15 +418,13 @@ export default class CmsZone extends Vue {
     }
 
     if (zoneId !== this.zoneId) {
-      return [];
+      return;
     }
 
     this.lastResponse = response.data;
     this.contents.push(...this.lastResponse.content);
-
     await Vue.nextTick();
     this.setupTracking(this.lastResponse.content);
-    return this.lastResponse.content;
   }
 
   get isInspectOverlayEnabled(): boolean {
