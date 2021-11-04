@@ -74,7 +74,7 @@
       </div>
       <cms-intersection-observer
         v-if="isScrolling"
-        :options="{ rootMargin: '25%' }"
+        :options="{ rootMargin: '5%' }"
         @intersect="next"
       />
       <slot v-if="cursorLoading" name="cursor" />
@@ -253,13 +253,13 @@ export default class CmsZone extends Vue {
   }
 
   get zoneHeader(): string {
-    return this.lastResponse
+    return this.lastResponse?.zone_header
       ? `<div class="zone-header">${this.lastResponse.zone_header}</div>`
       : '';
   }
 
   get zoneFooter(): string {
-    return this.lastResponse
+    return this.lastResponse?.zone_footer
       ? `<div class="zone-footer">${this.lastResponse.zone_footer}</div>`
       : '';
   }
