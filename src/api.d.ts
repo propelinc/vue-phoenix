@@ -21,9 +21,12 @@ export interface Content extends HTMLContent {
   };
 }
 
-export interface CMSZoneResponse {
+export interface CMSResponse {
+  captable?: Captable;
+}
+
+export interface CMSZoneResponse extends CMSResponse {
   content: Content[];
-  captable: Captable;
   zone_type: string;
   zone_header: string | null;
   zone_footer: string | null;
