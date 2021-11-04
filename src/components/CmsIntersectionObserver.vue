@@ -5,8 +5,8 @@
 <script lang="ts">
 import { Vue, Component, Prop } from 'vue-property-decorator';
 
-@Component({ name: 'cms-observer' })
-export default class CmsObserver extends Vue {
+@Component({ name: 'cms-intersection-observer' })
+export default class CmsIntersectionObserver extends Vue {
   @Prop({ type: Object, default: () => {} }) options!: object;
 
   observer: IntersectionObserver | null = null;

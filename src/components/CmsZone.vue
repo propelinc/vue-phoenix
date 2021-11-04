@@ -72,7 +72,11 @@
           :zone-id="zoneId"
         />
       </div>
-      <cms-observer v-if="isScrolling" :options="{ rootMargin: '25%' }" @intersect="next" />
+      <cms-intersection-observer
+        v-if="isScrolling"
+        :options="{ rootMargin: '25%' }"
+        @intersect="next"
+      />
       <slot v-if="cursorLoading" name="cursor" />
       <cms-content
         v-if="zoneFooter"
@@ -96,7 +100,7 @@ import { pluginOptions } from '../plugins/cms';
 import CmsCarousel from './CmsCarousel.vue';
 import CmsContent from './CmsContent';
 import CmsInspectSheet from './CmsInspectSheet.vue';
-import CmsObserver from './CmsObserver.vue';
+import CmsIntersectionObserver from './CmsIntersectionObserver.vue';
 
 class ZoneObserverManager {
   static instance: ZoneObserverManager;
@@ -192,7 +196,7 @@ class ZoneObserverManager {
 
 @Component({
   name: 'cms-zone',
-  components: { CmsCarousel, CmsContent, CmsInspectSheet, CmsObserver },
+  components: { CmsCarousel, CmsContent, CmsInspectSheet, CmsIntersectionObserver },
 })
 export default class CmsZone extends Vue {
   @Prop(String) zoneId!: string;
