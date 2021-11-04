@@ -122,6 +122,9 @@ class CmsClient {
     return this.http({
       zoneId,
       url: `/cms/zone/${zoneId}/categories`,
+      params: {
+        ...pluginOptions.getSiteVars(),
+      },
     });
   }
 }
