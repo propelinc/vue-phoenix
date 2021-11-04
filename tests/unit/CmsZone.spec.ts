@@ -153,7 +153,6 @@ describe('CmsZone.vue', (): void => {
       await response;
       await localVue.nextTick();
       await localVue.nextTick();
-      await localVue.nextTick();
 
       jest.runOnlyPendingTimers();
       expect(cmsClient.trackZone).toHaveBeenCalled();
@@ -187,7 +186,7 @@ describe('CmsZone.vue', (): void => {
       await response;
       await localVue.nextTick();
       await localVue.nextTick();
-      await localVue.nextTick();
+
       expect(cmsClient.trackZone).not.toHaveBeenCalled();
       expect(wrapper.find('.cms-zone-contents-5-0')).toBeTruthy();
       expect(wrapper.text()).toMatch('Some header');

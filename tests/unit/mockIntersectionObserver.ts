@@ -32,6 +32,10 @@ export default class MockIntersectionObserver {
     this.observed = [];
   }
 
+  takeRecords() {
+    return [];
+  }
+
   observe(el: Element) {
     this.observed.push(el);
     this.callback([{ target: el, intersectionRatio: 1, isIntersecting: true }], this);
