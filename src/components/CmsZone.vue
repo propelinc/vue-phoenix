@@ -249,19 +249,19 @@ export default class CmsZone extends Vue {
   }
 
   get zoneHeader(): string {
-    return this.lastResponse && this.lastResponse.zone_header
+    return this.lastResponse
       ? `<div class="zone-header">${this.lastResponse.zone_header}</div>`
       : '';
   }
 
   get zoneFooter(): string {
-    return this.lastResponse && this.lastResponse.zone_footer
+    return this.lastResponse
       ? `<div class="zone-footer">${this.lastResponse.zone_footer}</div>`
       : '';
   }
 
   get cursor(): string {
-    return this.lastResponse && this.lastResponse.cursor ? this.lastResponse.cursor : '';
+    return this.lastResponse?.cursor || '';
   }
 
   get isScrolling() {
