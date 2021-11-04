@@ -301,7 +301,6 @@ export default class CmsZone extends Vue {
 
   @Watch('zoneId')
   onZoneIdChanged(): void {
-    this.lastResponse = null;
     this.refresh();
   }
 
@@ -318,6 +317,7 @@ export default class CmsZone extends Vue {
   async refresh(): Promise<void> {
     this.allContentLoaded = false;
     this.cursorLoading = false;
+    this.lastResponse = null;
 
     if (!pluginOptions.checkConnection()) {
       this.zoneStatus = 'offline';
