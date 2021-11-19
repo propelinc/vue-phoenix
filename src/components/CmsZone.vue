@@ -206,30 +206,30 @@ export default class CmsZone extends Vue {
 
   nonce: number = 0;
   cursorLoading: boolean = false;
-  donePaging = false;
+  haltPaging: boolean = false;
 
   async startPaging() {
-    if (this.cursorLoading) {
-      return;
+    if (!this.cursorLoading) {
+      this.fetchPages();
     }
-    this.donePaging = false;
-    this.fetchPages();
   }
 
   async fetchPages() {
-    while (!this.donePaging && !this.allContentLoaded) {
-      this.cursorLoading = true;
-      try {
+    this.cursorLoading = true;
+
+    try {
+      while (!this.haltPaging && !this.allContentLoaded) {
         await this.getNextPage();
         await Vue.nextTick();
-      } finally {
-        this.cursorLoading = false;
       }
+    } finally {
+      this.cursorLoading = false;
+      this.haltPaging = false;
     }
   }
 
   stopPaging() {
-    this.donePaging = true;
+    this.haltPaging = true;
   }
 
   get id() {
