@@ -314,7 +314,7 @@ export default class CmsZone extends Vue {
   }
 
   async refresh(): Promise<void> {
-    this.donePaging = false;
+    this.haltPaging = false;
     this.cursorLoading = false;
     this.lastResponse = null;
     this.contents = [];
