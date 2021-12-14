@@ -1,5 +1,5 @@
 <template>
-  <div :id="id" :class="{ 'cms-zone--inspect': isInspectOverlayEnabled }">
+  <div :id="id" :class="cssClasses">
     <button
       v-if="isInspectOverlayEnabled"
       class="cms-zone__zone-label"
@@ -244,6 +244,15 @@ export default class CmsZone extends Vue {
     return `cms-zone-${this.zoneId}`;
   }
 
+  get cssClasses() {
+    return {
+      'cms-zone--inspect': this.isInspectOverlayEnabled,
+      'cms-zone-offline': this.zoneStatus === 'offline',
+      'cms-zone-error': this.zoneStatus === 'error',
+      'cms-zone-loading': this.zoneStatus === 'loading',
+    };
+  }
+
   get contentId() {
     return (index: number) => `cms-zone-content-${this.zoneId}-${index}`;
   }
@@ -329,18 +338,11 @@ export default class CmsZone extends Vue {
 
     if (!pluginOptions.checkConnection()) {
       this.zoneStatus = 'offline';
-      this.$el.classList.add('cms-zone-offline');
-      this.$el.classList.remove('cms-zone-error');
-      this.$el.classList.remove('cms-zone-loading');
       this.contents = [];
       return;
     }
 
     this.zoneStatus = 'loading';
-    this.$el.classList.add('cms-zone-loading');
-    this.$el.classList.remove('cms-zone-error');
-    this.$el.classList.remove('cms-zone-offline');
-
     this.zoneObserverManager.disconnect(this);
     await Vue.nextTick();
     this.zoneObserverManager.setupFetching(this);
@@ -352,15 +354,12 @@ export default class CmsZone extends Vue {
 
     try {
       await this.getNextPage();
-      this.$el.classList.remove('cms-zone-loading');
       this.zoneStatus = null;
     } catch (error) {
       this.zoneStatus = 'error';
-      this.$el.classList.add('cms-zone-error');
       this.contents = [];
       return;
     } finally {
-      this.$el.classList.remove('cms-zone-loading');
       // Circumvent issue where carousel breaks by forcing it to re-render
       this.nonce++;
       this.zoneObserverManager.disconnect(this);
