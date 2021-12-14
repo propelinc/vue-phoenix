@@ -72,7 +72,12 @@
           :zone-id="zoneId"
         />
       </div>
-      <cms-intersection-observer v-if="isScrolling" @enter="startPaging" @leave="stopPaging" />
+      <cms-intersection-observer
+        v-if="isScrolling"
+        :options="intersectionOptions"
+        @enter="startPaging"
+        @leave="stopPaging"
+      />
       <slot v-if="cursorLoading" name="cursor" />
       <cms-content
         v-if="zoneFooter"
@@ -197,6 +202,7 @@ export default class CmsZone extends Vue {
   @Prop(String) zoneId!: string;
   @Prop(Object) extra!: {};
   @Prop(Object) context!: {};
+  @Prop(Object) intersectionOptions!: {};
 
   zoneStatus: string | null = null;
   lastResponse: CMSZoneResponse | null = null;
@@ -229,7 +235,9 @@ export default class CmsZone extends Vue {
   }
 
   stopPaging() {
-    this.haltPaging = true;
+    if (this.cursorLoading) {
+      this.haltPaging = true;
+    }
   }
 
   get id() {
