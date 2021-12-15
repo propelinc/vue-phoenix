@@ -74,7 +74,7 @@
       </div>
       <cms-intersection-observer
         v-if="isScrolling"
-        :options="intersectionOptions"
+        :options="{ rootMargin: pluginOptions.lazyLoadRootMargin }"
         @enter="startPaging"
         @leave="stopPaging"
       />
@@ -202,8 +202,8 @@ export default class CmsZone extends Vue {
   @Prop(String) zoneId!: string;
   @Prop(Object) extra!: {};
   @Prop(Object) context!: {};
-  @Prop(Object) intersectionOptions!: {};
 
+  pluginOptions = pluginOptions;
   zoneStatus: string | null = null;
   lastResponse: CMSZoneResponse | null = null;
   contents: Content[] = [];
@@ -226,7 +226,6 @@ export default class CmsZone extends Vue {
     try {
       while (!this.haltPaging && !this.allContentLoaded) {
         await this.getNextPage();
-        await Vue.nextTick();
       }
     } finally {
       this.cursorLoading = false;
