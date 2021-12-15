@@ -1,9 +1,5 @@
 <template>
-  <div
-    :id="id"
-    v-infinite-scroll="{ action: next, enabled: isScrolling }"
-    :class="{ 'scrollable-content': isScrolling, 'cms-zone--inspect': isInspectOverlayEnabled }"
-  >
+  <div :id="id" :class="cssClasses">
     <button
       v-if="isInspectOverlayEnabled"
       class="cms-zone__zone-label"
@@ -76,6 +72,12 @@
           :zone-id="zoneId"
         />
       </div>
+      <cms-intersection-observer
+        v-if="isScrolling"
+        :options="{ rootMargin: pluginOptions.lazyLoadRootMargin }"
+        @enter="startPaging"
+        @leave="stopPaging"
+      />
       <slot v-if="cursorLoading" name="cursor" />
       <cms-content
         v-if="zoneFooter"
@@ -88,17 +90,17 @@
 </template>
 
 <script lang="ts">
-import debounce from 'lodash/debounce';
 import isEqual from 'lodash/isEqual';
 import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
 
-import { Content } from '../api';
+import { CMSZoneResponse, Content } from '../api';
 import cmsClient from '../cmsHttp';
 import { pluginOptions } from '../plugins/cms';
 
 import CmsCarousel from './CmsCarousel.vue';
 import CmsContent from './CmsContent';
 import CmsInspectSheet from './CmsInspectSheet.vue';
+import CmsIntersectionObserver from './CmsIntersectionObserver.vue';
 
 class ZoneObserverManager {
   static instance: ZoneObserverManager;
@@ -194,34 +196,91 @@ class ZoneObserverManager {
 
 @Component({
   name: 'cms-zone',
-  components: { CmsCarousel, CmsContent, CmsInspectSheet },
+  components: { CmsCarousel, CmsContent, CmsInspectSheet, CmsIntersectionObserver },
 })
 export default class CmsZone extends Vue {
   @Prop(String) zoneId!: string;
   @Prop(Object) extra!: {};
   @Prop(Object) context!: {};
 
+  pluginOptions = pluginOptions;
   zoneStatus: string | null = null;
-  zoneType: string = '';
-  zoneHeader: string = '';
-  zoneFooter: string = '';
+  lastResponse: CMSZoneResponse | null = null;
   contents: Content[] = [];
-  cursor: string = '';
-  scrollable: Element | null = null;
+  observed: Element[] = [];
+  shouldShowInspectModal = false;
 
   nonce: number = 0;
   cursorLoading: boolean = false;
-  next = debounce(() => this.getNextPage(), 400);
-  observed: Element[] = [];
+  haltPaging: boolean = false;
 
-  shouldShowInspectModal = false;
+  async startPaging() {
+    if (!this.cursorLoading) {
+      this.fetchPages();
+    }
+  }
+
+  async fetchPages() {
+    this.cursorLoading = true;
+
+    try {
+      while (!this.haltPaging && !this.allContentLoaded) {
+        await this.getNextPage();
+      }
+    } finally {
+      this.cursorLoading = false;
+      this.haltPaging = false;
+    }
+  }
+
+  stopPaging() {
+    if (this.cursorLoading) {
+      this.haltPaging = true;
+    }
+  }
 
   get id() {
     return `cms-zone-${this.zoneId}`;
   }
 
+  get cssClasses() {
+    return {
+      'cms-zone--inspect': this.isInspectOverlayEnabled,
+      'cms-zone-offline': this.zoneStatus === 'offline',
+      'cms-zone-error': this.zoneStatus === 'error',
+      'cms-zone-loading': this.zoneStatus === 'loading',
+    };
+  }
+
   get contentId() {
     return (index: number) => `cms-zone-content-${this.zoneId}-${index}`;
+  }
+
+  get allContentLoaded(): boolean {
+    return this.lastResponse?.content?.length === 0;
+  }
+
+  get zoneType(): string {
+    if (!this.lastResponse || this.zoneStatus === 'error') {
+      return '';
+    }
+    return this.lastResponse.zone_type;
+  }
+
+  get zoneHeader(): string {
+    return this.lastResponse?.zone_header
+      ? `<div class="zone-header">${this.lastResponse.zone_header}</div>`
+      : '';
+  }
+
+  get zoneFooter(): string {
+    return this.lastResponse?.zone_footer
+      ? `<div class="zone-footer">${this.lastResponse.zone_footer}</div>`
+      : '';
+  }
+
+  get cursor(): string {
+    return this.lastResponse?.cursor || '';
   }
 
   get isScrolling() {
@@ -271,20 +330,18 @@ export default class CmsZone extends Vue {
   }
 
   async refresh(): Promise<void> {
+    this.haltPaging = false;
+    this.cursorLoading = false;
+    this.lastResponse = null;
+    this.contents = [];
+
     if (!pluginOptions.checkConnection()) {
       this.zoneStatus = 'offline';
-      this.$el.classList.add('cms-zone-offline');
-      this.$el.classList.remove('cms-zone-error');
-      this.$el.classList.remove('cms-zone-loading');
       this.contents = [];
       return;
     }
 
     this.zoneStatus = 'loading';
-    this.$el.classList.add('cms-zone-loading');
-    this.$el.classList.remove('cms-zone-error');
-    this.$el.classList.remove('cms-zone-offline');
-
     this.zoneObserverManager.disconnect(this);
     await Vue.nextTick();
     this.zoneObserverManager.setupFetching(this);
@@ -294,40 +351,18 @@ export default class CmsZone extends Vue {
     // Increment nonce on every request to prevent vue from re-using cms-content components.
     this.nonce++;
 
-    let response;
     try {
-      response = await cmsClient.fetchZone({ zoneId: this.zoneId, extra: this.extra });
-      this.$el.classList.remove('cms-zone-loading');
-      if (!response.data || !response.data.content) {
-        throw new Error('No data');
-      }
+      await this.getNextPage();
+      this.zoneStatus = null;
     } catch (error) {
       this.zoneStatus = 'error';
-      this.$el.classList.remove('cms-zone-loading');
-      this.$el.classList.add('cms-zone-error');
-      this.zoneType = '';
       this.contents = [];
       return;
+    } finally {
+      // Circumvent issue where carousel breaks by forcing it to re-render
+      this.nonce++;
+      this.zoneObserverManager.disconnect(this);
     }
-    const data = response.data;
-    this.zoneType = data.zone_type;
-    this.contents = data.content as Content[];
-    this.cursor = data.cursor;
-    this.zoneHeader = data.zone_header
-      ? `<div class="zone-header">${data.zone_header || ''}</div>`
-      : '';
-    this.zoneFooter = data.zone_footer
-      ? `<div class="zone-footer">${data.zone_footer || ''}</div>`
-      : '';
-    this.zoneStatus = null;
-
-    // Circumvent issue where carousel breaks by forcing it to re-render
-    this.nonce++;
-
-    await Vue.nextTick();
-
-    this.zoneObserverManager.disconnect(this);
-    this.setupTracking(this.contents);
   }
 
   setupTracking(contents: Content[]): void {
@@ -366,34 +401,34 @@ export default class CmsZone extends Vue {
     }
   }
 
-  async getNextPage() {
+  async getNextPage(): Promise<void> {
     if (!pluginOptions.checkConnection()) {
       return;
     }
 
-    if (this.cursorLoading) {
+    if (this.allContentLoaded) {
       return;
     }
 
-    this.cursorLoading = true;
+    const zoneId = this.zoneId;
+    const response = await cmsClient.fetchZone({
+      zoneId: zoneId,
+      extra: this.extra,
+      cursor: this.cursor,
+    });
 
-    let response;
-    try {
-      response = await cmsClient.fetchZone({
-        zoneId: this.zoneId,
-        extra: this.extra,
-        cursor: this.cursor,
-      });
-      if (!response.data || !response.data.content) {
-        throw new Error('No data');
-      }
-      this.cursor = response.data.cursor;
-      const newContents = response.data.content as Content[];
-      this.contents.push(...newContents);
-      this.setupTracking(newContents);
-    } finally {
-      this.cursorLoading = false;
+    if (!response.data || !response.data.content) {
+      throw new Error('No data');
     }
+
+    if (zoneId !== this.zoneId) {
+      return;
+    }
+
+    this.lastResponse = response.data;
+    this.contents.push(...this.lastResponse.content);
+    await Vue.nextTick();
+    this.setupTracking(this.lastResponse.content);
   }
 
   get isInspectOverlayEnabled(): boolean {
@@ -410,29 +445,6 @@ export default class CmsZone extends Vue {
   }
 }
 </script>
-
-<style>
-.scrollable {
-  display: flex;
-  flex-direction: column;
-  position: relative;
-  height: 100%;
-}
-
-.scrollable-header {
-  flex: 0 0 auto;
-  position: static;
-}
-
-.scrollable-content {
-  height: 100%;
-  width: 100%;
-  flex: 1 1 auto;
-  position: relative; /* need this to position inner content */
-  overflow-y: auto;
-  -webkit-overflow-scrolling: touch;
-}
-</style>
 
 <style lang="less" scoped>
 .zone-inspect-overlay(@color-light, @color-dark) {

@@ -1,6 +1,6 @@
 import Axios, { AxiosInstance, AxiosResponse } from 'axios';
 
-import { Content, CmsStyleSheet } from './api';
+import { Content, CmsStyleSheet, CMSZoneResponse, CMSResponse } from './api';
 import { pluginOptions } from './plugins/cms';
 
 class CmsClient {
@@ -22,11 +22,19 @@ class CmsClient {
     return this._axios;
   }
 
-  async http({ zoneId, url, params }: { zoneId: string; url: string; params?: object }) {
+  async http<T extends CMSResponse>({
+    zoneId,
+    url,
+    params,
+  }: {
+    zoneId: string;
+    url: string;
+    params?: object;
+  }) {
     const captable = pluginOptions.getCaptable();
     const zoneCaptable = captable[zoneId];
     const headers = zoneCaptable ? { Captable: zoneCaptable } : {};
-    const response = await this.axios.get(url, { params, headers });
+    const response = await this.axios.get<T>(url, { params, headers });
     if (response.data && response.data.captable) {
       pluginOptions.setCaptable({ zoneId, captable: response.data.captable });
     }
@@ -91,7 +99,7 @@ class CmsClient {
 
     await this.fetchGlobalStyles();
 
-    return this.http({
+    return this.http<CMSZoneResponse>({
       zoneId,
       url: `/cms/zone/${zoneId}`,
       params: {
@@ -119,13 +127,12 @@ class CmsClient {
   }
 
   async fetchCategories(zoneId: string) {
-    return this.http({
-      zoneId,
-      url: `/cms/zone/${zoneId}/categories`,
-      params: {
-        ...pluginOptions.getSiteVars(),
-      },
-    });
+    const captable = pluginOptions.getCaptable();
+    const zoneCaptable = captable[zoneId];
+    const headers = zoneCaptable ? { Captable: zoneCaptable } : {};
+    const url = `/cms/zone/${zoneId}/categories`;
+    const params = { ...pluginOptions.getSiteVars() };
+    return await this.axios.get<string[]>(url, { headers, params });
   }
 }
 
