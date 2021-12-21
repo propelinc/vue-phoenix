@@ -446,16 +446,16 @@ export default class CmsZone extends Vue {
 }
 </script>
 
-<style lang="less" scoped>
-.zone-inspect-overlay(@color-light, @color-dark) {
-  border: 1px solid @color-dark;
+<style lang="scss" scoped>
+@mixin zone-inspect-overlay($color-light, $color-dark) {
+  border: 1px solid $color-dark;
 
   .cms-zone__zone-label {
-    background: fade(@color-light, 70%);
+    background: fade($color-light, 70%);
   }
 
   .cms-zone-content {
-    border: 1px dashed @color-light;
+    border: 1px dashed $color-light;
 
     &.cms-zone-content--tracked {
       border-style: solid;
@@ -464,14 +464,14 @@ export default class CmsZone extends Vue {
 }
 
 .cms-zone--inspect {
-  .zone-inspect-overlay(#a3b0f9, #5560cb);
+  @include zone-inspect-overlay(#a3b0f9, #5560cb);
 
   & & {
-    .zone-inspect-overlay(#b3f6a2, #51d156);
+    @include zone-inspect-overlay(#b3f6a2, #51d156);
   }
 
   & & & {
-    .zone-inspect-overlay(#fdcab7, #FC8247);
+    @include zone-inspect-overlay(#fdcab7, #fc8247);
   }
 }
 
