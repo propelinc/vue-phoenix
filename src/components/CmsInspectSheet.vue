@@ -124,8 +124,8 @@ export default class CmsInspectSheet extends Vue {
 }
 </script>
 
-<style lang="less" scoped>
-@cms-inspect-sheet-border: 1px solid #d1d3d7;
+<style lang="scss" scoped>
+$cms-inspect-sheet-border: 1px solid #d1d3d7;
 
 .cms-inspect-sheet-scrim {
   position: fixed;
@@ -155,7 +155,7 @@ export default class CmsInspectSheet extends Vue {
 .cms-inspect-sheet__header {
   padding: 8px 16px;
   flex: none;
-  border-bottom: @cms-inspect-sheet-border;
+  border-bottom: $cms-inspect-sheet-border;
 }
 
 .cms-inspect-sheet__header__title {
@@ -173,12 +173,12 @@ export default class CmsInspectSheet extends Vue {
   & + & {
     margin-top: 16px;
     padding-top: 16px;
-    border-top: @cms-inspect-sheet-border;
+    border-top: $cms-inspect-sheet-border;
   }
 }
 
 .cms-inspect-sheet__footer {
-  border-top: @cms-inspect-sheet-border;
+  border-top: $cms-inspect-sheet-border;
   flex: none;
   padding: 8px 16px;
 }
@@ -204,7 +204,7 @@ export default class CmsInspectSheet extends Vue {
   padding: 8px 0;
 
   & + & {
-    border-top: @cms-inspect-sheet-border;
+    border-top: $cms-inspect-sheet-border;
   }
 }
 
