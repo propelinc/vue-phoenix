@@ -99,7 +99,7 @@ export default class CmsInspectSheet extends Vue {
   }
 
   get zoneAdminLink(): string {
-    return `${pluginOptions.baseUrl}/admin/zone/edit/?id=${this.zoneId}`;
+    return `${pluginOptions.adminUrl}/admin/zone/edit/?id=${this.zoneId}`;
   }
 
   get siteVarEntries() {
@@ -115,7 +115,7 @@ export default class CmsInspectSheet extends Vue {
   }
 
   getDeliveryAdminLink(deliveryId: number): string {
-    return `${pluginOptions.baseUrl}/admin/delivery/?flt0_0=${deliveryId}`;
+    return `${pluginOptions.adminUrl}/admin/delivery/?flt0_0=${deliveryId}`;
   }
 
   refreshZone(): void {

@@ -18,6 +18,7 @@ interface DestroyHTMLElement extends HTMLElement {
 
 export interface CmsPluginOptions {
   baseUrl?: string;
+  adminUrl?: string;
   globalCssCacheMs?: number;
   router?: Router;
 
@@ -37,6 +38,7 @@ export interface CmsPluginOptions {
 
 export interface PluginOptions extends CmsPluginOptions {
   baseUrl: string;
+  adminUrl: string;
   checkConnection: () => boolean;
   getCaptable: () => Captable;
   getSiteVars: () => object;
@@ -48,6 +50,7 @@ export interface PluginOptions extends CmsPluginOptions {
 
 export const pluginOptions: PluginOptions = {
   baseUrl: '.',
+  adminUrl: '.',
   globalCssCacheMs: 2 * 60 * 1000,
   checkConnection() {
     return navigator.onLine;
