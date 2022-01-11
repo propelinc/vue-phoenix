@@ -12,7 +12,7 @@
     "axios": ">= 0.18.0",
     "jquery": "^3.3.1",
     "lodash": "^4.17.11",
-    "planout": "git://github.com/rawls238/Planout.js.git#97807c149d01031b972d9c3df7fb93558a166120",
+    "planout": "git+https://github.com/rawls238/Planout.js.git#97807c149d01031b972d9c3df7fb93558a166120",
     "vue": "^2.6.8",
     "vue-template-compiler": "^2.6.8",
     "vue-slick": "^1.1.15"
