@@ -209,6 +209,7 @@ export default class CmsZone extends Vue {
   contents: Content[] = [];
   observed: Element[] = [];
   shouldShowInspectModal = false;
+  refreshing = false;
 
   nonce: number = 0;
   cursorLoading: boolean = false;
@@ -333,7 +334,8 @@ export default class CmsZone extends Vue {
     this.haltPaging = false;
     this.cursorLoading = false;
     this.lastResponse = null;
-    this.contents = [];
+    this.refreshing = true;
+    // this.contents = [];
 
     if (!pluginOptions.checkConnection()) {
       this.zoneStatus = 'offline';
@@ -426,7 +428,13 @@ export default class CmsZone extends Vue {
     }
 
     this.lastResponse = response.data;
-    this.contents.push(...this.lastResponse.content);
+    if(this.refreshing){
+      this.contents = this.lastResponse.content;
+      this.refreshing = false;
+    }
+    else{
+      this.contents.push(...this.lastResponse.content);
+    }
     await Vue.nextTick();
     this.setupTracking(this.lastResponse.content);
   }
