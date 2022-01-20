@@ -335,7 +335,6 @@ export default class CmsZone extends Vue {
     this.cursorLoading = false;
     this.lastResponse = null;
     this.refreshing = true;
-    // this.contents = [];
 
     if (!pluginOptions.checkConnection()) {
       this.zoneStatus = 'offline';
