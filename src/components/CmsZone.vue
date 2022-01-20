@@ -427,11 +427,11 @@ export default class CmsZone extends Vue {
     }
 
     this.lastResponse = response.data;
-    if(this.refreshing){
+    if (this.refreshing) {
       this.contents = this.lastResponse.content;
       this.refreshing = false;
     }
-    else{
+    else {
       this.contents.push(...this.lastResponse.content);
     }
     await Vue.nextTick();
