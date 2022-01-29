@@ -362,7 +362,9 @@ export default class CmsZone extends Vue {
     } finally {
       // Circumvent issue where carousel breaks by forcing it to re-render
       this.nonce++;
+      await Vue.nextTick();
       this.zoneObserverManager.disconnect(this);
+      this.setupTracking(this.contents);
     }
   }
 
@@ -425,13 +427,11 @@ export default class CmsZone extends Vue {
     if (zoneId !== this.zoneId) {
       return;
     }
-
     this.lastResponse = response.data;
     if (this.refreshing) {
       this.contents = this.lastResponse.content;
       this.refreshing = false;
-    }
-    else {
+    } else {
       this.contents.push(...this.lastResponse.content);
     }
     await Vue.nextTick();
