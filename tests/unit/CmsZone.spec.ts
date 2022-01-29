@@ -153,6 +153,7 @@ describe('CmsZone.vue', (): void => {
       await response;
       await localVue.nextTick();
       await localVue.nextTick();
+      await localVue.nextTick();
 
       jest.runOnlyPendingTimers();
       expect(cmsClient.trackZone).toHaveBeenCalled();
@@ -184,6 +185,7 @@ describe('CmsZone.vue', (): void => {
       );
       const wrapper = mount(component, { localVue });
       await response;
+      await localVue.nextTick();
       await localVue.nextTick();
       await localVue.nextTick();
 
@@ -218,6 +220,7 @@ describe('CmsZone.vue', (): void => {
       );
 
       await response;
+      await localVue.nextTick();
       await localVue.nextTick();
       await localVue.nextTick();
       jest.runOnlyPendingTimers();
@@ -255,6 +258,7 @@ describe('CmsZone.vue', (): void => {
 
       const wrapper = mount(component, { localVue });
       await response;
+      await localVue.nextTick();
       await localVue.nextTick();
       await localVue.nextTick();
       jest.runOnlyPendingTimers();

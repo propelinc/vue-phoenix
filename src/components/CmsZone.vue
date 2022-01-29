@@ -226,7 +226,17 @@ export default class CmsZone extends Vue {
 
     try {
       while (!this.haltPaging && !this.allContentLoaded) {
-        await this.getNextPage();
+        const newContents = await this.getNextPage();
+
+        // Wait for vue to insert new elements into the DOM.
+        await Vue.nextTick();
+        const offset = this.contents.length - newContents.length;
+        this.setupTracking(newContents, offset);
+
+        // Wait an additional 100ms before fetching again. This will allow
+        // some time for the observed element to be pushed off screen and
+        // for the intersection observer to fire.
+        await new Promise((resolve) => setTimeout(resolve, 100));
       }
     } finally {
       this.cursorLoading = false;
@@ -349,32 +359,34 @@ export default class CmsZone extends Vue {
   }
 
   async fetchZone(): Promise<void> {
-    // Increment nonce on every request to prevent vue from re-using cms-content components.
-    this.nonce++;
-
     try {
       await this.getNextPage();
       this.zoneStatus = null;
-    } catch (error) {
-      this.zoneStatus = 'error';
-      this.contents = [];
-      return;
-    } finally {
+
+      // Incrementing the nonce causes all elements to be recreated which
+      // will break DOM references in the intersection observer.
+      this.zoneObserverManager.disconnect(this);
       // Circumvent issue where carousel breaks by forcing it to re-render
       this.nonce++;
+      // Wait for vue to re-create all content elements.
       await Vue.nextTick();
-      this.zoneObserverManager.disconnect(this);
+      // Setup tracking for the newly created DOM elements.
       this.setupTracking(this.contents);
+    } catch (error) {
+      this.zoneObserverManager.disconnect(this);
+      this.zoneStatus = 'error';
+      this.contents = [];
     }
   }
 
-  setupTracking(contents: Content[]): void {
+  setupTracking(contents: Content[], indexOffset = 0): void {
     contents.forEach((content, i) => {
       const trackOn = (content.extra || {}).track_on;
       if (trackOn) {
         this.setupDeferredTracking(content, trackOn);
       } else {
-        const el = (this.$refs.contents[i] as Vue).$el as Element;
+        const index = i + indexOffset;
+        const el = (this.$refs.contents[index] as Vue).$el as Element;
         this.zoneObserverManager.setupTracking(this, content, el);
       }
     });
@@ -404,13 +416,13 @@ export default class CmsZone extends Vue {
     }
   }
 
-  async getNextPage(): Promise<void> {
+  async getNextPage(): Promise<Content[]> {
     if (!pluginOptions.checkConnection()) {
-      return;
+      return [];
     }
 
     if (this.allContentLoaded) {
-      return;
+      return [];
     }
 
     const zoneId = this.zoneId;
@@ -425,7 +437,7 @@ export default class CmsZone extends Vue {
     }
 
     if (zoneId !== this.zoneId) {
-      return;
+      return [];
     }
     this.lastResponse = response.data;
     if (this.refreshing) {
@@ -434,8 +446,8 @@ export default class CmsZone extends Vue {
     } else {
       this.contents.push(...this.lastResponse.content);
     }
-    await Vue.nextTick();
-    this.setupTracking(this.lastResponse.content);
+
+    return this.lastResponse.content;
   }
 
   get isInspectOverlayEnabled(): boolean {
