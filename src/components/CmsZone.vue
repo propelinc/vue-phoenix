@@ -209,7 +209,6 @@ export default class CmsZone extends Vue {
   contents: Content[] = [];
   observed: Element[] = [];
   shouldShowInspectModal = false;
-  refreshing = false;
 
   nonce: number = 0;
   cursorLoading: boolean = false;
@@ -227,6 +226,7 @@ export default class CmsZone extends Vue {
     try {
       while (!this.haltPaging && !this.allContentLoaded) {
         const newContents = await this.getNextPage();
+        this.contents.push(...newContents);
 
         // Wait for vue to insert new elements into the DOM.
         await Vue.nextTick();
@@ -344,7 +344,6 @@ export default class CmsZone extends Vue {
     this.haltPaging = false;
     this.cursorLoading = false;
     this.lastResponse = null;
-    this.refreshing = true;
 
     if (!pluginOptions.checkConnection()) {
       this.zoneStatus = 'offline';
@@ -360,7 +359,7 @@ export default class CmsZone extends Vue {
 
   async fetchZone(): Promise<void> {
     try {
-      await this.getNextPage();
+      this.contents = await this.getNextPage();
       this.zoneStatus = null;
 
       // Incrementing the nonce causes all elements to be recreated which
@@ -440,13 +439,6 @@ export default class CmsZone extends Vue {
       return [];
     }
     this.lastResponse = response.data;
-    if (this.refreshing) {
-      this.contents = this.lastResponse.content;
-      this.refreshing = false;
-    } else {
-      this.contents.push(...this.lastResponse.content);
-    }
-
     return this.lastResponse.content;
   }
 
