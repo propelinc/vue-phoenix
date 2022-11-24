@@ -76,7 +76,10 @@ export default class CmsContent extends Vue {
       },
       ...compiled,
     };
-
+    
+    // CMS HTML templates are inserted into the Vue component CmsDynamicContent here
+    // CmsContent's extra prop becomes CmsDynamicContent's context prop
+    // Vue code inside CMS HTML templates has access to this context prop
     return h(dynamic, {
       attrs: this.cssManager.scopeAttrs,
       props: { context: this.mutableContext, zoneId: this.zoneId },
